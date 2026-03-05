@@ -92,6 +92,69 @@
         }
     }
     loadData();
+async function napMonMoi() {
+    const danhSachCuaBan = [
+        [cite_start]{ ten_mon: "Bánh mì chay thập cẩm (Mixed Vegan Bread)", gia_tien: 30000, hinh_anh: "", cong_thuc: "" }, // [cite: 4]
+        [cite_start]{ ten_mon: "Khoai tây chiên (French fries)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 5]
+        [cite_start]{ ten_mon: "Chả giò chay (Fried spring rolls)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 6]
+        [cite_start]{ ten_mon: "Hoành thánh chay chiên (Fried wonton)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 7]
+        [cite_start]{ ten_mon: "Salad dầu giấm (Vinaigrette salad)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 8]
+        [cite_start]{ ten_mon: "Mì Ý Chay (Vegan spaghetti)", gia_tien: 60000, hinh_anh: "", cong_thuc: "" }, // [cite: 9]
+        [cite_start]{ ten_mon: "Bún xào nghệ chay (Fried tumeric vermicelli & vegies)", gia_tien: 60000, hinh_anh: "", cong_thuc: "" }, // [cite: 10]
+        [cite_start]{ ten_mon: "Bún đậu chay (Vegan bun dau)", gia_tien: 60000, hinh_anh: "", cong_thuc: "" }, // [cite: 11]
+        [cite_start]{ ten_mon: "Mì xào chay (Vegan Fried Noodle & Veggies)", gia_tien: 60000, hinh_anh: "", cong_thuc: "" }, // [cite: 12]
+        [cite_start]{ ten_mon: "Pad Thái chay (Vegan Pad Thai)", gia_tien: 70000, hinh_anh: "", cong_thuc: "" }, // [cite: 13]
+        [cite_start]{ ten_mon: "Cơm chiên chay (Fried rice & veggies)", gia_tien: 70000, hinh_anh: "", cong_thuc: "" }, // [cite: 14]
+        [cite_start]{ ten_mon: "Cà ri chay & bánh mì/cơm/bún (Curry & bread/rice/vermicelli)", gia_tien: 60000, hinh_anh: "", cong_thuc: "" }, // [cite: 15]
+        [cite_start]{ ten_mon: "Xíu mại chay & bánh mì/cơm/bún (Vegan shumai bread/rice/vermicelli)", gia_tien: 60000, hinh_anh: "", cong_thuc: "" }, // [cite: 17]
+        [cite_start]{ ten_mon: "Cơm đậu hũ sả ớt (Rice & lemongrass chili tofu)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 18]
+        [cite_start]{ ten_mon: "Cơm lứt đậu hũ sả ớt (Brown rice & lemongrass chili tofu)", gia_tien: 45000, hinh_anh: "", cong_thuc: "" }, // [cite: 19]
+        [cite_start]{ ten_mon: "Cơm cà tím kho đậu hũ (Rice & braised eggplant & tofu)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 20, 21]
+        [cite_start]{ ten_mon: "Cơm cà tím kho gừng (Rice & braised eggplant & ginger)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 21]
+        [cite_start]{ ten_mon: "Cơm lứt cà tím kho gừng (Brown rice & braised eggplant & ginger)", gia_tien: 45000, hinh_anh: "", cong_thuc: "" }, // [cite: 22]
+        [cite_start]{ ten_mon: "Cơm lứt cà tím kho đậu hũ (Brown rice & braised eggplant & tofu)", gia_tien: 45000, hinh_anh: "", cong_thuc: "" }, // [cite: 23]
+        [cite_start]{ ten_mon: "Phở chay (Vegan Pho)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 24]
+        [cite_start]{ ten_mon: "Bún riêu chay (Tomato Vermicelli Soup)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 25]
+        [cite_start]{ ten_mon: "Bún Huế chay (Hue Noodle Soup)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 26]
+        [cite_start]{ ten_mon: "Bún cay Tứ Xuyên (Sichuan Vermicelli soup)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 27]
+        [cite_start]{ ten_mon: "Mì thịt xá xíu chay (Noodle soup with vegan char siu meat)", gia_tien: 50000, hinh_anh: "", cong_thuc: "" }, // [cite: 28]
+        [cite_start]{ ten_mon: "Mì tiềm chay (Chinese noodle soup)", gia_tien: 50000, hinh_anh: "", cong_thuc: "" }, // [cite: 30]
+        [cite_start]{ ten_mon: "Mì hoành thánh chay (Wonton noodle soup)", gia_tien: 50000, hinh_anh: "", cong_thuc: "" }, // [cite: 31]
+        [cite_start]{ ten_mon: "Đậu hũ mềm sốt Tứ Xuyên (Sichuan Soft Tofu)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 32]
+        [cite_start]{ ten_mon: "Đậu hũ kho sả ớt (Braised lemongrass chili Tofu)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 33]
+        [cite_start]{ ten_mon: "Đậu hũ mềm sốt Hong Kong (Hong Kong Soft Tofu)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 34]
+        [cite_start]{ ten_mon: "Đậu hũ sốt cà (Tofu & tomato sauce)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 35]
+        [cite_start]{ ten_mon: "Đậu hũ sốt cay (Tofu & spicy sauce)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 36]
+        [cite_start]{ ten_mon: "Cà tím kho gừng (Braised eggplant & ginger)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 37]
+        [cite_start]{ ten_mon: "Cà tím kho đậu hũ (Braised eggplant & tofu)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 38]
+        [cite_start]{ ten_mon: "Rau củ xào đậu hũ (Fried mixed vegetable & tofu)", gia_tien: 70000, hinh_anh: "", cong_thuc: "" }, // [cite: 39]
+        [cite_start]{ ten_mon: "Canh mây cà chua (Tomato & tofu soup)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 40]
+        [cite_start]{ ten_mon: "Canh rong biển thập cẩm (Mixed seaweed soup)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" }, // [cite: 41]
+        [cite_start]{ ten_mon: "Cơm trắng chén (White rice)", gia_tien: 10000, hinh_anh: "", cong_thuc: "" }, // [cite: 43]
+        [cite_start]{ ten_mon: "Cơm lứt chén (Brown rice)", gia_tien: 20000, hinh_anh: "", cong_thuc: "" }, // [cite: 44]
+        [cite_start]{ ten_mon: "Cafe sữa Saigon (Vegan milk coffee)", gia_tien: 30000, hinh_anh: "", cong_thuc: "" }, // [cite: 45]
+        [cite_start]{ ten_mon: "Nước chanh tươi (Fresh lemonade)", gia_tien: 30000, hinh_anh: "", cong_thuc: "" }, // [cite: 46]
+        [cite_start]{ ten_mon: "Nước chanh dây tươi (Fresh passion fruit juice)", gia_tien: 35000, hinh_anh: "", cong_thuc: "" }, // [cite: 47]
+        [cite_start]{ ten_mon: "Sinh tố chuối yến mạch (Vegan banana & oat smoothie)", gia_tien: 35000, hinh_anh: "", cong_thuc: "" }, // [cite: 48]
+        [cite_start]{ ten_mon: "Sinh tố chuối đậu phộng (Vegan banana & peanut smoothie)", gia_tien: 35000, hinh_anh: "", cong_thuc: "" }, // [cite: 49]
+        [cite_start]{ ten_mon: "Sinh tố chuối chanh dây (Vegan banana & passion fruit smoothie)", gia_tien: 35000, hinh_anh: "", cong_thuc: "" }, // [cite: 50]
+        [cite_start]{ ten_mon: "Sinh tố chuối thanh long (Vegan banana & dragon fruit smoothie)", gia_tien: 35000, hinh_anh: "", cong_thuc: "" }, // [cite: 51]
+        [cite_start]{ ten_mon: "Trà la hán quả ít ngọt (Monk fruit tea)", gia_tien: 20000, hinh_anh: "", cong_thuc: "" }, // [cite: 52]
+        [cite_start]{ ten_mon: "Coca Cola", gia_tien: 20000, hinh_anh: "", cong_thuc: "" }, // [cite: 53]
+        [cite_start]{ ten_mon: "Nước đóng chai (Bottled water)", gia_tien: 10000, hinh_anh: "", cong_thuc: "" } // [cite: 55]
+    ];
+
+    const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+    
+    for (const mon of danhSachCuaBan) {
+        await addDoc(collection(db, "Menus"), mon);
+    }
+    alert("Đã nạp xong tất cả món mới vào Thực Đơn!");
+}
+
+// Để chạy lệnh nạp, bạn chỉ cần xóa 2 dấu gạch chéo ở dòng dưới:
+ napMonMoi();
+
 </script>
 </body>
 </html>
