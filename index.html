@@ -62,7 +62,7 @@
 
     <div class="section-title">🍜 Thực Đơn / Menu</div>
     <div id="menu-list" class="menu-grid">
-        <p style="text-align:center; color:#999; grid-column: 1 / -1; font-size: 1.2em;">Đang dọn lên mâm...</p>
+        <p id="loading-text" style="text-align:center; color:#999; grid-column: 1 / -1; font-size: 1.2em;">Đang dọn lên mâm...</p>
     </div>
 
     <div class="section-title" style="text-align: center; border: none;">🏠 Trạm Dừng Chân</div>
@@ -83,11 +83,14 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // Đã thêm lại ĐẦY ĐỦ cấu hình
     const firebaseConfig = {
       apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo",
       authDomain: "phobut-95574.firebaseapp.com",
       projectId: "phobut-95574",
-      storageBucket: "phobut-95574.firebasestorage.app"
+      storageBucket: "phobut-95574.firebasestorage.app",
+      messagingSenderId: "588108977874",
+      appId: "1:588108977874:web:91eaa1d51fa3ddfbf6ff0b"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -116,7 +119,7 @@
             // Tải Thực đơn
             const mSnap = await getDocs(collection(db, "Menus"));
             const menuDiv = document.getElementById('menu-list');
-            menuDiv.innerHTML = "";
+            menuDiv.innerHTML = ""; // Xóa chữ "Đang dọn lên mâm..."
             
             mSnap.forEach(doc => {
                 const m = doc.data();
@@ -125,9 +128,12 @@
                 const tenEn = m.ten_tieng_anh || '';
                 const giaTien = Number(m.gia_tien) || 0;
                 
+                // Xử lý chống lỗi dấu ngoặc nháy
+                const safeTenMon = tenMon.replace(/"/g, '&quot;');
+                
                 menuDiv.innerHTML += `
                     <div class="menu-card">
-                        <img src="${m.hinh_anh || defaultImg}" alt="${tenMon}" loading="lazy">
+                        <img src="${m.hinh_anh || defaultImg}" alt="${safeTenMon}" loading="lazy">
                         <div class="card-content">
                             <div>
                                 <h3 class="name-vi">${tenMon}</h3>
@@ -135,58 +141,12 @@
                             </div>
                             <div>
                                 <p class="price">${giaTien.toLocaleString()}đ</p>
-                                <button class="btn-add" onclick="themVaoGio('${tenMon.replace(/'/g, "\\'")}', ${giaTien})">➕ Thêm vào giỏ</button>
+                                <button class="btn-add" data-ten="${safeTenMon}" data-gia="${giaTien}" onclick="window.themVaoGio(this.getAttribute('data-ten'), Number(this.getAttribute('data-gia')))">➕ Thêm vào giỏ</button>
                             </div>
                         </div>
                     </div>`;
             });
 
-            // Tải Địa chỉ
-            const lSnap = await getDocs(collection(db, "Locations"));
-            const locDiv = document.getElementById('location-list');
-            locDiv.innerHTML = "";
-            lSnap.forEach(doc => {
-                const l = doc.data();
-                locDiv.innerHTML += `<strong>${l.ten_quan || 'Veggie Saigon'}</strong><br>📍 ${l.dia_chi || ''}`;
-            });
-
-        } catch(e) {
-            console.error(e);
-            document.getElementById('menu-list').innerHTML = "<p>Lỗi tải thực đơn. Vui lòng thử lại!</p>";
-        }
-    }
-
-    // HÀM THÊM VÀO GIỎ & TẠO TIN NHẮN ZALO
-    window.themVaoGio = (ten, gia) => {
-        // Nếu món đã có trong giỏ thì cộng thêm 1, chưa có thì tạo mới
-        if (window.gioHang[ten]) {
-            window.gioHang[ten].soLuong++;
-        } else {
-            window.gioHang[ten] = { gia: gia, soLuong: 1 };
-        }
-        capNhatGiaoDienGioHang();
-    };
-
-    function capNhatGiaoDienGioHang() {
-        tongSoLuong = 0;
-        tongTien = 0;
-        
-        // Cấu trúc tin nhắn sẽ gửi qua Zalo
-        let donHangZalo = "🙏 Chào Veggie Saigon, mình muốn đặt các món sau:\n\n";
-        
-        for (let mon in window.gioHang) {
-            let sl = window.gioHang[mon].soLuong;
-            let gia = window.gioHang[mon].gia;
-            tongSoLuong += sl;
-            tongTien += (sl * gia);
-            donHangZalo += `- ${mon}: ${sl} phần\n`;
-        }
-        
-        donHangZalo += `\n💰 Tổng cộng: ${tongTien.toLocaleString()}đ\nXin cảm ơn!`;
-
-        // Cập nhật số liệu lên màn hình
-        document.getElementById('cart-count').innerText = tongSoLuong;
-        document.getElementById('cart-total').innerText = tongTien.toLocaleString() + 'đ';
-        
-        // Cập nhật link Zalo (Mã hóa tin nhắn để có dấu xuống dòng chuẩn)
-        const linkZalo = "https://z
+            // Nếu kho dữ liệu trống
+            if(menuDiv.innerHTML === "") {
+                menuDiv.innerHTML = "<p style='grid-column: 1 / -1; text-align
