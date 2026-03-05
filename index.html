@@ -2,11 +2,11 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Công cụ Nạp Bếp Bụt</title>
-    <style>body { font-family: sans-serif; text-align: center; padding: 50px; background: #fff3e0; }</style>
+    <title>Công cụ Nạp Bếp Bụt Chuẩn Anh-Việt</title>
+    <style>body { font-family: sans-serif; text-align: center; padding: 50px; background: #e8f5e9; }</style>
 </head>
 <body>
-    <h1 id="status" style="color: #d35400;">⏳ Đang nạp 48 món chay vào Firebase. Xin đừng tắt trang...</h1>
+    <h1 id="status" style="color: #2c3e50;">⏳ Đang nạp 48 món chuẩn ngôn ngữ vào Firebase...</h1>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -19,55 +19,56 @@
         });
         const db = getFirestore(app);
 
+        // Danh sách chuẩn mới tách riêng Tiếng Việt và Tiếng Anh
         const danhSach = [
-            { ten_mon: "Bánh mì chay thập cẩm", gia_tien: 30000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Khoai tây chiên", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Chả giò chay", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Hoành thánh chay chiên", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Salad dầu giấm", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Mì Ý Chay", gia_tien: 60000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Bún xào nghệ chay", gia_tien: 60000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Bún đậu chay", gia_tien: 60000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Mì xào chay", gia_tien: 60000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Pad Thái chay", gia_tien: 70000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm chiên chay", gia_tien: 70000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cà ri chay & bánh mì/cơm/bún", gia_tien: 60000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Xíu mại chay", gia_tien: 60000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm đậu hũ sả ớt", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm lứt đậu hũ sả ớt", gia_tien: 45000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm cà tím kho đậu hũ", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm cà tím kho gừng", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm lứt cà tím kho gừng", gia_tien: 45000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm lứt cà tím kho đậu hũ", gia_tien: 45000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Phở chay (Vegan Pho)", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Bún riêu chay", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Bún Huế chay", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Bún cay Tứ Xuyên", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Mì thịt xá xíu chay", gia_tien: 50000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Mì tiềm chay", gia_tien: 50000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Mì hoành thánh chay", gia_tien: 50000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Đậu hũ mềm sốt Tứ Xuyên", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Đậu hũ kho sả ớt", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Đậu hũ mềm sốt Hong Kong", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Đậu hũ sốt cà", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Đậu hũ sốt cay", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cà tím kho gừng", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cà tím kho đậu hũ", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Rau củ xào đậu hũ", gia_tien: 70000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Canh mây cà chua", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Canh rong biển thập cẩm", gia_tien: 40000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm trắng chén", gia_tien: 10000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cơm lứt chén", gia_tien: 20000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Cafe sữa Saigon", gia_tien: 30000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Nước chanh tươi", gia_tien: 30000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Nước chanh dây tươi", gia_tien: 35000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Sinh tố chuối yến mạch", gia_tien: 35000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Sinh tố chuối đậu phộng", gia_tien: 35000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Sinh tố chuối chanh dây", gia_tien: 35000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Sinh tố chuối thanh long", gia_tien: 35000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Trà la hán quả ít ngọt", gia_tien: 20000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Coca Cola", gia_tien: 20000, hinh_anh: "", cong_thuc: "" },
-            { ten_mon: "Nước đóng chai", gia_tien: 10000, hinh_anh: "", cong_thuc: "" }
+            { ten_tieng_viet: "Bánh mì chay thập cẩm", ten_tieng_anh: "Mixed Vegan Bread", gia_tien: 30000, hinh_anh: "" },
+            { ten_tieng_viet: "Khoai tây chiên", ten_tieng_anh: "French fries", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Chả giò chay", ten_tieng_anh: "Fried spring rolls", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Hoành thánh chay chiên", ten_tieng_anh: "Fried wonton", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Salad dầu giấm", ten_tieng_anh: "Vinaigrette salad", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Mì Ý Chay", ten_tieng_anh: "Vegan spaghetti", gia_tien: 60000, hinh_anh: "" },
+            { ten_tieng_viet: "Bún xào nghệ chay", ten_tieng_anh: "Fried tumeric vermicelli & vegies", gia_tien: 60000, hinh_anh: "" },
+            { ten_tieng_viet: "Bún đậu chay", ten_tieng_anh: "Vegan bun dau", gia_tien: 60000, hinh_anh: "" },
+            { ten_tieng_viet: "Mì xào chay", ten_tieng_anh: "Vegan Fried Noodle & Veggies", gia_tien: 60000, hinh_anh: "" },
+            { ten_tieng_viet: "Pad Thái chay", ten_tieng_anh: "Vegan Pad Thai", gia_tien: 70000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm chiên chay", ten_tieng_anh: "Fried rice & veggies", gia_tien: 70000, hinh_anh: "" },
+            { ten_tieng_viet: "Cà ri chay & bánh mì/cơm/bún", ten_tieng_anh: "Curry & bread/rice/vermicelli", gia_tien: 60000, hinh_anh: "" },
+            { ten_tieng_viet: "Xíu mại chay & bánh mì/cơm/bún", ten_tieng_anh: "Vegan shumai bread/rice/vermicelli", gia_tien: 60000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm đậu hũ sả ớt", ten_tieng_anh: "Rice & lemongrass chili tofu", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm lứt đậu hũ sả ớt", ten_tieng_anh: "Brown rice & lemongrass chili tofu", gia_tien: 45000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm cà tím kho đậu hũ", ten_tieng_anh: "Rice & braised eggplant & tofu", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm cà tím kho gừng", ten_tieng_anh: "Rice & braised eggplant & ginger", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm lứt cà tím kho gừng", ten_tieng_anh: "Brown rice & braised eggplant & ginger", gia_tien: 45000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm lứt cà tím kho đậu hũ", ten_tieng_anh: "Brown rice & braised eggplant & tofu", gia_tien: 45000, hinh_anh: "" },
+            { ten_tieng_viet: "Phở chay", ten_tieng_anh: "Vegan Pho", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Bún riêu chay", ten_tieng_anh: "Tomato Vermicelli Soup", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Bún Huế chay", ten_tieng_anh: "Hue Noodle Soup", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Bún cay Tứ Xuyên", ten_tieng_anh: "Sichuan Vermicelli soup", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Mì thịt xá xíu chay", ten_tieng_anh: "Noodle soup with vegan char siu meat", gia_tien: 50000, hinh_anh: "" },
+            { ten_tieng_viet: "Mì tiềm chay", ten_tieng_anh: "Chinese noodle soup", gia_tien: 50000, hinh_anh: "" },
+            { ten_tieng_viet: "Mì hoành thánh chay", ten_tieng_anh: "Wonton noodle soup", gia_tien: 50000, hinh_anh: "" },
+            { ten_tieng_viet: "Đậu hũ mềm sốt Tứ Xuyên", ten_tieng_anh: "Sichuan Soft Tofu", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Đậu hũ kho sả ớt", ten_tieng_anh: "Braised lemongrass chili Tofu", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Đậu hũ mềm sốt Hong Kong", ten_tieng_anh: "Hong Kong Soft Tofu", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Đậu hũ sốt cà", ten_tieng_anh: "Tofu & tomato sauce", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Đậu hũ sốt cay", ten_tieng_anh: "Tofu & spicy sauce", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Cà tím kho gừng", ten_tieng_anh: "Braised eggplant & ginger", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Cà tím kho đậu hũ", ten_tieng_anh: "Braised eggplant & tofu", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Rau củ xào đậu hũ", ten_tieng_anh: "Fried mixed vegetable & tofu", gia_tien: 70000, hinh_anh: "" },
+            { ten_tieng_viet: "Canh mây cà chua", ten_tieng_anh: "Tomato & tofu soup", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Canh rong biển thập cẩm", ten_tieng_anh: "Mixed seaweed soup", gia_tien: 40000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm trắng chén", ten_tieng_anh: "White rice", gia_tien: 10000, hinh_anh: "" },
+            { ten_tieng_viet: "Cơm lứt chén", ten_tieng_anh: "Brown rice", gia_tien: 20000, hinh_anh: "" },
+            { ten_tieng_viet: "Cafe sữa Saigon", ten_tieng_anh: "Vegan milk coffee", gia_tien: 30000, hinh_anh: "" },
+            { ten_tieng_viet: "Nước chanh tươi", ten_tieng_anh: "Fresh lemonade", gia_tien: 30000, hinh_anh: "" },
+            { ten_tieng_viet: "Nước chanh dây tươi", ten_tieng_anh: "Fresh passion fruit juice", gia_tien: 35000, hinh_anh: "" },
+            { ten_tieng_viet: "Sinh tố chuối yến mạch", ten_tieng_anh: "Vegan banana & oat smoothie", gia_tien: 35000, hinh_anh: "" },
+            { ten_tieng_viet: "Sinh tố chuối đậu phộng", ten_tieng_anh: "Vegan banana & peanut smoothie", gia_tien: 35000, hinh_anh: "" },
+            { ten_tieng_viet: "Sinh tố chuối chanh dây", ten_tieng_anh: "Vegan banana & passion fruit smoothie", gia_tien: 35000, hinh_anh: "" },
+            { ten_tieng_viet: "Sinh tố chuối thanh long", ten_tieng_anh: "Vegan banana & dragon fruit smoothie", gia_tien: 35000, hinh_anh: "" },
+            { ten_tieng_viet: "Trà la hán quả ít ngọt", ten_tieng_anh: "Monk fruit tea", gia_tien: 20000, hinh_anh: "" },
+            { ten_tieng_viet: "Coca Cola", ten_tieng_anh: "Coca Cola", gia_tien: 20000, hinh_anh: "" },
+            { ten_tieng_viet: "Nước đóng chai", ten_tieng_anh: "Bottled water", gia_tien: 10000, hinh_anh: "" }
         ];
 
         async function chayNap() {
@@ -75,15 +76,14 @@
                 for (const mon of danhSach) {
                     await addDoc(collection(db, "Menus"), mon);
                 }
-                document.getElementById('status').innerHTML = "🎉 THÀNH CÔNG RỒI!<br>48 món đã nằm gọn trong Firebase.";
+                document.getElementById('status').innerHTML = "🎉 XONG RỒI BẠN NHÉ!<br>Dữ liệu chuẩn đã được cập nhật.";
                 document.getElementById('status').style.color = "#27ae60";
             } catch (error) {
-                document.getElementById('status').innerHTML = "❌ BỊ LỖI RỒI: " + error.message;
+                document.getElementById('status').innerHTML = "❌ LỖI: " + error.message;
                 document.getElementById('status').style.color = "#c0392b";
             }
         }
         
-        // Tự động chạy ngay khi mở web
         chayNap();
     </script>
 </body>
