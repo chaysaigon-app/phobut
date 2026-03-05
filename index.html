@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>PhoBut - Veggie Saigon & Tỉnh Thức</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        img { width: 100%; border-radius: 8px; max-height: 300px; object-fit: cover; }
+        h2 { color: #2e7d32; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        .footer { margin-top: 40px; color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🙏 PhoBut - Thực Đơn Tỉnh Thức</h1>
+
+        <div class="card">
+            <h3>🎥 Bài Giảng Tỉnh Thức</h3>
+            <div id="video-list" class="video-container">Đang tải pháp âm...</div>
+        </div>
+
+        <div id="menu-list"></div>
+
+        <div class="footer" id="location-list"></div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo",
+      authDomain: "phobut-95574.firebaseapp.com",
+      projectId: "phobut-95574",
+      storageBucket: "phobut-95574.firebasestorage.app",
+      messagingSenderId: "588108977874",
+      appId: "1:588108977874:web:91eaa1d51fa3ddfbf6ff0b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 1. Hiện Video từ ngăn "Buddha"
+    async function loadBuddha() {
+        const snap = await getDocs(collection(db, "Buddha"));
+        const videoDiv = document.getElementById('video-list');
+        videoDiv.innerHTML = "";
+        snap.forEach(doc => {
+            const v = doc.data();
+            // Chuyển link youtube thường sang link nhúng (embed)
+            const videoId = v.bat_chanh_dao.split('v=')[1] || v.bat_chanh_dao.split('/').pop();
+            videoDiv.innerHTML += `<iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+        });
+    }
+
+    // 2. Hiện Thực đơn từ ngăn "Menus"
+    async function loadMenus() {
+        const snap = await getDocs(collection(db, "Menus"));
+        const menuDiv = document.getElementById('menu-list');
+        menuDiv.innerHTML = "";
+        snap.forEach(doc => {
+            const m = doc.data();
+            menuDiv.innerHTML += `
+                <div class="card">
+                    <img src="${m.hinh_anh}">
+                    <h2>${m.ten_mon}</h2>
+                    <p><b>Giá: ${m.gia_tien.toLocaleString()}đ</b></p>
+                    <p>${m.cong_thuc}</p>
+                </div>`;
+        });
+    }
+
+    // 3. Hiện Địa chỉ từ ngăn "Locations"
+    async function loadLocations() {
+        const snap = await getDocs(collection(db, "Locations"));
+        const locDiv = document.getElementById('location-list');
+        snap.forEach(doc => {
+            const l = doc.data();
+            locDiv.innerHTML += `<h4>🏠 ${l.ten_quan}</h4><p>📍 ${l.dia_chi}</p>`;
+        });
+    }
+
+    loadBuddha();
+    loadMenus();
+    loadLocations();
+</script>
+</body>
+</html>
