@@ -4,49 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhoBut - Veggie Saigon</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; }
-        
-        .header { background: #2e7d32; color: white; padding: 20px; text-align: center; }
-        .header h1 { margin: 0; font-size: 2em; }
-        .header p { margin: 5px 0 0; font-style: italic; }
-        
-        .container { max-width: 500px; margin: auto; padding: 15px; }
-        .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 25px 0 15px; font-size: 1.3em; font-weight: bold; }
-        
-        /* Video */
-        .video-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-
-        /* Giao diện 1 cột: Hình vuông nối tiếp */
-        .menu-list { display: flex; flex-direction: column; gap: 20px; }
-        .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: #ddd; }
-        
-        .card-content { padding: 15px; }
-        .name-vi { margin: 0 0 5px 0; font-size: 1.2em; color: #111; font-weight: bold; }
-        .name-en { margin: 0 0 10px 0; font-size: 0.9em; color: #666; font-style: italic; }
-        .price { color: #d35400; font-weight: bold; font-size: 1.2em; margin-bottom: 15px; }
-        
-        .btn-add { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
-        .btn-add:active { background: #1b5e20; }
-
-        /* Thanh Giỏ Hàng */
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-top: 2px solid #2e7d32; z-index: 1000; cursor: pointer; }
-        .cart-info { font-size: 1em; color: #333; line-height: 1.4; }
-        .cart-total { color: #d35400; font-weight: bold; font-size: 1.2em; }
-        .btn-view-cart { background: #e67e22; color: white; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 1em; border: none; cursor: pointer;}
-
-        /* Bảng Danh Sách Món (Popup Modal) */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 15px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
-        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; font-size: 0.95em; }
-        .btn-checkout-zalo { background: #0068ff; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 1.1em; font-weight: bold; margin-top: 15px; cursor: pointer; }
-    </style>
 </head>
-<body>
+<body style="font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; text-align: center; padding-top: 50px;">
 
-<div class="header">
-    <h1>🙏 Phở Bụt</h1>
-    <p>Veggie Saigon -
+    <div style="background: #2e7d32; color: white; padding: 20px; border-radius: 10px; margin: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+        <h1 style="margin: 0; font-size: 2em;">🙏 Phở Bụt Đang Tải...</h1>
+        <p>Nếu bạn nhìn thấy khung màu xanh này, nghĩa là trang web không bị lỗi trắng trơn nữa!</p>
+    </div>
+    
+    <div id="menu-list" style="margin-top: 30px; color: #d35400; font-weight: bold; font-size: 1.2em;">
+        Đang kết nối kho dữ liệu...
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo",
+      authDomain: "phobut-95574.firebaseapp.com",
+      projectId: "phobut-95574",
+      storageBucket: "phobut-95574.firebasestorage.app",
+      messagingSenderId: "588108977874",
+      appId: "1:588108977874:web:91eaa1d51fa3ddfbf6ff0b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function testData() {
+        try {
+            const mSnap = await getDocs(collection(db, "Menus"));
+            let html = "";
+            mSnap.forEach(doc => {
+                html += `<p style="color:#2e7d32;">✅ Tải thành công món: ${doc.data().ten_tieng_viet}</p>`;
+            });
+            document.getElementById('menu-list').innerHTML = html;
+        } catch(error) {
+            document.getElementById('menu-list').innerHTML = "❌ Lỗi kết nối Firebase: " + error.message;
+        }
+    }
+    
+    testData();
+</script>
+</body>
+</html>
