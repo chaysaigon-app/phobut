@@ -31,7 +31,7 @@
         .btn-add { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
         .btn-add:active { background: #1b5e20; }
 
-        /* Thanh Giỏ Hàng (Bấm vào để mở danh sách) */
+        /* Thanh Giỏ Hàng */
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-top: 2px solid #2e7d32; z-index: 1000; cursor: pointer; }
         .cart-info { font-size: 1em; color: #333; line-height: 1.4; }
         .cart-total { color: #d35400; font-weight: bold; font-size: 1.2em; }
@@ -41,7 +41,6 @@
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 15px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
         .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .close-btn:hover { color: black; }
         .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; font-size: 0.95em; }
         .btn-checkout-zalo { background: #0068ff; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 1.1em; font-weight: bold; margin-top: 15px; cursor: pointer; }
     </style>
@@ -77,15 +76,13 @@
 <div id="cart-modal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="window.dongGioHang()">&times;</span>
-        <h2 style="color: #2e7d32; margin-top: 0;">🛒 Giỏ Hàng Của Bạn</h2>
+        <h2 style="color: #2e7d32; margin-top: 0;">🛒 Giỏ Hàng</h2>
         
-        <div id="cart-items-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;">
-            </div>
+        <div id="cart-items-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
         
         <h3 style="color: #d35400; text-align: right; border-top: 2px solid #eee; padding-top: 10px;">Tổng: <span id="modal-total">0đ</span></h3>
         
         <button class="btn-checkout-zalo" onclick="window.guiZalo()">💬 Chốt Đơn Qua Zalo</button>
-        <p style="font-size: 0.8em; color: #666; text-align: center; margin-top: 10px;">(Hệ thống sẽ copy đơn, bạn chỉ cần <b>Dán/Paste</b> vào Zalo nhé)</p>
     </div>
 </div>
 
@@ -108,7 +105,6 @@
 
     async function chayWeb() {
         try {
-            // Tải Video
             const bSnap = await getDocs(collection(db, "Buddha"));
             const videoDiv = document.getElementById('video-list');
             bSnap.forEach(doc => {
@@ -119,7 +115,6 @@
                 }
             });
 
-            // Tải Thực Đơn
             const mSnap = await getDocs(collection(db, "Menus"));
             const menuDiv = document.getElementById('menu-list');
             menuDiv.innerHTML = "";
@@ -130,121 +125,8 @@
                 const tenEn = String(m.ten_tieng_anh || '');
                 const gia = Number(m.gia_tien) || 0;
                 const hinh = m.hinh_anh ? String(m.hinh_anh) : "https://via.placeholder.com/500x500?text=Veggie+Saigon";
-                
                 const tenAnToan = tenVi.replace(/['"]/g, '');
 
                 menuDiv.innerHTML += `
                     <div class="menu-card">
-                        <img src="${hinh}" alt="Hình món ăn">
-                        <div class="card-content">
-                            <h3 class="name-vi">${tenVi}</h3>
-                            <p class="name-en">${tenEn}</p>
-                            <p class="price">${gia.toLocaleString()}đ</p>
-                            <button class="btn-add" onclick="window.themVaoGio('${tenAnToan}', ${gia}, event)">➕ Thêm vào giỏ</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // Tải Địa chỉ
-            const lSnap = await getDocs(collection(db, "Locations"));
-            const locDiv = document.getElementById('location-list');
-            locDiv.innerHTML = "";
-            lSnap.forEach(doc => {
-                const l = doc.data();
-                locDiv.innerHTML += `<strong>${l.ten_quan || 'Veggie Saigon'}</strong><br>📍 ${l.dia_chi || ''}`;
-            });
-
-        } catch(error) {
-            console.error(error);
-            document.getElementById('loading-msg').innerHTML = "Lỗi tải trang. Vui lòng tải lại!";
-        }
-    }
-
-    // THÊM MÓN VÀO GIỎ CỘNG DỒN
-    window.themVaoGio = (ten, gia, event) => {
-        event.stopPropagation(); // Ngăn mở popup khi đang bấm thêm món
-        
-        if (window.gioHang[ten]) {
-            window.gioHang[ten].soLuong++;
-        } else {
-            window.gioHang[ten] = { gia: gia, soLuong: 1 };
-        }
-        
-        let tongSoLuong = 0;
-        tongTienGioHang = 0;
-        
-        for (let mon in window.gioHang) {
-            let sl = window.gioHang[mon].soLuong;
-            let tien = window.gioHang[mon].gia;
-            tongSoLuong += sl;
-            tongTienGioHang += (sl * tien);
-        }
-
-        document.getElementById('cart-count').innerText = tongSoLuong;
-        document.getElementById('cart-total').innerText = tongTienGioHang.toLocaleString() + 'đ';
-        
-        // Báo hiệu đã thêm
-        const btn = event.target;
-        btn.innerHTML = "✅ Đã thêm";
-        btn.style.background = "#e67e22";
-        setTimeout(() => { btn.innerHTML = "➕ Thêm vào giỏ"; btn.style.background = "#2e7d32"; }, 1000);
-    };
-
-    // MỞ BẢNG DANH SÁCH MÓN
-    window.moGioHang = () => {
-        const listDiv = document.getElementById('cart-items-list');
-        listDiv.innerHTML = "";
-        
-        if(Object.keys(window.gioHang).length === 0) {
-            listDiv.innerHTML = "<p style='text-align:center; color:#888;'>Giỏ hàng đang trống.</p>";
-        } else {
-            for (let mon in window.gioHang) {
-                let sl = window.gioHang[mon].soLuong;
-                let gia = window.gioHang[mon].gia;
-                let thanhTien = sl * gia;
-                listDiv.innerHTML += `
-                    <div class="cart-item">
-                        <div><b>${mon}</b> <br> <small style="color:#666;">${gia.toLocaleString()}đ x ${sl}</small></div>
-                        <div style="font-weight:bold; color:#d35400;">${thanhTien.toLocaleString()}đ</div>
-                    </div>
-                `;
-            }
-        }
-        document.getElementById('modal-total').innerText = tongTienGioHang.toLocaleString() + 'đ';
-        document.getElementById('cart-modal').style.display = "block";
-    };
-
-    // ĐÓNG BẢNG
-    window.dongGioHang = () => {
-        document.getElementById('cart-modal').style.display = "none";
-    };
-
-    // COPY VÀ GỬI ZALO
-    window.guiZalo = () => {
-        if(Object.keys(window.gioHang).length === 0) {
-            alert("Bạn chưa chọn món ăn nào!");
-            return;
-        }
-
-        let donZalo = "🙏 Chào Veggie Saigon, mình đặt món:\n\n";
-        for (let mon in window.gioHang) {
-            let sl = window.gioHang[mon].soLuong;
-            donZalo += `- ${mon}: ${sl} phần\n`;
-        }
-        donZalo += `\n💰 Tổng cộng: ${tongTienGioHang.toLocaleString()}đ\nXin cảm ơn!`;
-
-        // Lệnh COPY nội dung
-        navigator.clipboard.writeText(donZalo).then(() => {
-            alert("✅ Hệ thống đã sao chép Đơn hàng.\n\nSau khi Zalo mở lên, bạn chỉ cần nhấn giữ ô chat và chọn DÁN (PASTE) để gửi nhé!");
-            window.location.href = "https://zalo.me/0909108890";
-        }).catch(err => {
-            // Nếu điện thoại cũ không cho copy, dùng cách truyền thống
-            window.location.href = "https://zalo.me/0909108890?text=" + encodeURIComponent(donZalo);
-        });
-    };
-
-    chayWeb();
-</script>
-</body>
-</html>
+                        <img src="${hinh}" alt="Hình
