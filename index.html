@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhoBut - Veggie Saigon</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 20px; text-align: center; }
+        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding: 15px; text-align: center; }
         .container { max-width: 500px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; }
+        img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .btn { display: block; background: #2e7d32; color: white; padding: 12px; text-decoration: none; border-radius: 8px; margin-top: 10px; font-weight: bold; }
+        .btn { display: block; background: #2e7d32; color: white; padding: 12px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px; }
+        .price { color: #e74c3c; font-size: 1.2em; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -20,14 +21,17 @@
     <h1>🙏 PhoBut</h1>
     
     <div id="video-area"></div>
-    <div id="menu-area">Đang tải món ăn...</div>
-    <div id="location-area" style="margin-top:20px; color:#666;"></div>
+    
+    <div id="menu-area">Đang chuẩn bị món ăn từ bếp Bụt...</div>
+    
+    <div id="location-area" style="margin-top:20px; color:#666; font-size: 0.9em;"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // Cấu hình từ hình ảnh của bạn
     const firebaseConfig = {
       apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo",
       authDomain: "phobut-95574.firebaseapp.com",
@@ -40,14 +44,23 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function start() {
+    async function loadData() {
         try {
             // 1. Lấy Video (Ngăn Buddha)
             const bSnap = await getDocs(collection(db, "Buddha"));
             bSnap.forEach(doc => {
-                const link = doc.data().bat_chanh_dao;
-                const id = link.split('v=')[1] || link.split('/').pop();
-                document.getElementById('video-area').innerHTML = `<div class="card"><div class="video-container"><iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe></div></div>`;
+                const data = doc.data();
+                if(data.bat_chanh_dao) {
+                    const link = data.bat_chanh_dao;
+                    const id = link.includes('v=') ? link.split('v=')[1].split('&')[0] : link.split('/').pop();
+                    document.getElementById('video-area').innerHTML = `
+                        <div class="card">
+                            <div class="video-container">
+                                <iframe src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                            <p><b>🎥 Pháp Âm Bát Chánh Đạo</b></p>
+                        </div>`;
+                }
             });
 
             // 2. Lấy Menu (Ngăn Menus)
@@ -56,4 +69,29 @@
             menuArea.innerHTML = "";
             mSnap.forEach(doc => {
                 const m = doc.data();
-                menuArea.innerHTML += `<div class="card"><img src="${m.hinh_anh}">
+                menuArea.innerHTML += `
+                    <div class="card">
+                        <img src="${m.hinh_anh || 'https://via.placeholder.com/300'}">
+                        <h3>${m.ten_mon}</h3>
+                        <p class="price">${Number(m.gia_tien).toLocaleString()}đ</p>
+                        <p>${m.cong_thuc || ''}</p>
+                        <a href="https://zalo.me/0909108890" class="btn">🛒 Chọn món này</a>
+                    </div>`;
+            });
+
+            // 3. Lấy Địa chỉ (Ngăn Locations)
+            const lSnap = await getDocs(collection(db, "Locations"));
+            lSnap.forEach(doc => {
+                const l = doc.data();
+                document.getElementById('location-area').innerHTML = `🏠 <b>${l.ten_quan || 'Veggie Saigon'}</b><br>📍 ${l.dia_chi || ''}`;
+            });
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('menu-area').innerHTML = "Lỗi kết nối. Hãy kiểm tra lại Firebase Rules!";
+        }
+    }
+    loadData();
+</script>
+</body>
+</html>
