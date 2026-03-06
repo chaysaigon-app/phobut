@@ -49,7 +49,12 @@
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 15px; position: relative; }
         .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; font-size: 0.95em; }
+        
+        /* CSS cho nút tăng giảm trong giỏ */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; font-size: 0.95em; }
+        .qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .btn-qty { background: #eee; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .btn-qty:active { background: #ccc; }
     </style>
 </head>
 <body>
@@ -72,28 +77,13 @@
         <div class="about-text">
             Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
             <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
-            Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
+            Bếp nhà Veggie Saigon cam kết:
             <ul>
                 <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-                <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
-                <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
+                <li><b>Không Ngũ Vị Tân:</b> Không hành, hẹ, tỏi, kiệu, hưng cừ.</li>
             </ul>
-            <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
-            Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa, mang đến hương vị vừa quen thuộc vừa mới lạ, sang trọng.<br><br>
-            <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
-            Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
-            <ul>
-                <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
-                <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
-                <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
-            </ul>
-            <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
-            Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự <b>Tỉnh thức</b>. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏
+            <b>4. Ăn uống Tỉnh thức:</b> Mỗi thực khách không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn. 🙏
         </div>
-        <div class="video-wrapper-short">
-            <iframe src="https://www.youtube.com/embed/PQGCBwmg8n8" allowfullscreen></iframe>
-        </div>
-        <div class="video-info" style="background: white;">Tham quan bếp Phở Bụt</div>
     </div>
 
     <div class="section-title">🍜 Thực Đơn</div>
@@ -105,33 +95,12 @@
     <div class="location-card">
         <strong style="font-size: 1.1em; color: #2e7d32;">Phở Bụt Vegan - Quán Chay Da Nang</strong><br>
         <p style="margin: 10px 0; color: #555;">📍 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
-        <p style="margin: 5px 0; color: #777; font-size: 0.9em;">⏰ Mở cửa: 10:00 – 21:00</p>
         <a href="https://www.google.com/maps/search/?api=1&query=Phở+Bụt+Vegan+76+Thủ+Khoa+Huân+Đà+Nẵng" target="_blank" class="btn-maps">🗺️ Xem trên Google Maps</a>
     </div>
 
     <div class="contact-btns">
         <button class="btn-qr btn-qr-zalo" onclick="window.hienThiQR('zalo')">📱 Zalo QR</button>
         <button class="btn-qr btn-qr-wa" onclick="window.hienThiQR('wa')">💬 WhatsApp QR</button>
-    </div>
-
-    <div class="section-title">🕯️ Nuôi Dưỡng Tâm Hồn</div>
-    <div id="video-section">
-        <div class="video-item">
-            <div class="video-wrapper-landscape"><iframe src="https://www.youtube.com/embed/6F4cVu5aDkU" allowfullscreen></iframe></div>
-            <div class="video-info">Bát Chánh Đạo</div>
-        </div>
-        <div class="video-item">
-            <div class="video-wrapper-landscape"><iframe src="https://www.youtube.com/embed/MVwM2lQ6DCg" allowfullscreen></iframe></div>
-            <div class="video-info">Kinh Từ Bi</div>
-        </div>
-        <div class="video-item">
-            <div class="video-wrapper-landscape"><iframe src="https://www.youtube.com/embed/DMVhQJUreAk" allowfullscreen></iframe></div>
-            <div class="video-info">Giải Mã Sinh Tử</div>
-        </div>
-        <div class="video-item">
-            <div class="video-wrapper-landscape"><iframe src="https://www.youtube.com/embed/gwMV-DfcMHs" allowfullscreen></iframe></div>
-            <div class="video-info">10 Sợi Dây Xích Kiết Sử</div>
-        </div>
     </div>
 </div>
 
@@ -144,9 +113,9 @@
     <div class="modal-content">
         <span class="close-btn" onclick="window.dongModal('cart-modal')">×</span>
         <h2 style="color: #2e7d32; margin-top: 0;">🛒 Giỏ Hàng</h2>
-        <div id="cart-items-list" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
+        <div id="cart-items-list" style="max-height: 350px; overflow-y: auto; margin-bottom: 15px;"></div>
         <h3 style="color: #d35400; text-align: right; border-top: 2px solid #eee; padding-top: 10px;">Tổng: <span id="modal-total">0 VND</span></h3>
-        <button style="background: #0068ff; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 1.1em; font-weight: bold; cursor: pointer;" onclick="window.guiZalo()">📱 Gửi Đơn Qua Zalo</button>
+        <button style="background: #0068ff; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 1.1em; font-weight: bold; cursor: pointer;" onclick="window.guiZalo()">📱 Gửi Đơn & Copy Qua Zalo</button>
     </div>
 </div>
 
@@ -165,40 +134,113 @@
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574", storageBucket: "phobut-95574.firebasestorage.app", messagingSenderId: "588108977874", appId: "1:588108977874:web:91eaa1d51fa3ddfbf6ff0b" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    window.gioHang = {}; let tongTienGioHang = 0;
+
+    window.gioHang = {};
+    let tongTienGioHang = 0;
 
     async function chayWeb() {
         try {
             const mSnap = await getDocs(collection(db, "Menus"));
             const menuDiv = document.getElementById('menu-list'); menuDiv.innerHTML = "";
             mSnap.forEach(doc => {
-                const m = doc.data(); const tenVi = String(m.ten_tieng_viet || 'Món Chay'); const tenEn = String(m.ten_tieng_anh || ''); const gia = Number(m.gia_tien) || 0; const hinh = m.hinh_anh || "https://via.placeholder.com/500x500?text=Pho+But";
-                menuDiv.innerHTML += `<div class="menu-card"><img src="${hinh}"><div class="card-content"><h3 class="name-vi">${tenVi}</h3><p class="name-en">${tenEn}</p><p class="price">${gia.toLocaleString()} VND</p><button class="btn-add" onclick="window.themVaoGio('${tenVi.replace(/'/g, "")}', ${gia}, event)">➕ Thêm vào giỏ</button></div></div>`;
+                const m = doc.data();
+                const tenVi = String(m.ten_tieng_viet || 'Món Chay');
+                const tenEn = String(m.ten_tieng_anh || '');
+                const gia = Number(m.gia_tien) || 0;
+                const hinh = m.hinh_anh || "https://via.placeholder.com/500x500?text=Pho+But";
+                
+                menuDiv.innerHTML += `
+                    <div class="menu-card">
+                        <img src="${hinh}">
+                        <div class="card-content">
+                            <h3 class="name-vi">${tenVi}</h3>
+                            <p class="name-en">${tenEn}</p>
+                            <p class="price">${gia.toLocaleString()} VND</p>
+                            <button class="btn-add" onclick="window.themVaoGio('${tenVi.replace(/'/g, "")}', ${gia})">➕ Thêm vào giỏ</button>
+                        </div>
+                    </div>`;
             });
         } catch(e) { console.error(e); }
     }
 
-    window.themVaoGio = (ten, gia, event) => { if (window.gioHang[ten]) window.gioHang[ten].soLuong++; else window.gioHang[ten] = { gia: gia, soLuong: 1 }; let tongSoLuong = 0; tongTienGioHang = 0; for (let m in window.gioHang) { tongSoLuong += window.gioHang[m].soLuong; tongTienGioHang += (window.gioHang[m].soLuong * window.gioHang[m].gia); } document.getElementById('cart-count').innerText = tongSoLuong; document.getElementById('cart-total').innerText = tongTienGioHang.toLocaleString() + ' VND'; };
-    
+    // Hàm cập nhật hiển thị thanh giỏ hàng dưới cùng
+    window.capNhatThanhGioHang = () => {
+        let tongSoLuong = 0;
+        tongTienGioHang = 0;
+        for (let m in window.gioHang) {
+            tongSoLuong += window.gioHang[m].soLuong;
+            tongTienGioHang += (window.gioHang[m].soLuong * window.gioHang[m].gia);
+        }
+        document.getElementById('cart-count').innerText = tongSoLuong;
+        document.getElementById('cart-total').innerText = tongTienGioHang.toLocaleString() + ' VND';
+        document.getElementById('modal-total').innerText = tongTienGioHang.toLocaleString() + ' VND';
+    };
+
+    window.themVaoGio = (ten, gia) => {
+        if (window.gioHang[ten]) {
+            window.gioHang[ten].soLuong++;
+        } else {
+            window.gioHang[ten] = { gia: gia, soLuong: 1 };
+        }
+        window.capNhatThanhGioHang();
+    };
+
+    // Hàm thay đổi số lượng +/- trong modal
+    window.doiSoLuong = (ten, delta) => {
+        if (window.gioHang[ten]) {
+            window.gioHang[ten].soLuong += delta;
+            if (window.gioHang[ten].soLuong <= 0) {
+                delete window.gioHang[ten];
+            }
+        }
+        window.moGioHang(); // Vẽ lại giao diện modal
+        window.capNhatThanhGioHang(); // Cập nhật thanh bar
+    };
+
     window.moGioHang = () => { 
-        const listDiv = document.getElementById('cart-items-list'); listDiv.innerHTML = ""; 
-        for (let m in window.gioHang) { listDiv.innerHTML += `<div class="cart-item"><div><b>${m}</b><br>${window.gioHang[m].gia.toLocaleString()} x ${window.gioHang[m].soLuong}</div><div>${(window.gioHang[m].soLuong * window.gioHang[m].gia).toLocaleString()} VND</div></div>`; } 
-        document.getElementById('modal-total').innerText = tongTienGioHang.toLocaleString() + ' VND'; 
+        const listDiv = document.getElementById('cart-items-list'); 
+        listDiv.innerHTML = ""; 
+        let hasItem = false;
+        for (let m in window.gioHang) { 
+            hasItem = true;
+            listDiv.innerHTML += `
+                <div class="cart-item">
+                    <div>
+                        <b>${m}</b><br>
+                        ${window.gioHang[m].gia.toLocaleString()} VND
+                        <div class="qty-controls">
+                            <button class="btn-qty" onclick="window.doiSoLuong('${m}', -1)">-</button>
+                            <span><b>${window.gioHang[m].soLuong}</b></span>
+                            <button class="btn-qty" onclick="window.doiSoLuong('${m}', 1)">+</button>
+                        </div>
+                    </div>
+                    <div style="font-weight:bold; color:#d35400;">
+                        ${(window.gioHang[m].soLuong * window.gioHang[m].gia).toLocaleString()} VND
+                    </div>
+                </div>`; 
+        } 
+        if(!hasItem) listDiv.innerHTML = "<p style='text-align:center; color:#888;'>Giỏ hàng đang trống</p>";
         document.getElementById('cart-modal').style.display = "block"; 
     };
 
     window.dongModal = (id) => document.getElementById(id).style.display = "none";
 
-    // FIX LỖI ZALO: COPY TRƯỚC - CHUYỂN HƯỚNG SAU
     window.guiZalo = () => {
-        let text = "🙏 Chào Phở Bụt, tôi muốn đặt:\n\n";
-        for (let m in window.gioHang) { text += `- ${m}: ${window.gioHang[m].soLuong}\n`; }
-        text += `\n💰 Tổng: ${tongTienGioHang.toLocaleString()} VND\nXin cảm ơn!`;
+        if (Object.keys(window.gioHang).length === 0) {
+            alert("Giỏ hàng của bạn đang trống!");
+            return;
+        }
 
-        // Sử dụng Clipboard API hiện đại
+        let text = "🙏 Chào Phở Bụt, tôi muốn đặt đơn hàng sau:\n--------------------------\n";
+        for (let m in window.gioHang) { 
+            text += `• ${m}: ${window.gioHang[m].soLuong} phần\n`; 
+        }
+        text += `--------------------------\n💰 Tổng cộng: ${tongTienGioHang.toLocaleString()} VND\n\nXin cảm ơn!`;
+
+        // Copy vào bộ nhớ tạm
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(() => {
-                alert("✅ Đã copy đơn hàng! Zalo sẽ mở ngay bây giờ, bạn chỉ cần nhấn 'Dán' (Paste) và gửi đơn nhé.");
+                alert("✅ Đã copy đơn hàng! Bạn chỉ cần sang Zalo và 'Dán' vào ô tin nhắn.");
                 window.location.href = "https://zalo.me/0968107788";
             }).catch(() => {
                 thucHienCopyCu(text);
@@ -208,23 +250,35 @@
         }
     };
 
-    // Hàm dự phòng cho các trình duyệt/điện thoại cũ
     function thucHienCopyCu(text) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
+        textArea.style.position = "fixed"; // Tránh scroll trang
         document.body.appendChild(textArea);
+        textArea.focus();
         textArea.select();
         try {
             document.execCommand('copy');
-            alert("✅ Đã copy đơn hàng! Zalo sẽ mở ngay bây giờ, bạn chỉ cần nhấn 'Dán' (Paste) và gửi đơn nhé.");
+            alert("✅ Đã copy đơn hàng! Bạn chỉ cần sang Zalo và 'Dán' vào ô tin nhắn.");
         } catch (err) {
-            console.error('Không thể copy');
+            console.error('Lỗi copy');
         }
         document.body.removeChild(textArea);
         window.location.href = "https://zalo.me/0968107788";
     }
 
-    window.hienThiQR = (type) => { const img = document.getElementById('qr-image'); const num = document.getElementById('qr-number'); if(type === 'zalo') { img.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://zalo.me/0968107788"; num.innerText = "0968 107 788 (Zalo)"; } else { img.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://wa.me/84968107788"; num.innerText = "0968 107 788 (WhatsApp)"; } document.getElementById('qr-modal').style.display = "block"; };
+    window.hienThiQR = (type) => { 
+        const img = document.getElementById('qr-image'); 
+        const num = document.getElementById('qr-number'); 
+        if(type === 'zalo') { 
+            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://zalo.me/0968107788"; 
+            num.innerText = "0968 107 788 (Zalo)"; 
+        } else { 
+            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://wa.me/84968107788"; 
+            num.innerText = "0968 107 788 (WhatsApp)"; 
+        } 
+        document.getElementById('qr-modal').style.display = "block"; 
+    };
     
     chayWeb();
 </script>
