@@ -22,15 +22,12 @@
         .about-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
         .about-img-square { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
         .about-text { padding: 20px; font-size: 1em; line-height: 1.6; color: #444; text-align: justify; }
-        .about-text ul { padding-left: 20px; margin-top: 5px; }
-        .video-wrapper-short { position: relative; width: 100%; max-width: 315px; margin: 0 auto 15px; aspect-ratio: 9/16; background: #000; border-radius: 12px; overflow: hidden; }
-        .video-wrapper-short iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .about-text b { color: #2e7d32; }
+        .about-text ul { padding-left: 18px; margin: 10px 0; list-style-type: none; }
+        .about-text ul li { position: relative; margin-bottom: 5px; }
+        .about-text ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
         .location-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; margin-bottom: 25px; }
         .btn-maps { display: inline-block; background: #2e7d32; color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .video-item { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .video-wrapper-landscape { position: relative; padding-bottom: 56.25%; height: 0; background: #000; }
-        .video-wrapper-landscape iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .video-info { padding: 12px; font-weight: bold; font-size: 0.95em; color: #2e7d32; text-align: center; background: white; }
         .menu-list { display: flex; flex-direction: column; gap: 20px; }
         .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
@@ -49,12 +46,9 @@
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
         .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 15px; position: relative; }
         .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        
-        /* CSS cho nút tăng giảm trong giỏ */
         .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; font-size: 0.95em; }
         .qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
         .btn-qty { background: #eee; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-        .btn-qty:active { background: #ccc; }
     </style>
 </head>
 <body>
@@ -76,13 +70,28 @@
         <img src="https://scontent.fdad1-2.fna.fbcdn.net/v/t39.30808-6/648093393_913420674737698_4812098189760785095_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=dd6889&_nc_ohc=rpPf2GbuMxAQ7kNvwG7tPMm&_nc_oc=Admlx3Kr1ARAwPEmqN3qvaONsU3b_1SQQ2qncZEqnWG3Rea1OsTgFS1yjHEbfWMuQ28&_nc_zt=23&_nc_ht=scontent.fdad1-2.fna&_nc_gid=-aUhE-ErZMpgdrUFqMzZNw&_nc_ss=8&oh=00_AfxdrwkonKxv8WPEk9vE291t6vSdaF6FG4xPwpNy0gfr8w&oe=69B04367" alt="Phở Bụt" class="about-img-square">
         <div class="about-text">
             Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
+            
             <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
-            Bếp nhà Veggie Saigon cam kết:
+            Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
             <ul>
                 <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-                <li><b>Không Ngũ Vị Tân:</b> Không hành, hẹ, tỏi, kiệu, hưng cừ.</li>
+                <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
+                <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
             </ul>
-            <b>4. Ăn uống Tỉnh thức:</b> Mỗi thực khách không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn. 🙏
+
+            <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
+            Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa, mang đến hương vị vừa quen thuộc vừa mới lạ, sang trọng.<br><br>
+
+            <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
+            Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
+            <ul>
+                <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
+                <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
+                <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
+            </ul>
+
+            <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
+            Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏
         </div>
     </div>
 
@@ -95,7 +104,7 @@
     <div class="location-card">
         <strong style="font-size: 1.1em; color: #2e7d32;">Phở Bụt Vegan - Quán Chay Da Nang</strong><br>
         <p style="margin: 10px 0; color: #555;">📍 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
-        <a href="https://www.google.com/maps/search/?api=1&query=Phở+Bụt+Vegan+76+Thủ+Khoa+Huân+Đà+Nẵng" target="_blank" class="btn-maps">🗺️ Xem trên Google Maps</a>
+        <a href="https://maps.app.goo.gl/YourMapLink" target="_blank" class="btn-maps">🗺️ Xem trên Google Maps</a>
     </div>
 
     <div class="contact-btns">
@@ -163,7 +172,6 @@
         } catch(e) { console.error(e); }
     }
 
-    // Hàm cập nhật hiển thị thanh giỏ hàng dưới cùng
     window.capNhatThanhGioHang = () => {
         let tongSoLuong = 0;
         tongTienGioHang = 0;
@@ -177,24 +185,18 @@
     };
 
     window.themVaoGio = (ten, gia) => {
-        if (window.gioHang[ten]) {
-            window.gioHang[ten].soLuong++;
-        } else {
-            window.gioHang[ten] = { gia: gia, soLuong: 1 };
-        }
+        if (window.gioHang[ten]) { window.gioHang[ten].soLuong++; } 
+        else { window.gioHang[ten] = { gia: gia, soLuong: 1 }; }
         window.capNhatThanhGioHang();
     };
 
-    // Hàm thay đổi số lượng +/- trong modal
     window.doiSoLuong = (ten, delta) => {
         if (window.gioHang[ten]) {
             window.gioHang[ten].soLuong += delta;
-            if (window.gioHang[ten].soLuong <= 0) {
-                delete window.gioHang[ten];
-            }
+            if (window.gioHang[ten].soLuong <= 0) { delete window.gioHang[ten]; }
         }
-        window.moGioHang(); // Vẽ lại giao diện modal
-        window.capNhatThanhGioHang(); // Cập nhật thanh bar
+        window.moGioHang();
+        window.capNhatThanhGioHang();
     };
 
     window.moGioHang = () => { 
@@ -226,44 +228,27 @@
     window.dongModal = (id) => document.getElementById(id).style.display = "none";
 
     window.guiZalo = () => {
-        if (Object.keys(window.gioHang).length === 0) {
-            alert("Giỏ hàng của bạn đang trống!");
-            return;
-        }
+        if (Object.keys(window.gioHang).length === 0) { alert("Giỏ hàng đang trống!"); return; }
+        let text = "🙏 Chào Phở Bụt, tôi muốn đặt đơn hàng:\n--------------------------\n";
+        for (let m in window.gioHang) { text += `• ${m}: ${window.gioHang[m].soLuong} phần\n`; }
+        text += `--------------------------\n💰 Tổng: ${tongTienGioHang.toLocaleString()} VND\n\nCảm ơn!`;
 
-        let text = "🙏 Chào Phở Bụt, tôi muốn đặt đơn hàng sau:\n--------------------------\n";
-        for (let m in window.gioHang) { 
-            text += `• ${m}: ${window.gioHang[m].soLuong} phần\n`; 
-        }
-        text += `--------------------------\n💰 Tổng cộng: ${tongTienGioHang.toLocaleString()} VND\n\nXin cảm ơn!`;
-
-        // Copy vào bộ nhớ tạm
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(() => {
-                alert("✅ Đã copy đơn hàng! Bạn chỉ cần sang Zalo và 'Dán' vào ô tin nhắn.");
+                alert("✅ Đã copy đơn hàng! Đang chuyển đến Zalo...");
                 window.location.href = "https://zalo.me/0968107788";
-            }).catch(() => {
-                thucHienCopyCu(text);
-            });
-        } else {
-            thucHienCopyCu(text);
-        }
+            }).catch(() => { thucHienCopyCu(text); });
+        } else { thucHienCopyCu(text); }
     };
 
     function thucHienCopyCu(text) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
-        textArea.style.position = "fixed"; // Tránh scroll trang
         document.body.appendChild(textArea);
-        textArea.focus();
         textArea.select();
-        try {
-            document.execCommand('copy');
-            alert("✅ Đã copy đơn hàng! Bạn chỉ cần sang Zalo và 'Dán' vào ô tin nhắn.");
-        } catch (err) {
-            console.error('Lỗi copy');
-        }
+        document.execCommand('copy');
         document.body.removeChild(textArea);
+        alert("✅ Đã copy đơn hàng! Đang chuyển đến Zalo...");
         window.location.href = "https://zalo.me/0968107788";
     }
 
