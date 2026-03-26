@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quản Trị Phở Bụt</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .admin-container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+        .form-group { margin-bottom: 15px; }
+        input, button { padding: 10px; width: 100%; box-sizing: border-box; }
+        button { background: #2e7d32; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .menu-item-admin { display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <h2>🍀 Quản Lý Thực Đơn</h2>
+    
+    <div id="add-form">
+        <div class="form-group"><input type="text" id="tenVi" placeholder="Tên tiếng Việt"></div>
+        <div class="form-group"><input type="text" id="tenEn" placeholder="Tên tiếng Anh"></div>
+        <div class="form-group"><input type="number" id="gia" placeholder="Giá tiền (VNĐ)"></div>
+        <div class="form-group">
+            <label>Chọn ảnh món ăn:</label>
+            <input type="file" id="fileAnh" accept="image/*">
+        </div>
+        <button onclick="themMonMoi()">➕ Thêm Món Mới</button>
+    </div>
+
+    <hr>
+    <h3>Danh sách món hiện tại</h3>
+    <div id="list-mon-admin">Đang tải dữ liệu...</div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+    // Cấu hình Firebase (Con dùng y hệt cái cũ của con nghen)
+    const firebaseConfig = { 
+        apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", 
+        authDomain: "phobut-95574.firebaseapp.com", 
+        projectId: "phobut-95574", 
+        storageBucket: "phobut-95574.firebasestorage.app", 
+        messagingSenderId: "588108977874", 
+        appId: "1:588108977874:web:91eaa1d51fa3ddfbf6ff0b" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // 1. Hàm tải ảnh lên Storage và lấy Link sạch
+    window.themMonMoi = async () => {
+        const tenVi = document.getElementById('tenVi').value;
+        const tenEn = document.getElementById('tenEn').value;
+        const gia = document.getElementById('gia').value;
+        const file = document.getElementById('fileAnh').files[0];
+
+        if(!file || !tenVi) { alert("Con bận điền đủ thông tin với chọn ảnh nghen!"); return; }
+
+        try {
+            // Tải lên Storage
+            const storageRef = ref(storage, 'menu/' + file.name);
+            const snapshot = await uploadBytes(storageRef, file);
+            const urlHinh = await getDownloadURL(snapshot.ref);
+
+            // Lưu vào Firestore
+            await addDoc(collection(db, "Menus"), {
+                ten_tieng_viet: tenVi,
+                ten_tieng_anh: tenEn,
+                gia_tien: Number(gia),
+                hinh_anh: urlHinh // Link này sẽ sống vĩnh viễn trên web
+            });
+
+            alert("Đã thêm món thành công rồi nghen!");
+            location.reload();
+        } catch (e) { console.error(e); }
+    };
+
+    // 2. Hàm hiển thị và Xóa món (để dọn dẹp mấy cái link Drive cũ)
+    async function loadAdminMenu() {
+        const querySnapshot = await getDocs(collection(db, "Menus"));
+        const listDiv = document.getElementById('list-mon-admin');
+        listDiv.innerHTML = "";
+        querySnapshot.forEach((docData) => {
+            const m = docData.data();
+            listDiv.innerHTML += `
+                <div class="menu-item-admin">
+                    <span>${m.ten_tieng_viet} - ${m.gia_tien}đ</span>
+                    <button style="width:70px; background:red;" onclick="xoaMon('${docData.id}')">Xóa</button>
+                </div>`;
+        });
+    }
+
+    window.xoaMon = async (id) => {
+        if(confirm("Con có chắc muốn xóa món này không?")) {
+            await deleteDoc(doc(db, "Menus", id));
+            location.reload();
+        }
+    };
+
+    loadAdminMenu();
+</script>
+</body>
+</html>
