@@ -34,6 +34,9 @@
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
+        /* Khung thông điệp ngắn đã được khôi phục */
+        .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
+        
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .social-btn { padding: 8px 15px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.9em; display: inline-flex; align-items: center; }
         .bg-fb { background: #1877F2; } .bg-tiktok { background: #000000; } .bg-yt { background: #FF0000; }
@@ -81,7 +84,6 @@
         .cart-item-controls { display: flex; align-items: center; gap: 12px; }
         .btn-qty { background: #f0f0f0; border: 1px solid #ddd; width: 28px; height: 28px; border-radius: 5px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         
-        /* CSS cho phần tài khoản và lịch sử đơn hàng */
         .history-card { background: #f9f9f9; border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9em; }
         .history-status { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; background: #ddd; }
         .admin-zone { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #3498db; }
@@ -114,6 +116,8 @@
             <img id="about-img" src="https://via.placeholder.com/600x400?text=Pho+But" alt="Phở Bụt">
         </div>
         <div class="about-content">
+            <div class="message-box" id="dynamic-message" style="display: none;"></div>
+            
             <div class="social-links" id="social-links"></div>
             <div class="contact-box">
                 <p>📍 <b>Địa chỉ:</b> 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
@@ -123,6 +127,7 @@
     </div>
 
     <div class="core-about-card" id="core-about-card">Đang tải thông tin giới thiệu...</div>
+    
     <div id="youtube-container" style="display: none;"></div>
 
     <div class="section-title">🍜 Thực Đơn</div>
@@ -241,7 +246,6 @@
     let cart = {};
     let thongTinQuan = {}; 
 
-    // --- TẢI DỮ LIỆU CỬA HÀNG ---
     async function loadThongTinQuan() {
         const snap = await getDoc(doc(db, "Settings", "info"));
         if (snap.exists()) {
@@ -250,6 +254,12 @@
             document.getElementById('core-about-card').innerHTML = data.bai_gioi_thieu_chinh || "";
             if(data.hinh_dai_dien) document.getElementById('about-img').src = data.hinh_dai_dien;
             
+            if(data.loi_gioi_thieu && data.loi_gioi_thieu.trim() !== "") {
+                const msgBox = document.getElementById('dynamic-message');
+                msgBox.innerHTML = `<b>Thông điệp từ cửa hàng:</b><br>` + data.loi_gioi_thieu.replace(/\n/g, '<br>');
+                msgBox.style.display = 'block';
+            }
+
             if(data.link_youtube && data.link_youtube.trim() !== "") {
                 let ytId = ""; const url = data.link_youtube;
                 if(url.includes("v=")) ytId = url.split("v=")[1].substring(0,11);
@@ -270,7 +280,6 @@
         }
     }
 
-    // --- QUẢN LÝ XÁC THỰC (AUTH) ---
     onAuthStateChanged(auth, async (user) => {
         const bar = document.getElementById('auth-status');
         if (user) {
@@ -280,7 +289,6 @@
                              <span class="auth-link" onclick="window.moTaiKhoan()">[Tài khoản]</span> 
                              | <span class="auth-link" onclick="window.logout()" style="font-weight:normal;">Đăng xuất</span>`;
             
-            // Tải thông tin cá nhân đã lưu
             const uSnap = await getDoc(doc(db, "Users", user.email));
             if(uSnap.exists()) {
                 user_profile = uSnap.data();
@@ -288,7 +296,6 @@
                 document.getElementById('profile-address').value = user_profile.address || "";
             }
 
-            // Kiểm tra quyền Quản lý/Nhân viên
             if(user.email === EMAIL_CHUYEN_TRACH) {
                 document.getElementById('admin-zone').style.display = 'block';
                 document.getElementById('btn-admin-only').style.display = 'block';
@@ -307,11 +314,7 @@
         }
     });
 
-    window.moModalXacThuc = () => {
-        window.chuyenForm('login');
-        document.getElementById('auth-modal').style.display = 'block';
-    };
-
+    window.moModalXacThuc = () => { window.chuyenForm('login'); document.getElementById('auth-modal').style.display = 'block'; };
     window.chuyenForm = (type) => {
         document.getElementById('form-login').style.display = 'none';
         document.getElementById('form-register').style.display = 'none';
@@ -355,7 +358,6 @@
 
     window.logout = () => signOut(auth);
 
-    // --- QUẢN LÝ TÀI KHOẢN & LỊCH SỬ ---
     window.moTaiKhoan = async () => {
         document.getElementById('profile-modal').style.display = 'block';
         const listDiv = document.getElementById('order-history-list');
@@ -367,7 +369,6 @@
             let orders = [];
             snap.forEach(d => orders.push({ id: d.id, ...d.data() }));
             
-            // Sắp xếp đơn hàng mới nhất lên đầu bằng Javascript (tránh lỗi yêu cầu tạo Index của Firebase)
             orders.sort((a, b) => {
                 let timeA = a.thoi_gian ? a.thoi_gian.toMillis() : 0;
                 let timeB = b.thoi_gian ? b.thoi_gian.toMillis() : 0;
@@ -398,9 +399,7 @@
                         </div>`;
                 });
             }
-        } catch(e) {
-            listDiv.innerHTML = '<p style="color:red; font-size:0.85em;">Không thể tải lịch sử đơn hàng.</p>';
-        }
+        } catch(e) { listDiv.innerHTML = '<p style="color:red; font-size:0.85em;">Không thể tải lịch sử đơn hàng.</p>'; }
     };
 
     window.luuThongTinCaNhan = async () => {
@@ -413,7 +412,6 @@
         } catch(e) { alert("Lỗi lưu thông tin: " + e.message); }
     };
 
-    // --- QUẢN LÝ THỰC ĐƠN VÀ GIỎ HÀNG ---
     async function fetchMenu() {
         const snap = await getDocs(collection(db, "Menus"));
         const list = document.getElementById('menu-list');
@@ -488,19 +486,13 @@
 
     window.tienHanhDatHang = () => {
         if(!current_user) { Swal.fire("Vui lòng đăng nhập để tiếp tục!"); window.moModalXacThuc(); return; }
-        
-        // Tự động điền thông tin nếu đã lưu trong Profile
         document.getElementById('ship-phone').value = user_profile.phone || "";
         document.getElementById('ship-address').value = user_profile.address || "";
-        
         document.getElementById('cart-modal').style.display = 'none';
         document.getElementById('checkout-modal').style.display = 'block';
     };
 
-    window.quayLaiGioHang = () => {
-        document.getElementById('checkout-modal').style.display = 'none';
-        window.moGioHang();
-    };
+    window.quayLaiGioHang = () => { document.getElementById('checkout-modal').style.display = 'none'; window.moGioHang(); };
 
     window.xacNhanDatHang = async () => {
         const phone = document.getElementById('ship-phone').value;
@@ -534,7 +526,6 @@
                 trang_thai: "Chờ xác nhận" 
             });
 
-            // Tự động cập nhật lại Profile nếu khách hàng nhập số/địa chỉ mới
             if(phone !== user_profile.phone || address !== user_profile.address) {
                 await setDoc(doc(db, "Users", current_user.email), { phone: phone, address: address }, { merge: true });
                 user_profile = { phone, address };
