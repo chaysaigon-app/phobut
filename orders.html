@@ -2,73 +2,47 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Lý Đơn Hàng & Báo Cáo - Phở Bụt</title>
+    <title>Quản Lý Đơn Hàng & Lợi Nhuận</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript"> (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })(); </script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        #admin-login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e3f2fd; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .btn-google { background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .admin-wrapper { max-width: 1000px; margin: auto; display: none; } 
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; position: relative; }
-        h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
-        
-        /* Giao diện Báo cáo */
-        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .report-box { background: #f9fbf9; padding: 15px; border-radius: 10px; border: 1px solid #c8e6c9; text-align: center; }
-        .report-box h4 { margin: 0; color: #666; font-size: 0.9em; }
-        .report-box p { margin: 5px 0 0 0; font-size: 1.4em; font-weight: bold; color: #2e7d32; }
-        .filter-area { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 8px; }
-        .filter-area input { padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
-
-        /* Giao diện Đơn hàng */
-        .order-card { border-left: 5px solid #3498db; background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-        .order-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; color: white; }
-        .action-buttons { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
-        .btn-status { padding: 6px 12px; font-size: 0.8em; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; color: white; }
-        .btn-logout { position: absolute; top: 20px; right: 20px; background: #d32f2f; color: white; border-radius: 20px; padding: 6px 15px; border: none; cursor: pointer; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .report-grid { display: flex; gap: 15px; margin-top: 15px; }
+        .report-box { flex: 1; background: #f9fbf9; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
+        .order-card { border-left: 5px solid #3498db; background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; }
+        .btn-status { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; color: white; font-weight: bold; margin-right: 5px; }
     </style>
 </head>
 <body>
 
-<div id="admin-login-screen">
-    <h2>Trang Xử Lý & Báo Cáo</h2>
-    <button class="btn-google" onclick="window.dangNhapGoogle()">🔑 Đăng Nhập Google</button>
+<div id="admin-login-screen" style="text-align:center; padding-top:100px;">
+    <button onclick="window.dangNhapGoogle()" style="padding:15px 30px; background:#e67e22; color:white; border-radius:30px; border:none; font-weight:bold;">🔑 Đăng Nhập Xử Lý Đơn</button>
 </div>
 
-<div class="admin-wrapper">
-    <button class="btn-logout" onclick="window.dangXuat()">Thoát</button>
-
+<div class="admin-wrapper" style="display:none; max-width:900px; margin:auto;">
     <div class="card">
-        <h2>📊 Báo Cáo Doanh Thu (Đơn đã hoàn thành)</h2>
-        <div class="filter-area">
-            <div>
-                <label style="font-size:0.8em; display:block;">Từ ngày:</label>
-                <input type="date" id="date-from">
-            </div>
-            <div>
-                <label style="font-size:0.8em; display:block;">Đến ngày:</label>
-                <input type="date" id="date-to">
-            </div>
-            <button onclick="window.tinhBao Cao()" style="padding: 8px 15px; background: #2e7d32; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Lọc báo cáo</button>
+        <h2>📊 Báo Cáo Lợi Nhuận</h2>
+        <div style="margin-bottom:10px;">
+            Từ: <input type="date" id="date-from"> Đến: <input type="date" id="date-to"> 
+            <button onclick="window.tinhBaoCao()" style="background:#2e7d32; color:white; padding:5px 15px;">Lọc</button>
         </div>
         <div class="report-grid">
-            <div class="report-box"><h4>Hôm nay</h4><p id="sum-today">0đ</p></div>
-            <div class="report-box"><h4>Tháng này</h4><p id="sum-month">0đ</p></div>
-            <div class="report-box"><h4>Theo lọc</h4><p id="sum-filter" style="color:#e67e22;">0đ</p></div>
+            <div class="report-box"><h4>Doanh Thu</h4><p id="sum-revenue">0đ</p></div>
+            <div class="report-box"><h4>Giá Vốn</h4><p id="sum-cost">0đ</p></div>
+            <div class="report-box"><h4>Lợi Nhuận</h4><p id="sum-profit" style="color:green; font-weight:bold;">0đ</p></div>
         </div>
     </div>
 
     <div class="card">
-        <h2>📦 Đơn Hàng Cần Xử Lý</h2>
+        <h2>📦 Danh Sách Đơn Hàng</h2>
         <div id="order-list">Đang tải...</div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy, getDoc, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, updateDoc, doc, query, orderBy, getDoc, writeBatch, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
@@ -78,116 +52,73 @@
     const provider = new GoogleAuthProvider();
 
     const ADMIN_EMAIL = "chaysaigon@gmail.com";
-    let currentUserEmail = "";
     window.allOrders = [];
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            currentUserEmail = user.email;
             const staffSnap = await getDoc(doc(db, "Settings", "staff"));
             const isStaff = staffSnap.exists() && staffSnap.data().emails?.includes(user.email);
-            
             if (user.email === ADMIN_EMAIL || isStaff) {
                 document.getElementById('admin-login-screen').style.display = 'none';
                 document.querySelector('.admin-wrapper').style.display = 'block';
                 loadOrders();
-            } else { alert("Không có quyền!"); signOut(auth); }
-        } else { document.getElementById('admin-login-screen').style.display = 'flex'; }
+            } else signOut(auth);
+        }
     });
 
-    window.dangNhapGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { alert(e.message); } };
-    window.dangXuat = () => signOut(auth);
+    window.dangNhapGoogle = async () => { await signInWithPopup(auth, provider); };
 
     async function loadOrders() {
         const snap = await getDocs(query(collection(db, "Orders"), orderBy("thoi_gian", "desc")));
         window.allOrders = [];
-        const listDiv = document.getElementById('order-list');
-        listDiv.innerHTML = "";
+        const listDiv = document.getElementById('order-list'); listDiv.innerHTML = "";
 
         snap.forEach(d => {
-            const o = { id: d.id, ...d.data() };
-            window.allOrders.push(o);
-
-            let itemsHTML = ""; for(let k in o.chi_tiet) itemsHTML += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
-            let statusColor = o.trang_thai === 'Đã hoàn thành' ? '#2ecc71' : (o.trang_thai === 'Đơn hàng huỷ' ? '#7f8c8d' : '#3498db');
-
-            listDiv.innerHTML += `
-                <div class="order-card">
-                    <div class="order-header">
-                        <div><b>Khách:</b> ${o.khach_hang}<br><b>SĐT:</b> ${o.dien_thoai}<br><b>Địa chỉ:</b> ${o.dia_chi}</div>
-                        <div class="status-badge" style="background:${statusColor}">${o.trang_thai}</div>
-                    </div>
-                    <ul>${itemsHTML}</ul>
-                    <div style="font-weight:bold; color:#d35400;">Tổng thu: ${o.tong_tien.toLocaleString()}đ</div>
-                    <div class="action-buttons">
-                        <button class="btn-status" style="background:#9b59b6" onclick="window.updateStatus('${o.id}', 'Đã liên hệ')">Liên hệ</button>
-                        <button class="btn-status" style="background:#f1c40f; color:#333" onclick="window.updateStatus('${o.id}', 'Đã thanh toán')">Thanh toán</button>
-                        <button class="btn-status" style="background:#3498db" onclick="window.updateStatus('${o.id}', 'Đang giao')">Giao hàng</button>
-                        <button class="btn-status" style="background:#2ecc71" onclick="window.updateStatus('${o.id}', 'Đã hoàn thành')">Hoàn thành & Trừ kho</button>
-                        <button class="btn-status" style="background:#95a5a6" onclick="window.updateStatus('${o.id}', 'Đơn hàng huỷ')">Hủy</button>
-                        ${currentUserEmail === ADMIN_EMAIL ? `<button class="btn-status" style="background:#e74c3c; margin-left:auto" onclick="window.deleteOrder('${o.id}')">Xóa</button>` : ''}
-                    </div>
-                </div>`;
+            const o = { id: d.id, ...d.data() }; window.allOrders.push(o);
+            let items = ""; for(let k in o.chi_tiet) items += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
+            listDiv.innerHTML += `<div class="order-card">
+                <b>Khách: ${o.khach_hang} - Trạng thái: ${o.trang_thai}</b>
+                <ul>${items}</ul>
+                <div>Tổng thu: ${o.tong_tien.toLocaleString()}đ</div>
+                <div style="margin-top:10px;">
+                    <button class="btn-status" style="background:#3498db" onclick="window.updateStatus('${o.id}', 'Đang giao')">Giao hàng</button>
+                    <button class="btn-status" style="background:#2ecc71" onclick="window.updateStatus('${o.id}', 'Đã hoàn thành')">Hoàn thành & Trừ kho</button>
+                    <button class="btn-status" style="background:#7f8c8d" onclick="window.updateStatus('${o.id}', 'Đơn hàng huỷ')">Hủy</button>
+                </div>
+            </div>`;
         });
         window.tinhBaoCao();
     }
 
-    window.updateStatus = async (id, newStatus) => {
+    window.updateStatus = async (id, newS) => {
         const o = window.allOrders.find(x => x.id === id);
         try {
-            // NẾU HOÀN THÀNH -> TỰ ĐỘNG TRỪ KHO
-            if (newStatus === 'Đã hoàn thành' && o.trang_thai !== 'Đã hoàn thành') {
+            if (newS === 'Đã hoàn thành' && o.trang_thai !== 'Đã hoàn thành') {
                 const batch = writeBatch(db);
-                for (let tenMon in o.chi_tiet) {
-                    // Tìm món trong bảng Menus để trừ kho
-                    const qMenu = query(collection(db, "Menus"), where("ten_tieng_viet", "==", tenMon));
-                    const menuSnap = await getDocs(qMenu);
-                    menuSnap.forEach(mDoc => {
-                        const newStock = (mDoc.data().ton_kho || 0) - o.chi_tiet[tenMon].sl;
-                        batch.update(doc(db, "Menus", mDoc.id), { ton_kho: Math.max(0, newStock) });
-                    });
+                for (let ten in o.chi_tiet) {
+                    const q = query(collection(db, "Menus"), where("ten_tieng_viet", "==", ten));
+                    const mSnap = await getDocs(q);
+                    mSnap.forEach(m => batch.update(doc(db, "Menus", m.id), { ton_kho: Math.max(0, (m.data().ton_kho||0) - o.chi_tiet[ten].sl) }));
                 }
                 await batch.commit();
             }
-
-            await updateDoc(doc(db, "Orders", id), { trang_thai: newStatus });
-            
-            // Gửi Email thông báo (có chi tiết món)
-            let details = ""; for(let k in o.chi_tiet) details += `- ${k} (x${o.chi_tiet[k].sl})\n`;
-            emailjs.send("service_j8kubcd", "template_3ee7url", {
-                to_email: o.khach_hang,
-                subject: `Cập nhật đơn hàng: ${newStatus}`,
-                message: `Trạng thái mới: ${newStatus}\n\nChi tiết đơn hàng:\n${details}\nTổng tiền: ${o.tong_tien.toLocaleString()}đ`
-            });
-
-            alert("Đã cập nhật và gửi thông báo!"); loadOrders();
-        } catch(e) { alert("Lỗi: " + e.message); }
+            await updateDoc(doc(db, "Orders", id), { trang_thai: newS });
+            alert("Đã cập nhật!"); loadOrders();
+        } catch(e) { alert(e.message); }
     };
 
     window.tinhBaoCao = () => {
-        const now = new Date();
-        const startToday = new Date(now.setHours(0,0,0,0)).getTime();
-        const startMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-        
         const fFrom = document.getElementById('date-from').value ? new Date(document.getElementById('date-from').value).getTime() : 0;
         const fTo = document.getElementById('date-to').value ? new Date(document.getElementById('date-to').value).setHours(23,59,59,999) : Infinity;
-
-        let sToday = 0, sMonth = 0, sFilter = 0;
-
+        let rev = 0, cost = 0;
         window.allOrders.filter(o => o.trang_thai === 'Đã hoàn thành' && o.thoi_gian).forEach(o => {
-            const time = o.thoi_gian.toMillis();
-            if (time >= startToday) sToday += o.tong_tien;
-            if (time >= startMonth) sMonth += o.tong_tien;
-            if (time >= fFrom && time <= fTo) sFilter += o.tong_tien;
+            const t = o.thoi_gian.toMillis();
+            if (t >= fFrom && t <= fTo) { rev += (o.tong_tien || 0); cost += (o.tong_von || 0); }
         });
-
-        document.getElementById('sum-today').innerText = sToday.toLocaleString() + 'đ';
-        document.getElementById('sum-month').innerText = sMonth.toLocaleString() + 'đ';
-        document.getElementById('sum-filter').innerText = sFilter.toLocaleString() + 'đ';
+        document.getElementById('sum-revenue').innerText = rev.toLocaleString() + 'đ';
+        document.getElementById('sum-cost').innerText = cost.toLocaleString() + 'đ';
+        document.getElementById('sum-profit').innerText = (rev - cost).toLocaleString() + 'đ';
     };
-
-    window.deleteOrder = async (id) => { if(confirm("Xóa vĩnh viễn?")) { await deleteDoc(doc(db, "Orders", id)); loadOrders(); } };
-
 </script>
 </body>
 </html>
