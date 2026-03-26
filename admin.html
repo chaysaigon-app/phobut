@@ -6,13 +6,11 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
         
-        /* Màn hình khóa cửa ngoài */
         #admin-login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0fdf4; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #admin-login-screen h2 { color: #2e7d32; font-size: 2em; margin-bottom: 10px; }
         .btn-google { background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        /* Giao diện bên trong */
-        .admin-wrapper { max-width: 900px; margin: auto; display: none; } /* Giấu đi khi chưa đăng nhập */
+        .admin-wrapper { max-width: 900px; margin: auto; display: none; } 
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; position: relative; }
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
         h3 { color: #e67e22; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em; border-bottom: 1px dashed #ddd; padding-bottom: 5px; }
@@ -45,7 +43,7 @@
         <button class="btn-logout" onclick="window.dangXuatAdmin()">🔒 Thoát</button>
         <h2>🏠 Cài Đặt Thông Tin & Kết Nối</h2>
         
-        <h3>📞 Thông Tin Nhận Đơn Hàng (Của Quán)</h3>
+        <h3>📞 Thông Tin Nhận Đơn Hàng</h3>
         <div class="form-group">
             <label>Email nhận đơn (ví dụ: chaysaigon@gmail.com):</label>
             <input type="email" id="adminEmail" placeholder="Điền email đặng nhận thông báo...">
@@ -55,26 +53,32 @@
             <input type="text" id="adminZalo" placeholder="Điền số Zalo của quán...">
         </div>
         <div class="form-group">
-            <label>Số điện thoại nhận tin WhatsApp (Kèm mã vùng, ví dụ: 84968107788):</label>
-            <input type="text" id="adminWhatsapp" placeholder="Điền số WhatsApp của quán (Bỏ số 0 ở đầu, thay bằng 84)...">
+            <label>Số điện thoại nhận tin WhatsApp (Bỏ số 0, thay bằng 84):</label>
+            <input type="text" id="adminWhatsapp" placeholder="Ví dụ: 84968107788...">
         </div>
 
-        <h3>🌐 Giới Thiệu & Mạng Xã Hội</h3>
+        <h3>📝 Bài Giới Thiệu Chính (Dài) & Lời Ngỏ (Ngắn)</h3>
         <div class="form-group">
-            <label>Thông điệp từ Bếp (Lời giới thiệu ngắn gọn):</label>
-            <textarea id="loiGioiThieu" rows="3" placeholder="Con viết đôi lời chánh niệm giới thiệu quán vô đây nghen..."></textarea>
+            <label>Thông điệp từ Bếp (Lời ngỏ ngắn gọn nằm trong khung nhỏ):</label>
+            <textarea id="loiGioiThieu" rows="3" placeholder="Viết đôi lời chánh niệm ngắn gọn..."></textarea>
         </div>
         <div class="form-group">
-            <label>Link Video YouTube (Tự động phát bên dưới bài giới thiệu dài):</label>
-            <input type="text" id="linkYoutube" placeholder="Ví dụ: https://www.youtube.com/watch?v=...">
+            <label>Bài Giới Thiệu Chính (Nằm bên dưới hình ảnh):<br>
+            <i style="color:#d35400; font-weight:normal; font-size:0.9em;">(Mẹo: Giữ nguyên mấy cái thẻ như &lt;b&gt;...&lt;/b&gt; đặng in đậm, hay &lt;br&gt; đặng xuống dòng cho nó đẹp nghen con)</i></label>
+            <textarea id="baiGioiThieuChinh" rows="12" placeholder="Nội dung giới thiệu chi tiết..."></textarea>
         </div>
+
+        <h3>🌐 Đa Phương Tiện & Mạng Xã Hội</h3>
         <div class="form-group">
             <label>Hình đại diện quán (Để trống nếu giữ hình cũ):</label>
             <input type="file" id="fileAnhDaiDien" accept="image/*">
             <br>
             <img id="previewDaiDien" src="" style="width: 150px; margin-top: 15px; border-radius: 10px; display: none; object-fit: cover;">
         </div>
-
+        <div class="form-group">
+            <label>Link Video YouTube (Tự động phát bên dưới bài giới thiệu dài):</label>
+            <input type="text" id="linkYoutube" placeholder="Ví dụ: https://www.youtube.com/watch?v=...">
+        </div>
         <div class="form-group">
             <label>Link bản đồ Google Maps:</label>
             <input type="text" id="linkMap" placeholder="Ví dụ: https://goo.gl/maps/...">
@@ -142,45 +146,60 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // CHỈ CÓ EMAIL NÀY MỚI ĐƯỢC VÔ QUẢN TRỊ
     const EMAIL_CHUYEN_TRACH = "chaysaigon@gmail.com"; 
 
     const cloudName = "dym7dwnji", uploadPreset = "qjrpdbhs";
     let current_img_url = "";
     let current_avatar_url = "";
 
-    // 1. Quản lý Đăng Nhập
+    // Cái bài mặc định đặng mồi sẵn cho quán
+    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
+        
+<b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
+Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
+<ul>
+    <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
+    <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
+    <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
+</ul>
+
+<b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
+Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
+
+<b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
+Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
+<ul>
+    <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
+    <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
+    <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
+</ul>
+
+<b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
+Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏`;
+
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // Kiểm tra rặt coi có đúng email quản trị không
             if (user.email === EMAIL_CHUYEN_TRACH) {
                 document.getElementById('admin-login-screen').style.display = 'none';
                 document.querySelector('.admin-wrapper').style.display = 'block';
-                // Đăng nhập đúng rồi mới tải dữ liệu đặng tránh lỗi
                 loadThongTin();
                 loadData();
             } else {
-                alert("Mô Phật! Trạm này chỉ dành riêng cho Bếp trưởng nghen con. Tài khoản Gmail này không có chìa khóa vô cửa thiền ráo trọi.");
-                signOut(auth); // Đuổi ra liền
+                alert("Mô Phật! Trạm này chỉ dành riêng cho Bếp trưởng nghen con.");
+                signOut(auth);
             }
         } else {
-            // Chưa đăng nhập thì khóa màn hình lại
             document.getElementById('admin-login-screen').style.display = 'flex';
             document.querySelector('.admin-wrapper').style.display = 'none';
         }
     });
 
     window.dangNhapGoogle = async () => {
-        try {
-            await signInWithPopup(auth, provider);
-        } catch (error) {
-            alert("Lỗi đăng nhập: " + error.message);
-        }
+        try { await signInWithPopup(auth, provider); } catch (error) { alert("Lỗi đăng nhập: " + error.message); }
     };
 
     window.dangXuatAdmin = () => { signOut(auth); };
 
-    // 2. Các chức năng bên trong (giữ nguyên ráo trọi)
     async function uploadToCloudinary(file) {
         const formData = new FormData();
         formData.append("file", file);
@@ -200,6 +219,9 @@
             document.getElementById('adminWhatsapp').value = data.admin_whatsapp || "";
 
             document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
+            // Tải bài giới thiệu chính, nếu chưa có thì lấy cái mặc định
+            document.getElementById('baiGioiThieuChinh').value = data.bai_gioi_thieu_chinh || defaultBaiGioiThieu;
+
             document.getElementById('linkYoutube').value = data.link_youtube || "";
             document.getElementById('linkMap').value = data.link_map || "";
             document.getElementById('linkFb').value = data.link_fb || "";
@@ -212,6 +234,9 @@
                 img.src = current_avatar_url;
                 img.style.display = "block";
             }
+        } else {
+            // Chưa có dữ liệu gì ráo thì rải cái mặc định lên
+            document.getElementById('baiGioiThieuChinh').value = defaultBaiGioiThieu;
         }
     }
 
@@ -221,6 +246,7 @@
         const adminWhatsapp = document.getElementById('adminWhatsapp').value;
 
         const loi = document.getElementById('loiGioiThieu').value;
+        const baiChinh = document.getElementById('baiGioiThieuChinh').value;
         const linkYtVideo = document.getElementById('linkYoutube').value;
         const linkMap = document.getElementById('linkMap').value;
         const linkFb = document.getElementById('linkFb').value;
@@ -239,6 +265,7 @@
                 admin_zalo: adminZalo,
                 admin_whatsapp: adminWhatsapp,
                 loi_gioi_thieu: loi,
+                bai_gioi_thieu_chinh: baiChinh,
                 link_youtube: linkYtVideo,
                 link_map: linkMap,
                 link_fb: linkFb,
