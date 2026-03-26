@@ -19,13 +19,11 @@
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
         .btn-logout { position: absolute; top: 20px; right: 25px; background: #d32f2f; color: white; border-radius: 20px; padding: 8px 15px; border: none; font-weight: bold; cursor: pointer;}
         
-        /* Giao diện thẻ đơn hàng */
         .order-card { border-left: 5px solid #3498db; background: #fdfefe; padding: 15px; margin-bottom: 20px; border-radius: 8px; font-size: 0.95em; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .order-card ul { margin: 5px 0 10px 0; padding-left: 20px; }
         .order-header { display: flex; justify-content: space-between; align-items: flex-start; }
         .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.85em; font-weight: bold; background: #eee; }
         
-        /* Cụm nút trạng thái */
         .action-buttons { margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
         .btn-status { padding: 8px 15px; font-size: 0.85em; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
         .btn-status:active { transform: scale(0.95); }
@@ -35,7 +33,7 @@
         .bg-deliv { background: #3498db; } .bg-deliv:hover { background: #2980b9; }
         .bg-done { background: #2ecc71; } .bg-done:hover { background: #27ae60; }
         .bg-cancel { background: #95a5a6; } .bg-cancel:hover { background: #7f8c8d; }
-        .bg-del { background: #e74c3c; margin-left: auto;} .bg-del:hover { background: #c0392b; } /* Nút xóa đẩy về góc phải */
+        .bg-del { background: #e74c3c; margin-left: auto;} .bg-del:hover { background: #c0392b; } 
     </style>
 </head>
 <body>
@@ -67,19 +65,19 @@
 
     const EMAIL_CHUYEN_TRACH = "chaysaigon@gmail.com"; 
     let current_email = "";
+    
+    // Bộ nhớ tạm để lưu chi tiết đơn hàng cho tính năng gửi Email
+    window.danhSachDonHang = {};
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             current_email = user.email;
-            
-            // Lấy danh sách nhân viên từ Firestore
             const snap = await getDoc(doc(db, "Settings", "staff"));
             let isStaff = false;
             if(snap.exists() && snap.data().emails && snap.data().emails.includes(current_email)) {
                 isStaff = true;
             }
 
-            // Kiểm tra: Nếu là Admin hoặc có tên trong danh sách nhân viên thì cho vào
             if (current_email === EMAIL_CHUYEN_TRACH || isStaff) {
                 document.getElementById('admin-login-screen').style.display = 'none';
                 document.querySelector('.admin-wrapper').style.display = 'block';
@@ -102,11 +100,14 @@
         const snapO = await getDocs(qO);
         const divO = document.getElementById('order-list');
         divO.innerHTML = "";
+        window.danhSachDonHang = {}; // Làm sạch bộ nhớ
         
         if(snapO.empty) { divO.innerHTML = "<p>Chưa có đơn hàng nào.</p>"; return; }
 
         snapO.forEach(d => {
             const o = d.data();
+            window.danhSachDonHang[d.id] = o; // Lưu dữ liệu vào bộ nhớ tạm
+
             let items = ""; for(let k in o.chi_tiet) items += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
             
             let infoHTML = `<b>Email khách:</b> ${o.khach_hang} <br>
@@ -122,7 +123,6 @@
             if (currentStatus === 'Đã hoàn thành') statusColor = '#2ecc71';
             if (currentStatus === 'Đơn hàng huỷ') statusColor = '#7f8c8d';
 
-            // Chỉ Admin mới được thấy nút Xóa đơn hàng
             let nutXoa = '';
             if(current_email === EMAIL_CHUYEN_TRACH) {
                 nutXoa = `<button class="btn-status bg-del" onclick="window.xoaDonHang('${d.id}')">🗑️ Xóa Đơn</button>`;
@@ -140,25 +140,35 @@
                     <b style="color:#d35400; font-size: 1.1em;">💰 Tổng thu: ${(o.tong_tien || 0).toLocaleString()}đ</b>
                     
                     <div class="action-buttons">
-                        <button class="btn-status bg-contact" onclick="window.capNhatTrangThai('${d.id}', 'Đã liên hệ khách hàng', '${o.khach_hang}')">Đã liên hệ</button>
-                        <button class="btn-status bg-paid" onclick="window.capNhatTrangThai('${d.id}', 'Đã thanh toán', '${o.khach_hang}')">Đã thanh toán</button>
-                        <button class="btn-status bg-deliv" onclick="window.capNhatTrangThai('${d.id}', 'Đang giao hàng', '${o.khach_hang}')">Đang giao hàng</button>
-                        <button class="btn-status bg-done" onclick="window.capNhatTrangThai('${d.id}', 'Đã hoàn thành', '${o.khach_hang}')">Hoàn thành</button>
-                        <button class="btn-status bg-cancel" onclick="window.capNhatTrangThai('${d.id}', 'Đơn hàng huỷ', '${o.khach_hang}')">Hủy đơn</button>
+                        <button class="btn-status bg-contact" onclick="window.capNhatTrangThai('${d.id}', 'Đã liên hệ khách hàng')">Đã liên hệ</button>
+                        <button class="btn-status bg-paid" onclick="window.capNhatTrangThai('${d.id}', 'Đã thanh toán')">Đã thanh toán</button>
+                        <button class="btn-status bg-deliv" onclick="window.capNhatTrangThai('${d.id}', 'Đang giao hàng')">Đang giao hàng</button>
+                        <button class="btn-status bg-done" onclick="window.capNhatTrangThai('${d.id}', 'Đã hoàn thành')">Hoàn thành</button>
+                        <button class="btn-status bg-cancel" onclick="window.capNhatTrangThai('${d.id}', 'Đơn hàng huỷ')">Hủy đơn</button>
                         ${nutXoa}
                     </div>
                 </div>`;
         });
     }
 
-    window.capNhatTrangThai = async (id, trangThaiMoi, emailKhachHang) => {
+    window.capNhatTrangThai = async (id, trangThaiMoi) => {
+        const o = window.danhSachDonHang[id];
+        const emailKhachHang = o.khach_hang;
+
         try {
             await updateDoc(doc(db, "Orders", id), { trang_thai: trangThaiMoi });
             
-            // Tự động gửi Email thông báo trạng thái
+            // Xây dựng lại danh sách món ăn cho Email
+            let itemsText = ""; 
+            for(let k in o.chi_tiet) {
+                itemsText += `- ${k} (x${o.chi_tiet[k].sl})\n`;
+            }
+
             const emailjsServiceID = "service_j8kubcd";
             const emailjsTemplateID = "template_3ee7url";
-            const noiDungThu = `Xin chào,\n\nCửa hàng Phở Bụt xin thông báo đơn hàng của bạn vừa được cập nhật trạng thái mới:\n\nTrạng thái hiện tại: [ ${trangThaiMoi.toUpperCase()} ]\n\nCảm ơn bạn đã lựa chọn món chay tĩnh thức của Phở Bụt!`;
+            
+            // Cập nhật nội dung thư bao gồm cả chi tiết đơn hàng
+            const noiDungThu = `Xin chào,\n\nCửa hàng Phở Bụt xin thông báo đơn hàng của bạn vừa được cập nhật trạng thái mới:\n\nTrạng thái hiện tại: [ ${trangThaiMoi.toUpperCase()} ]\n\n--- CHI TIẾT ĐƠN HÀNG ---\n${itemsText}\n💰 Tổng tiền: ${(o.tong_tien || 0).toLocaleString()}đ\n📍 Giao tới: ${o.dia_chi}\n📞 SĐT liên hệ: ${o.dien_thoai}\n\nCảm ơn bạn đã lựa chọn món chay tĩnh thức của Phở Bụt!`;
 
             emailjs.send(emailjsServiceID, emailjsTemplateID, {
                 to_email: emailKhachHang,
@@ -166,7 +176,7 @@
                 message: noiDungThu
             });
 
-            alert(`Đã cập nhật thành "${trangThaiMoi}" và gửi email cho khách.`);
+            alert(`Đã cập nhật thành "${trangThaiMoi}" và gửi email chi tiết cho khách.`);
             loadDanhSachDonHang(); 
         } catch (e) {
             alert("Đã xảy ra lỗi: " + e.message);
