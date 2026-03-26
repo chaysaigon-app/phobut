@@ -11,7 +11,7 @@
         h3 { color: #e67e22; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em; border-bottom: 1px dashed #ddd; padding-bottom: 5px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+        input[type="text"], input[type="number"], input[type="email"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
         button { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-primary { background: #2e7d32; color: white; width: 100%; margin-top: 10px; }
         .btn-update { background: #e67e22; color: white; width: 100%; margin-top: 10px; display: none; }
@@ -20,16 +20,31 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
-        .order-card { border-left: 5px solid #e67e22; background: #fffdf9; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+        .order-card { border-left: 5px solid #e67e22; background: #fffdf9; padding: 15px; margin-bottom: 15px; border-radius: 8px; font-size: 0.95em; line-height: 1.5;}
+        .order-card ul { margin: 5px 0 10px 0; padding-left: 20px; }
     </style>
 </head>
 <body>
 
 <div class="admin-wrapper">
-
     <div class="card">
         <h2>🏠 Cài Đặt Thông Tin & Kết Nối</h2>
         
+        <h3>📞 Thông Tin Nhận Đơn Hàng (Của Quán)</h3>
+        <div class="form-group">
+            <label>Email nhận đơn (ví dụ: chaysaigon@gmail.com):</label>
+            <input type="email" id="adminEmail" placeholder="Điền email đặng nhận thông báo...">
+        </div>
+        <div class="form-group">
+            <label>Số điện thoại nhận tin Zalo (ví dụ: 0968107788):</label>
+            <input type="text" id="adminZalo" placeholder="Điền số Zalo của quán...">
+        </div>
+        <div class="form-group">
+            <label>Số điện thoại nhận tin WhatsApp (Kèm mã vùng, ví dụ: 84968107788):</label>
+            <input type="text" id="adminWhatsapp" placeholder="Điền số WhatsApp của quán (Bỏ số 0 ở đầu, thay bằng 84)...">
+        </div>
+
+        <h3>🌐 Giới Thiệu & Mạng Xã Hội</h3>
         <div class="form-group">
             <label>Thông điệp từ Bếp (Lời giới thiệu ngắn gọn):</label>
             <textarea id="loiGioiThieu" rows="3" placeholder="Con viết đôi lời chánh niệm giới thiệu quán vô đây nghen..."></textarea>
@@ -45,7 +60,6 @@
             <img id="previewDaiDien" src="" style="width: 150px; margin-top: 15px; border-radius: 10px; display: none; object-fit: cover;">
         </div>
 
-        <h3>🌐 Các kênh Mạng Xã Hội & Bản Đồ</h3>
         <div class="form-group">
             <label>Link bản đồ Google Maps:</label>
             <input type="text" id="linkMap" placeholder="Ví dụ: https://goo.gl/maps/...">
@@ -100,7 +114,6 @@
         <h2>🛒 Đơn Hàng Mới Nhất</h2>
         <div id="order-list">Đang tải đơn hàng...</div>
     </div>
-
 </div>
 
 <script type="module">
@@ -124,11 +137,17 @@
         return data.secure_url;
     }
 
-    // --- PHẦN QUẢN LÝ THÔNG TIN QUÁN ---
     async function loadThongTin() {
         const docSnap = await getDoc(doc(db, "Settings", "info"));
         if (docSnap.exists()) {
             const data = docSnap.data();
+            
+            // Thông tin nhận đơn
+            document.getElementById('adminEmail').value = data.admin_email || "";
+            document.getElementById('adminZalo').value = data.admin_zalo || "";
+            document.getElementById('adminWhatsapp').value = data.admin_whatsapp || "";
+
+            // Thông tin hiển thị
             document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
             document.getElementById('linkYoutube').value = data.link_youtube || "";
             document.getElementById('linkMap').value = data.link_map || "";
@@ -146,6 +165,10 @@
     }
 
     window.luuThongTin = async () => {
+        const adminEmail = document.getElementById('adminEmail').value;
+        const adminZalo = document.getElementById('adminZalo').value;
+        const adminWhatsapp = document.getElementById('adminWhatsapp').value;
+
         const loi = document.getElementById('loiGioiThieu').value;
         const linkYtVideo = document.getElementById('linkYoutube').value;
         const linkMap = document.getElementById('linkMap').value;
@@ -161,6 +184,9 @@
             if(file) { url = await uploadToCloudinary(file); }
 
             await setDoc(doc(db, "Settings", "info"), {
+                admin_email: adminEmail,
+                admin_zalo: adminZalo,
+                admin_whatsapp: adminWhatsapp,
                 loi_gioi_thieu: loi,
                 link_youtube: linkYtVideo,
                 link_map: linkMap,
@@ -179,7 +205,6 @@
         }
     };
 
-    // --- PHẦN QUẢN LÝ MÓN ĂN & ĐƠN HÀNG ---
     window.luuMon = async (isUpdate) => {
         const ten = document.getElementById('tenVi').value;
         const gia = document.getElementById('gia').value;
@@ -245,13 +270,27 @@
         snapO.forEach(d => {
             const o = d.data();
             let items = ""; for(let k in o.chi_tiet) items += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
-            divO.innerHTML += `<div class="order-card"><b>${o.khach_hang}</b>: <ul>${items}</ul></div>`;
+            
+            let infoHTML = `<b>Email khách:</b> ${o.khach_hang} <br>
+                            <b>SĐT:</b> ${o.dien_thoai || '<span style="color:red">Chưa nhập</span>'}`;
+            if(o.so_zalo) infoHTML += ` | <b>Zalo:</b> <a href="https://zalo.me/${o.so_zalo}" target="_blank">${o.so_zalo}</a>`;
+            if(o.so_whatsapp) infoHTML += ` | <b>WhatsApp:</b> ${o.so_whatsapp}`;
+            infoHTML += `<br><b>Giao tới:</b> ${o.dia_chi || '<span style="color:red">Chưa nhập</span>'}<br>`;
+            if(o.ghi_chu) infoHTML += `<b>Lời dặn:</b> <i>${o.ghi_chu}</i><br>`;
+
+            divO.innerHTML += `
+                <div class="order-card">
+                    ${infoHTML}
+                    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 10px 0;">
+                    <b>Chi tiết món:</b>
+                    <ul>${items}</ul>
+                    <b style="color:#d35400;">💰 Tổng thu: ${(o.tong_tien || 0).toLocaleString()}đ</b>
+                </div>`;
         });
     }
 
     window.xoaMon = async (id) => { if(confirm("Xóa thiệt nghen con?")) { await deleteDoc(doc(db, "Menus", id)); location.reload(); } };
     
-    // Khởi chạy
     loadThongTin();
     loadData();
 </script>
