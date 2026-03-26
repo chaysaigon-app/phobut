@@ -35,8 +35,8 @@
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
+        /* Đã xóa dòng content cứng gây lỗi dịch thuật */
         .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
-        .message-box::before { content: "Thông điệp từ cửa hàng:"; display: block; font-weight: bold; margin-bottom: 5px; font-style: normal; color: #1b5e20; }
         
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .social-btn { padding: 8px 15px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.9em; display: inline-flex; align-items: center; }
@@ -160,7 +160,7 @@
     function googleTranslateElementInit() {
         new google.translate.TranslateElement({
             pageLanguage: 'vi',
-            includedLanguages: 'en,zh-CN,ko,ru', // Chỉ định Tiếng Anh, Tiếng Trung, Tiếng Hàn, Tiếng Nga
+            includedLanguages: 'en,zh-CN,ko,ru', 
             layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
             autoDisplay: false
         }, 'google_translate_element');
