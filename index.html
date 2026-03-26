@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cửa Hàng Trực Tuyến</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript"> (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })(); </script>
     <style>
         :root { --main-color: #2e7d32; --dark-color: #1b5e20; }
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; line-height: 1.6; }
@@ -65,6 +63,9 @@
         
         .history-item { background: #f9f9f9; padding: 12px; border-radius: 10px; border-left: 4px solid var(--main-color); margin-bottom: 10px; font-size: 0.9em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .history-item.cancel { border-left-color: #e74c3c; opacity: 0.7; }
+        
+        /* Chữ thông báo nổi bật */
+        .highlight-notice { background: #fff3cd; color: #856404; padding: 12px 15px; border-radius: 8px; border-left: 5px solid #ffeeba; margin-bottom: 20px; font-weight: bold; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
@@ -211,7 +212,10 @@
         const isA = currentUser.email === ADMIN_EMAIL;
         let az = (isA || isS) ? `<div class="admin-zone" style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:15px; border-left:4px solid #3498db;"><h3>Quản lý</h3><a href="orders.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#3498db">📦 Đơn Hàng & Kho</a>${isA ? '<a href="admin.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#2e7d32">⚙️ Cài Đặt</a>' : ''}</div>` : "";
         
-        document.getElementById('profile-container').innerHTML = `${az}<h2>Tài Khoản</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button><div style="margin-top:25px; border-top:1px dashed #ccc; padding-top:15px;"><h3 style="color:var(--main-color); margin-bottom:15px;">📜 Lịch Sử Đơn Hàng</h3><div id="order-history-list">Đang tải lịch sử...</div><button onclick="document.getElementById('profile-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">Đóng</button></div>`;
+        // CHÈN DÒNG CHỮ VÀNG BÁO KHÁCH GỌI ĐIỆN VÀO ĐÂY
+        const loiNhan = `<div class="highlight-notice">🔔 Thí chủ hoan hỷ liên hệ trực tiếp với quán đặng đơn hàng được bếp xử lý nhanh chóng nhất ráo trọi nghen!</div>`;
+
+        document.getElementById('profile-container').innerHTML = `${az}<h2>Tài Khoản</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button><div style="margin-top:25px; border-top:1px dashed #ccc; padding-top:15px;">${loiNhan}<h3 style="color:var(--main-color); margin-bottom:15px;">📜 Lịch Sử Đơn Hàng</h3><div id="order-history-list">Đang tải lịch sử...</div><button onclick="document.getElementById('profile-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">Đóng</button></div>`;
         document.getElementById('profile-modal').style.display='block';
 
         try {
@@ -277,44 +281,30 @@
         try {
             const iSnap = await getDoc(doc(db, "Settings", "info")); 
             const dI = iSnap.exists() ? iSnap.data() : {};
-            const tenQuan = dI.brand_name || "Cửa Hàng";
             
             const snapM = await getDocs(collection(db, "Menus")); const mD = {};
             snapM.forEach(d => { mD[d.data().ten_tieng_viet] = { ton: d.data().ton_kho||0, von: d.data().gia_von||0 }; });
             
-            let sub = 0, von = 0, msg = "";
+            let sub = 0, von = 0;
             for(let k in cart) { 
                 if(cart[k].sl > mD[k].ton) {
                     btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN";
                     return Swal.fire("Hết món", `Xin lỗi, món ${k} không đủ kho`, "error"); 
                 } 
-                sub += cart[k].sl*cart[k].gia; von += cart[k].sl*mD[k].von; msg += `- ${k} (Số lượng: ${cart[k].sl})\n`; 
+                sub += cart[k].sl*cart[k].gia; von += cart[k].sl*mD[k].von; 
             }
             
             const tax = Math.round(sub * ((dI.vat_rate||0)/100));
             const tongCong = sub + tax;
             
+            // CHỈ LƯU ĐƠN VÀO FIREBASE - ĐÃ GỠ RÁO TRỌI EMAILJS BÊN PHÍA KHÁCH
             await addDoc(collection(db, "Orders"), { 
                 khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, 
                 gia_tam_tinh: sub, tien_thue: tax, phan_tram_thue: dI.vat_rate||0, 
                 tong_tien: tongCong, tong_von: von, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" 
             });
             
-            // GỬI 2 EMAIL CÙNG LÚC BẰNG PROMISE.ALL CHO NHANH GỌN LẸ
-            await Promise.all([
-                emailjs.send("service_j8kubcd", "template_3ee7url", { 
-                    to_email: dI.admin_email || ADMIN_EMAIL, 
-                    subject: `🚨 [ĐƠN MỚI] Khách hàng: ${ph}`, 
-                    message: `Kính báo Admin,\n\nQuán vừa nhận được một đơn đặt hàng mới.\n\n👤 THÔNG TIN KHÁCH HÀNG:\n- Email: ${currentUser.email}\n- SĐT: ${ph}\n- Địa chỉ: ${ad}\n\n📦 CHI TIẾT ĐƠN HÀNG:\n${msg}\n💰 TỔNG THU (Đã gồm VAT): ${tongCong.toLocaleString()}đ\n\nThí chủ hãy vào trang Quản lý đơn hàng (orders.html) để xem nghen!` 
-                }),
-                emailjs.send("service_j8kubcd", "template_3ee7url", { 
-                    to_email: currentUser.email, 
-                    subject: `✅ Xác nhận đặt hàng thành công tại ${tenQuan}`, 
-                    message: `Kính chào quý khách,\n\nCảm ơn quý khách đã tin tưởng và đặt hàng tại ${tenQuan}.\n\n📦 CHI TIẾT ĐƠN HÀNG CỦA QUÝ KHÁCH:\n${msg}\n💰 TỔNG THANH TOÁN: ${tongCong.toLocaleString()}đ\n\nChúng tôi sẽ sớm liên hệ qua số điện thoại ${ph} để giao hàng.\n\nKính chúc quý khách thân tâm an lạc!` 
-                })
-            ]);
-            
-            Swal.fire("Thành công!", "Đã gửi đơn hàng. Quý khách vui lòng kiểm tra email nghen!", "success"); 
+            Swal.fire("Thành công!", "Đã lên đơn ráo trọi! Thí chủ hoan hỷ theo dõi tình trạng trong phần Tài Khoản nghen.", "success"); 
             cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
         } catch (e) { 
             alert(e.message); 
