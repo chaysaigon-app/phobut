@@ -2,123 +2,57 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hệ Thống Quản Trị Hệ Sinh Thái</title>
+    <title>Quản Trị Hệ Thống Toàn Diện</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        #admin-login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0fdf4; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .btn-google { background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
         .admin-wrapper { max-width: 900px; margin: auto; display: none; } 
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; position: relative; }
-        h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
-        h3 { color: #e67e22; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em; border-bottom: 1px dashed #ddd; padding-bottom: 5px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; position: relative; }
+        h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; }
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="number"], input[type="email"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
-        button { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-primary { background: #2e7d32; color: white; width: 100%; margin-top: 10px; }
-        .btn-logout { position: absolute; top: 20px; right: 25px; background: #d32f2f; color: white; border-radius: 20px; padding: 8px 15px; }
-        .staff-item { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: #2e7d32; color: white; width: 100%; }
         .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
     </style>
 </head>
 <body>
 
-<div id="admin-login-screen">
-    <h2>Cửa Sổ Quản Trị Cấp Cao</h2>
-    <p>Vui lòng đăng nhập bằng Gmail quản trị để cấu hình hệ thống.</p>
-    <button class="btn-google" onclick="window.dangNhapGoogle()">🔑 Đăng Nhập Google</button>
+<div id="admin-login-screen" style="text-align:center; margin-top:100px;">
+    <h2>Trang Quản Trị</h2>
+    <button onclick="window.dangNhapGoogle()" style="padding:15px 30px; background:#e67e22; color:white; border-radius:30px; border:none; font-weight:bold;">🔑 Đăng Nhập Google</button>
 </div>
 
 <div class="admin-wrapper">
-    <button class="btn-logout" onclick="window.dangXuatAdmin()">🔒 Thoát</button>
-    
+    <button onclick="window.logout()" style="float:right; background:#d32f2f; color:white;">Đăng Xuất</button>
+    <a href="orders.html" target="_blank" style="background:#3498db; color:white; padding:10px 15px; border-radius:8px; text-decoration:none; font-weight:bold;">📦 Đơn Hàng & Báo Cáo</a>
+
     <div class="card">
-        <h2>🏠 Cấu Hình Thương Hiệu & Thông Tin</h2>
-        
-        <h3>✨ Nhận Diện Thương Hiệu</h3>
-        <div class="form-group">
-            <label>Tên Thương Hiệu (Hiển thị tiêu đề & Logo):</label>
-            <input type="text" id="brandName" placeholder="Ví dụ: Phở Bụt, Chay Vui...">
-        </div>
-        <div class="form-group">
-            <label>Địa chỉ cửa hàng:</label>
-            <input type="text" id="storeAddress" placeholder="Ví dụ: 76 Thủ Khoa Huân, Đà Nẵng">
-        </div>
-        <div class="form-group">
-            <label>Số điện thoại hotline:</label>
-            <input type="text" id="storePhone" placeholder="Ví dụ: 0968 107 788">
-        </div>
-
-        <h3>📞 Thông Tin Nhận Đơn (Nội Bộ)</h3>
-        <div class="form-group">
-            <label>Email nhận thông báo đơn mới:</label>
-            <input type="email" id="adminEmail" placeholder="Điền email của bạn">
-        </div>
-        <div class="form-group">
-            <label>Số Zalo nhận tin (09...):</label>
-            <input type="text" id="adminZalo" placeholder="Số điện thoại Zalo của quán">
-        </div>
-        <div class="form-group">
-            <label>Số WhatsApp (84...):</label>
-            <input type="text" id="adminWhatsapp" placeholder="Số WhatsApp (mã vùng 84)">
-        </div>
-
-        <h3>📝 Bài Giới Thiệu & Đa Phương Tiện</h3>
-        <div class="form-group">
-            <label>Lời ngỏ ngắn (Khung xanh):</label>
-            <textarea id="loiGioiThieu" rows="2"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Bài giới thiệu chi tiết (HTML):</label>
-            <textarea id="baiGioiThieuChinh" rows="10"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Hình đại diện thương hiệu:</label>
-            <input type="file" id="fileAnhDaiDien" accept="image/*">
-            <img id="previewDaiDien" src="" style="width: 150px; margin-top: 10px; display: none; border-radius: 10px;">
-        </div>
-        <div class="form-group">
-            <label>Link Video YouTube (Hoặc Shorts):</label>
-            <input type="text" id="linkYoutube">
-        </div>
-        <div class="form-group">
-            <label>Link Google Maps (Nút chỉ đường):</label>
-            <input type="text" id="linkMap">
-        </div>
-
-        <button id="btn-luu-thong-tin" class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Toàn Bộ Cấu Hình</button>
+        <h2>🏠 Cấu Hình Thương Hiệu</h2>
+        <div class="form-group"><label>Tên Thương Hiệu:</label><input type="text" id="brandName"></div>
+        <div class="form-group"><label>Địa chỉ:</label><input type="text" id="storeAddress"></div>
+        <div class="form-group"><label>Hotline:</label><input type="text" id="storePhone"></div>
+        <div class="form-group"><label>Email nhận đơn:</label><input type="email" id="adminEmail"></div>
+        <div class="form-group"><label>Giới thiệu chi tiết (HTML):</label><textarea id="baiGioiThieuChinh" rows="5"></textarea></div>
+        <button class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Cấu Hình</button>
     </div>
 
     <div class="card">
-        <h2>👥 Quản Lý Nhân Viên</h2>
-        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <input type="email" id="newStaffEmail" placeholder="Nhập email nhân viên">
-            <button class="btn-primary" style="width: auto; margin: 0;" onclick="window.themNhanVien()">Thêm</button>
-        </div>
-        <div id="staff-list"></div>
-    </div>
-
-    <div class="card">
-        <h2>🍜 Quản Lý Thực Đơn</h2>
+        <h2>🍜 Quản Lý Thực Đơn (Giá vốn & Kho)</h2>
         <input type="hidden" id="edit-id">
-        <div class="form-group">
-            <label>Tên món:</label>
-            <input type="text" id="tenVi">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px;">
+            <div class="form-group"><label>Tên món:</label><input type="text" id="tenVi"></div>
+            <div class="form-group"><label>Bán:</label><input type="number" id="gia"></div>
+            <div class="form-group"><label>Vốn:</label><input type="number" id="giaVon"></div>
+            <div class="form-group"><label>Kho:</label><input type="number" id="tonKho"></div>
         </div>
-        <div class="form-group">
-            <label>Giá tiền:</label>
-            <input type="number" id="gia">
-        </div>
-        <div class="form-group">
-            <label>Hình ảnh món:</label>
-            <input type="file" id="fileAnh" accept="image/*">
-        </div>
-        <button id="btn-add-submit" class="btn-primary" onclick="window.luuMon(false)">Thêm Món Mới</button>
-        <button id="btn-update-submit" style="display:none; background:#e67e22; color:white; width:100%;" onclick="window.luuMon(true)">Cập Nhật</button>
-        <table id="menu-table">
-            <thead><tr><th>Hình</th><th>Tên</th><th>Giá</th><th>Thao tác</th></tr></thead>
+        <div class="form-group"><label>Hình ảnh:</label><input type="file" id="fileAnh"></div>
+        <button id="btn-add" class="btn-primary" onclick="window.luuMon(false)">Thêm Món</button>
+        <button id="btn-up" style="display:none; background:#e67e22; color:white; width:100%;" onclick="window.luuMon(true)">Cập Nhật</button>
+        <table>
+            <thead><tr><th>Hình</th><th>Tên</th><th>Giá</th><th>Vốn</th><th>Kho</th><th>Thao tác</th></tr></thead>
             <tbody id="menu-body"></tbody>
         </table>
     </div>
@@ -129,34 +63,19 @@
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // KHI ĐÓNG GÓI CHO DOMAIN MỚI, CHỈ CẦN THAY firebaseConfig DƯỚI ĐÂY
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    const EMAIL_CHUYEN_TRACH = "chaysaigon@gmail.com"; 
+    const ADMIN_EMAIL = "chaysaigon@gmail.com"; 
     const cloudName = "dym7dwnji", uploadPreset = "qjrpdbhs";
-    let current_avatar_url = "", current_img_url = "";
+    let current_img = "";
 
-    onAuthStateChanged(auth, (user) => {
-        if (user && user.email === EMAIL_CHUYEN_TRACH) {
-            document.getElementById('admin-login-screen').style.display = 'none';
-            document.querySelector('.admin-wrapper').style.display = 'block';
-            loadThongTin(); loadData(); loadStaff();
-        } else if (user) { alert("Từ chối truy cập!"); signOut(auth); }
-    });
-
-    window.dangNhapGoogle = async () => { try { await signInWithPopup(auth, provider); } catch (e) { alert(e.message); } };
-    window.dangXuatAdmin = () => signOut(auth);
-
-    async function uploadToCloudinary(file) {
-        const formData = new FormData();
-        formData.append("file", file); formData.append("upload_preset", uploadPreset);
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
-        const data = await res.json(); return data.secure_url;
-    }
+    onAuthStateChanged(auth, (user) => { if (user && user.email === ADMIN_EMAIL) { document.getElementById('admin-login-screen').style.display='none'; document.querySelector('.admin-wrapper').style.display='block'; loadThongTin(); loadData(); } else if(user) signOut(auth); });
+    window.dangNhapGoogle = async () => { await signInWithPopup(auth, provider); };
+    window.logout = () => signOut(auth);
 
     async function loadThongTin() {
         const snap = await getDoc(doc(db, "Settings", "info"));
@@ -166,79 +85,48 @@
             document.getElementById('storeAddress').value = d.store_address || "";
             document.getElementById('storePhone').value = d.store_phone || "";
             document.getElementById('adminEmail').value = d.admin_email || "";
-            document.getElementById('adminZalo').value = d.admin_zalo || "";
-            document.getElementById('adminWhatsapp').value = d.admin_whatsapp || "";
-            document.getElementById('loiGioiThieu').value = d.loi_gioi_thieu || "";
             document.getElementById('baiGioiThieuChinh').value = d.bai_gioi_thieu_chinh || "";
-            document.getElementById('linkYoutube').value = d.link_youtube || "";
-            document.getElementById('linkMap').value = d.link_map || "";
-            if(d.hinh_dai_dien) { current_avatar_url = d.hinh_dai_dien; document.getElementById('previewDaiDien').src = d.hinh_dai_dien; document.getElementById('previewDaiDien').style.display = "block"; }
         }
     }
 
     window.luuThongTin = async () => {
-        const btn = document.getElementById('btn-luu-thong-tin'); btn.innerText = "⌛ Đang lưu...";
-        let url = current_avatar_url;
-        const file = document.getElementById('fileAnhDaiDien').files[0];
-        if(file) url = await uploadToCloudinary(file);
-
         await setDoc(doc(db, "Settings", "info"), {
             brand_name: document.getElementById('brandName').value,
             store_address: document.getElementById('storeAddress').value,
             store_phone: document.getElementById('storePhone').value,
             admin_email: document.getElementById('adminEmail').value,
-            admin_zalo: document.getElementById('adminZalo').value,
-            admin_whatsapp: document.getElementById('adminWhatsapp').value,
-            loi_gioi_thieu: document.getElementById('loiGioiThieu').value,
-            bai_gioi_thieu_chinh: document.getElementById('baiGioiThieuChinh').value,
-            link_youtube: document.getElementById('linkYoutube').value,
-            link_map: document.getElementById('linkMap').value,
-            hinh_dai_dien: url
+            bai_gioi_thieu_chinh: document.getElementById('baiGioiThieuChinh').value
         }, { merge: true });
-        alert("Thành công!"); btn.innerText = "💾 Lưu Toàn Bộ Cấu Hình"; loadThongTin();
+        alert("Đã lưu!");
     };
 
-    // Các hàm loadData, loadStaff, luuMon giữ nguyên cấu trúc cũ...
-    async function loadStaff() {
-        const snap = await getDoc(doc(db, "Settings", "staff"));
-        const div = document.getElementById('staff-list'); div.innerHTML = "";
-        if(snap.exists() && snap.data().emails) {
-            snap.data().emails.forEach(em => { div.innerHTML += `<div class="staff-item"><span>${em}</span><button onclick="window.xoaStaff('${em}')">Xóa</button></div>`; });
-        }
-    }
-    window.themNhanVien = async () => {
-        const em = document.getElementById('newStaffEmail').value; if(!em) return;
-        const snap = await getDoc(doc(db, "Settings", "staff"));
-        let list = snap.exists() ? snap.data().emails : [];
-        if(!list.includes(em)) { list.push(em); await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff(); }
-    };
-    window.xoaStaff = async (em) => {
-        const snap = await getDoc(doc(db, "Settings", "staff"));
-        let list = snap.data().emails.filter(e => e !== em);
-        await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff();
-    };
     async function loadData() {
         const snap = await getDocs(collection(db, "Menus"));
         const body = document.getElementById('menu-body'); body.innerHTML = "";
         snap.forEach(d => {
             const m = d.data();
-            body.innerHTML += `<tr><td><img src="${m.hinh_anh}" class="img-preview"></td><td>${m.ten_tieng_viet}</td><td>${m.gia_tien}đ</td><td><button onclick="window.chuanBiSua('${d.id}','${m.ten_tieng_viet}',${m.gia_tien},'${m.hinh_anh}')">Sửa</button> <button onclick="window.xoaMon('${d.id}')">Xóa</button></td></tr>`;
+            body.innerHTML += `<tr><td><img src="${m.hinh_anh}" class="img-preview"></td><td>${m.ten_tieng_viet}</td><td>${m.gia_tien}</td><td>${m.gia_von||0}</td><td>${m.ton_kho}</td><td><button onclick="window.sua('${d.id}','${m.ten_tieng_viet}',${m.gia_tien},${m.gia_von||0},${m.ton_kho},'${m.hinh_anh}')">Sửa</button></td></tr>`;
         });
     }
-    window.luuMon = async (isUpdate) => {
-        let url = current_img_url;
+
+    window.luuMon = async (isUp) => {
         const file = document.getElementById('fileAnh').files[0];
-        if(file) url = await uploadToCloudinary(file);
-        const data = { ten_tieng_viet: document.getElementById('tenVi').value, gia_tien: Number(document.getElementById('gia').value), hinh_anh: url };
-        if(isUpdate) await updateDoc(doc(db, "Menus", document.getElementById('edit-id').value), data);
+        let url = current_img;
+        if(file) {
+            const formData = new FormData(); formData.append("file", file); formData.append("upload_preset", uploadPreset);
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
+            const d = await res.json(); url = d.secure_url;
+        }
+        const data = { ten_tieng_viet: document.getElementById('tenVi').value, gia_tien: Number(document.getElementById('gia').value), gia_von: Number(document.getElementById('giaVon').value), ton_kho: Number(document.getElementById('tonKho').value), hinh_anh: url };
+        if(isUp) await updateDoc(doc(db, "Menus", document.getElementById('edit-id').value), data);
         else await addDoc(collection(db, "Menus"), data);
         location.reload();
     };
-    window.chuanBiSua = (id, ten, gia, hinh) => {
-        document.getElementById('edit-id').value = id; document.getElementById('tenVi').value = ten; document.getElementById('gia').value = gia; current_img_url = hinh;
-        document.getElementById('btn-add-submit').style.display='none'; document.getElementById('btn-update-submit').style.display='block';
+
+    window.sua = (id, ten, gia, von, ton, hinh) => {
+        document.getElementById('edit-id').value = id; document.getElementById('tenVi').value = ten; document.getElementById('gia').value = gia; document.getElementById('giaVon').value = von; document.getElementById('tonKho').value = ton; current_img = hinh;
+        document.getElementById('btn-add').style.display='none'; document.getElementById('btn-up').style.display='block';
     };
-    window.xoaMon = async (id) => { if(confirm("Xóa?")) { await deleteDoc(doc(db, "Menus", id)); loadData(); } };
 </script>
 </body>
 </html>
