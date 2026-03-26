@@ -2,53 +2,52 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Xử Lý Đơn Hàng & Kho - Phở Bụt</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript"> (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })(); </script>
+    <title>Quản Lý Đơn Hàng & Tài Chính</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
         .card { background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .report-grid { display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
-        .report-box { flex: 1; min-width: 150px; background: #f9fbf9; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 15px; }
+        .report-box { background: #f9fbf9; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #ddd; }
+        .report-box h4 { margin: 0; font-size: 0.85em; color: #666; }
+        .report-box p { margin: 5px 0 0; font-weight: bold; font-size: 1.1em; }
         .order-card { border-left: 6px solid #3498db; background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 8px; }
         .btn-status { padding: 8px 12px; border-radius: 5px; border: none; cursor: pointer; color: white; font-weight: bold; margin-right: 5px; margin-top: 5px; }
-        .stock-table { width: 100%; border-collapse: collapse; }
-        .stock-table td, .stock-table th { padding: 10px; border-bottom: 1px solid #eee; }
-        .stock-input { width: 80px; padding: 5px; border-radius: 4px; border: 1px solid #ddd; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="admin-login-screen" style="text-align:center; padding-top:100px;">
-    <h2>🔐 Đăng Nhập Hệ Thống Xử Lý</h2>
-    <button onclick="window.dangNhapGoogle()" style="padding:15px 30px; background:#e67e22; color:white; border-radius:30px; border:none; font-weight:bold;">Đăng Nhập</button>
+    <h2>🔐 Hệ Thống Xử Lý Đơn</h2>
+    <button onclick="window.dangNhapGoogle()" style="padding:15px 30px; background:#e67e22; color:white; border-radius:30px; border:none; font-weight:bold; cursor:pointer;">Đăng Nhập</button>
 </div>
 
-<div class="admin-wrapper" id="main-content" style="display:none; max-width:1000px; margin:auto;">
+<div class="admin-wrapper" id="main-content" style="display:none; max-width:1100px; margin:auto;">
     <button onclick="window.logout()" style="float:right; background:#d32f2f; color:white; border:none; padding:8px 15px; border-radius:20px;">Thoát</button>
     
     <div class="card">
-        <h2>📊 Báo Cáo Lợi Nhuận (Đơn Hoàn Thành)</h2>
+        <h2>📊 Báo Cáo Tài Chính (Đơn Hoàn Thành)</h2>
         <div>
             Từ: <input type="date" id="date-from"> Đến: <input type="date" id="date-to"> 
-            <button onclick="window.tinhBaoCao()" style="background:#2e7d32; color:white; padding:5px 15px;">Lọc</button>
+            <button onclick="window.tinhBaoCao()" style="background:#2e7d32; color:white; padding:5px 15px; border:none; border-radius:5px;">Lọc báo cáo</button>
         </div>
         <div class="report-grid">
-            <div class="report-box"><h4>Doanh Thu</h4><p id="sum-rev">0đ</p></div>
+            <div class="report-box"><h4>Tổng Thu (Gồm thuế)</h4><p id="sum-total">0đ</p></div>
+            <div class="report-box"><h4>Thuế VAT thu hộ</h4><p id="sum-vat" style="color:#d35400;">0đ</p></div>
+            <div class="report-box"><h4>Doanh Thu Thuần</h4><p id="sum-net">0đ</p></div>
             <div class="report-box"><h4>Giá Vốn</h4><p id="sum-cost">0đ</p></div>
-            <div class="report-box"><h4>Lợi Nhuận</h4><p id="sum-profit" style="color:green; font-weight:bold;">0đ</p></div>
+            <div class="report-box"><h4>Lợi Nhuận Ròng</h4><p id="sum-profit" style="color:green;">0đ</p></div>
         </div>
     </div>
 
     <div class="card">
-        <h2>📦 Đơn Hàng Cần Xử Lý</h2>
+        <h2>📦 Danh Sách Đơn Hàng</h2>
         <div id="order-list">Đang tải...</div>
     </div>
 
     <div class="card">
-        <h2>🍜 Quản Lý Tồn Kho (Cập nhật nhanh)</h2>
-        <table class="stock-table">
-            <thead><tr><th>Tên Món</th><th>Số lượng tồn</th><th>Thao tác</th></tr></thead>
+        <h2>🍜 Quản Lý Tồn Kho</h2>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead><tr style="text-align:left;"><th>Tên Món</th><th>Tồn Kho</th><th>Thao tác</th></tr></thead>
             <tbody id="stock-body"></tbody>
         </table>
     </div>
@@ -89,17 +88,16 @@
         snap.forEach(d => {
             const o = { id: d.id, ...d.data() }; window.allOrders.push(o);
             let items = ""; for(let k in o.chi_tiet) items += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
-            let time = o.thoi_gian ? o.thoi_gian.toDate().toLocaleString() : "Vừa xong";
             listDiv.innerHTML += `<div class="order-card">
-                <b>⏰ ${time} - Khách: ${o.khach_hang}</b><br>
-                📞 SĐT: ${o.dien_thoai} | 📍 ĐC: ${o.dia_chi}<br>
+                <b>Khách: ${o.khach_hang} - Trạng thái: ${o.trang_thai}</b><br>
+                SĐT: ${o.dien_thoai} | ĐC: ${o.dia_chi}<br>
                 <ul>${items}</ul>
-                <b>Tổng: ${o.tong_tien.toLocaleString()}đ [${o.trang_thai}]</b>
+                <div style="font-size:0.9em; color:#666;">Tạm tính: ${(o.gia_tam_tinh||0).toLocaleString()}đ | Thuế (${o.phan_tram_thue||0}%): ${(o.tien_thue||0).toLocaleString()}đ</div>
+                <b style="color:#d35400;">Tổng thanh toán: ${o.tong_tien.toLocaleString()}đ</b>
                 <div style="margin-top:10px;">
                     <button class="btn-status" style="background:#3498db" onclick="window.updateStatus('${o.id}', 'Đang giao')">🚚 Đang giao</button>
                     <button class="btn-status" style="background:#2ecc71" onclick="window.updateStatus('${o.id}', 'Đã hoàn thành')">✅ Hoàn thành & Trừ kho</button>
                     <button class="btn-status" style="background:#7f8c8d" onclick="window.updateStatus('${o.id}', 'Đơn hàng huỷ')">❌ Hủy</button>
-                    ${auth.currentUser.email === ADMIN_EMAIL ? `<button class="btn-status" style="background:#e74c3c; float:right" onclick="window.del('${o.id}')">Xóa</button>` : ''}
                 </div>
             </div>`;
         });
@@ -123,39 +121,35 @@
         } catch(e) { alert(e.message); }
     };
 
+    window.tinhBaoCao = () => {
+        const fFrom = document.getElementById('date-from').value ? new Date(document.getElementById('date-from').value).getTime() : 0;
+        const fTo = document.getElementById('date-to').value ? new Date(document.getElementById('date-to').value).setHours(23,59,59,999) : Infinity;
+        let total = 0, vat = 0, net = 0, cost = 0;
+        window.allOrders.filter(o => o.trang_thai === 'Đã hoàn thành' && o.thoi_gian).forEach(o => {
+            const t = o.thoi_gian.toMillis();
+            if (t >= fFrom && t <= fTo) { 
+                total += (o.tong_tien || 0);
+                vat += (o.tien_thue || 0);
+                net += (o.gia_tam_tinh || o.tong_tien); // Backup nếu đơn cũ ko có giá tạm tính
+                cost += (o.tong_von || 0); 
+            }
+        });
+        document.getElementById('sum-total').innerText = total.toLocaleString() + 'đ';
+        document.getElementById('sum-vat').innerText = vat.toLocaleString() + 'đ';
+        document.getElementById('sum-net').innerText = net.toLocaleString() + 'đ';
+        document.getElementById('sum-cost').innerText = cost.toLocaleString() + 'đ';
+        document.getElementById('sum-profit').innerText = (net - cost).toLocaleString() + 'đ';
+    };
+
     async function loadStock() {
         const snap = await getDocs(collection(db, "Menus"));
         const body = document.getElementById('stock-body'); body.innerHTML = "";
         snap.forEach(d => {
             const m = d.data();
-            body.innerHTML += `<tr>
-                <td>${m.ten_tieng_viet}</td>
-                <td><input type="number" id="st-${d.id}" class="stock-input" value="${m.ton_kho||0}"></td>
-                <td><button onclick="window.updateStock('${d.id}')" style="background:#2e7d32; color:white; padding:5px 10px; border-radius:5px;">Cập nhật</button></td>
-            </tr>`;
+            body.innerHTML += `<tr><td>${m.ten_tieng_viet}</td><td><input type="number" id="st-${d.id}" style="width:60px;" value="${m.ton_kho||0}"></td><td><button onclick="window.upStock('${d.id}')">Lưu</button></td></tr>`;
         });
     }
-
-    window.updateStock = async (id) => {
-        const newVal = Number(document.getElementById('st-'+id).value);
-        await updateDoc(doc(db, "Menus", id), { ton_kho: newVal });
-        alert("Đã cập nhật kho!");
-    };
-
-    window.tinhBaoCao = () => {
-        const fFrom = document.getElementById('date-from').value ? new Date(document.getElementById('date-from').value).getTime() : 0;
-        const fTo = document.getElementById('date-to').value ? new Date(document.getElementById('date-to').value).setHours(23,59,59,999) : Infinity;
-        let rev = 0, cost = 0;
-        window.allOrders.filter(o => o.trang_thai === 'Đã hoàn thành' && o.thoi_gian).forEach(o => {
-            const t = o.thoi_gian.toMillis();
-            if (t >= fFrom && t <= fTo) { rev += (o.tong_tien || 0); cost += (o.tong_von || 0); }
-        });
-        document.getElementById('sum-rev').innerText = rev.toLocaleString() + 'đ';
-        document.getElementById('sum-cost').innerText = cost.toLocaleString() + 'đ';
-        document.getElementById('sum-profit').innerText = (rev - cost).toLocaleString() + 'đ';
-    };
-
-    window.del = async (id) => { if(confirm("Xóa vĩnh viễn đơn này?")) { await deleteDoc(doc(db, "Orders", id)); loadOrders(); } };
+    window.upStock = async (id) => { await updateDoc(doc(db, "Menus", id), { ton_kho: Number(document.getElementById('st-'+id).value) }); alert("Đã lưu!"); };
 </script>
 </body>
 </html>
