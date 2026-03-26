@@ -22,14 +22,15 @@
         .order-card { background: #fff; border-left: 6px solid #3498db; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
         .order-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
         .order-time { font-size: 0.85em; color: #888; font-weight: bold; }
-        .order-status { font-weight: bold; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; }
+        .order-status { font-weight: bold; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; text-transform: uppercase; }
         
         .customer-info { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.95em; }
         .info-group p { margin: 5px 0; }
         .info-group b { color: var(--main-color); }
         
-        .item-list { list-style: none; padding: 0; margin: 15px 0; background: #fcfcfc; padding: 10px; border-radius: 8px; }
+        .item-list { list-style: none; padding: 0; margin: 15px 0; background: #fcfcfc; padding: 10px; border-radius: 8px; border: 1px solid #f0f0f0; }
         .item-list li { padding: 5px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; }
+        .item-list li:last-child { border-bottom: none; }
 
         /* Nút bấm */
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
@@ -46,7 +47,9 @@
 
         @media print {
             .no-print { display: none !important; }
-            .order-card { border: 1px solid #000; box-shadow: none; break-inside: avoid; }
+            body { background: white; padding: 0; }
+            .order-card { border: 1px solid #000; box-shadow: none; break-inside: avoid; margin: 0; }
+            .card { box-shadow: none; padding: 0; }
         }
     </style>
 </head>
@@ -54,7 +57,7 @@
 
 <div id="login-screen" style="text-align:center; padding-top:100px;">
     <h2>🔐 ĐĂNG NHẬP QUẢN LÝ</h2>
-    <button onclick="window.lg()" style="padding:15px 35px; background:#e67e22; border-radius:30px; font-size:1.1em;">VÀO HỆ THỐNG</button>
+    <button onclick="window.lg()" style="padding:15px 35px; background:#e67e22; border-radius:30px; font-size:1.1em; color:white; border:none; cursor:pointer; font-weight:bold;">VÀO HỆ THỐNG</button>
 </div>
 
 <div class="container" id="main-content" style="display:none;">
@@ -145,12 +148,12 @@
                     </div>
                     <ul class="item-list">${itms}</ul>
                     <div style="text-align:right; font-size:0.9em;">
-                        Tạm tính: ${o.gia_tam_tinh.toLocaleString()}đ | Thuế (${o.phan_tram_thue}%): ${o.tien_thue.toLocaleString()}đ<br>
-                        <b style="font-size:1.2em; color:#d35400;">TỔNG: ${o.tong_tien.toLocaleString()}đ</b>
+                        Tạm tính: ${(o.gia_tam_tinh || 0).toLocaleString()}đ | Thuế (${o.phan_tram_thue || 0}%): ${(o.tien_thue || 0).toLocaleString()}đ<br>
+                        <b style="font-size:1.2em; color:#d35400;">TỔNG: ${(o.tong_tien || 0).toLocaleString()}đ</b>
                     </div>
                     <div class="btn-group no-print">
-                        <button class="btn-ship" onclick="window.upS('${o.id}', 'Đang giao')">🚚 Giao Hàng</button>
-                        <button class="btn-done" onclick="window.upS('${o.id}', 'Đã hoàn thành')">✅ Hoàn Thành</button>
+                        <button class="btn-ship" onclick="window.upS('${o.id}', 'Đang giao')">🚚 Đang giao</button>
+                        <button class="btn-done" onclick="window.upS('${o.id}', 'Đã hoàn thành')">✅ Hoàn thành</button>
                         <button class="btn-cancel" onclick="window.upS('${o.id}', 'Hủy')">❌ Hủy</button>
                         <button class="btn-print" onclick="window.printBill('${o.id}')">🖨️ In Bill</button>
                     </div>
@@ -161,17 +164,28 @@
 
     window.upS = async (id, s) => {
         const o = allOrders.find(x => x.id === id);
-        if (s === 'Đã hoàn thành' && o.trang_thai !== 'Đã hoàn thành') {
-            const batch = writeBatch(db);
-            for (let k in o.chi_tiet) {
-                const q = query(collection(db, "Menus"), where("ten_tieng_viet", "==", k));
-                const mS = await getDocs(q);
-                mS.forEach(m => batch.update(doc(db, "Menus", m.id), { ton_kho: Math.max(0, (m.data().ton_kho || 0) - o.chi_tiet[k].sl) }));
+        try {
+            if (s === 'Đã hoàn thành' && o.trang_thai !== 'Đã hoàn thành') {
+                const batch = writeBatch(db);
+                for (let k in o.chi_tiet) {
+                    const q = query(collection(db, "Menus"), where("ten_tieng_viet", "==", k));
+                    const mS = await getDocs(q);
+                    mS.forEach(m => batch.update(doc(db, "Menus", m.id), { ton_kho: Math.max(0, (m.data().ton_kho || 0) - o.chi_tiet[k].sl) }));
+                }
+                await batch.commit();
             }
-            await batch.commit();
-        }
-        await updateDoc(doc(db, "Orders", id), { trang_thai: s });
-        loadOrders(); loadStock();
+            await updateDoc(doc(db, "Orders", id), { trang_thai: s });
+
+            // Gửi Email thông báo tình trạng đơn cho khách
+            await emailjs.send("service_j8kubcd", "template_3ee7url", {
+                to_email: o.khach_hang,
+                subject: `Cập nhật đơn hàng: ${s}`,
+                message: `Chào bạn, đơn hàng của bạn hiện đang: ${s}. Cảm ơn bạn đã ủng hộ!`
+            });
+
+            alert("Đã cập nhật trạng thái và gửi Email cho khách!");
+            loadOrders(); loadStock();
+        } catch(e) { alert("Lỗi: " + e.message); }
     };
 
     window.calc = () => {
@@ -180,7 +194,12 @@
         const t = document.getElementById('dT').value ? new Date(document.getElementById('dT').value).setHours(23,59,59) : Infinity;
         allOrders.filter(o => o.trang_thai === 'Đã hoàn thành' && o.thoi_gian).forEach(o => {
             const tm = o.thoi_gian.toMillis();
-            if (tm >= f && tm <= t) { rev += o.tong_tien; vat += o.tien_thue; net += o.gia_tam_tinh; cost += o.tong_von; }
+            if (tm >= f && tm <= t) { 
+                rev += (o.tong_tien || 0); 
+                vat += (o.tien_thue || 0); 
+                net += (o.gia_tam_tinh || 0); 
+                cost += (o.tong_von || 0); 
+            }
         });
         document.getElementById('sT').innerText = rev.toLocaleString() + 'đ';
         document.getElementById('sV').innerText = vat.toLocaleString() + 'đ';
