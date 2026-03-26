@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Quản Lý Đơn Hàng & Tài Chính - Hệ Thống Admin</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript"> (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })(); </script>
     <style>
         :root { --main-color: #2e7d32; }
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
@@ -169,14 +167,7 @@
         btn.innerText = "Đang xử lý...";
 
         try {
-            // 1. Lấy thông tin quán từ Firebase đặng đưa vô chữ ký Email
-            const infoSnap = await getDoc(doc(db, "Settings", "info"));
-            const dI = infoSnap.exists() ? infoSnap.data() : {};
-            const tenQuan = dI.brand_name || "Cửa hàng của chúng tôi";
-            const sdtQuan = dI.store_phone || "";
-            const dcQuan = dI.store_address || "";
-
-            // 2. Cập nhật tồn kho nếu hoàn thành
+            // 1. Cập nhật tồn kho nếu hoàn thành ráo trọi
             if (s === 'Đã hoàn thành' && o.trang_thai !== 'Đã hoàn thành') {
                 const batch = writeBatch(db);
                 for (let k in o.chi_tiet) {
@@ -187,25 +178,14 @@
                 await batch.commit();
             }
 
-            // 3. Cập nhật trạng thái
+            // 2. Cập nhật trạng thái mới
             await updateDoc(doc(db, "Orders", id), { trang_thai: s });
 
-            // 4. Tạo chi tiết món ăn đặng khách xem trong mail
-            let chiTietMon = "";
-            for (let tM in o.chi_tiet) { chiTietMon += `- ${tM} (Số lượng: ${o.chi_tiet[tM].sl})\n`; }
-
-            // 5. Gửi Email thông báo có đầy đủ đầu đuôi
-            await emailjs.send("service_j8kubcd", "template_3ee7url", {
-                to_email: o.khach_hang,
-                subject: `🔔 [${tenQuan}] CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG`,
-                message: `Kính chào quý khách,\n\nChúng tôi xin thông báo đơn hàng của quý khách tại ${tenQuan} hiện đã chuyển sang trạng thái: ${s.toUpperCase()}.\n\n--------------------------\n📦 CHI TIẾT ĐƠN HÀNG:\n${chiTietMon}\n💰 TỔNG CỘNG: ${o.tong_tien.toLocaleString()}đ\n--------------------------\n\nNếu có thắc mắc, quý khách vui lòng liên hệ:\n📞 Hotline: ${sdtQuan}\n📍 Địa chỉ: ${dcQuan}\n\nChân thành cảm ơn quý khách!\nKính chúc quý khách vạn sự như ý.`
-            });
-
-            alert("Đã cập nhật và gửi Email thông báo rạch ròi cho khách!");
+            alert(`Đã cập nhật trạng thái đơn hàng thành: ${s}!`);
             loadOrders(); loadStock();
         } catch(e) { 
             console.error(e);
-            alert("Cập nhật trạng thái xong nhưng chưa gửi được Email. Thí chủ kiểm tra lại EmailJS nghen!");
+            alert("Lỗi cập nhật: " + e.message);
             loadOrders();
         }
     };
