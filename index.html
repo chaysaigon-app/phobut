@@ -5,36 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phở Bụt - Ẩm Thực Chay Tỉnh Thức</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+       (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })();
+    </script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; line-height: 1.6; }
         .auth-bar { background: #1b5e20; color: white; padding: 10px; text-align: right; font-size: 0.85em; }
-        
-        /* Chỉnh lại Header cho ngay ngắn, không bị lỗi thiết kế */
         .header { background: #2e7d32; color: white; padding: 35px 20px 25px; text-align: center; position: relative; }
         .header h1 { margin: 0; font-size: 2.2em; letter-spacing: 1px; }
         .header p { margin: 5px 0 15px; font-style: italic; opacity: 0.9; font-size: 1.1em; }
         .lang-switch { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85em; font-weight: bold; border: 1px solid rgba(255,255,255,0.5); }
-        
-        /* Phục hồi trọn vẹn Huy hiệu Halal & Ngũ Vị Tân */
         .dietary-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-        .badge { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-transform: uppercase; }
-        .badge-vegan { background: #4caf50; color: white; border: 1px solid #388e3c; }
-        .badge-halal { background: #f1c40f; color: #333; border: 1px solid #d4ac0d; }
-        .halal-icon { color: white; font-size: 1.4em; line-height: 1; }
-        .badge-allium { background: #ffffff; color: #2e7d32; border: 1px solid #2e7d32; }
-        .allium-icons { font-size: 1.2em; display: flex; gap: 3px; }
+        .badge { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-transform: uppercase; background: white; color: #2e7d32; }
+        .badge-vegan { background: #4caf50; color: white; border: none; }
         
         .container { max-width: 1000px; margin: auto; padding: 15px; }
         .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 30px 0 20px; font-size: 1.5em; font-weight: bold; }
         
-        /* Cấu trúc phần Động (Hình ảnh, Thông điệp, Liên hệ) */
         .dynamic-section { background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 20px; }
         @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 40px; } }
         
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
-        /* Khung Thông Điệp Của Quán */
         .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
         .message-box::before { content: "✍️ Thông điệp từ Bếp:"; display: block; font-weight: bold; margin-bottom: 5px; font-style: normal; color: #1b5e20; }
         
@@ -46,19 +40,16 @@
         .contact-box p { margin: 5px 0; }
         .btn-maps { display: inline-block; background: #e67e22; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; margin-top: 10px; }
 
-        /* Cấu trúc phần Cốt Lõi (Bài giới thiệu cũ) */
         .core-about-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: justify; }
         .core-about-card b { color: #2e7d32; }
         .core-about-card ul { padding-left: 18px; margin: 10px 0 20px; list-style-type: none; }
         .core-about-card ul li { position: relative; margin-bottom: 8px; }
         .core-about-card ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
 
-        /* Video YouTube */
         #youtube-container { max-width: 800px; margin: 0 auto 30px auto; }
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* Thực đơn dàn ngang */
         .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
         .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
@@ -68,23 +59,20 @@
         .btn-add { background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; transition: 0.2s; }
         .btn-add:active { transform: scale(0.95); }
         
-        /* Giỏ hàng & Modal */
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-top: 2px solid #2e7d32; z-index: 1000; }
         .cart-info { font-size: 1.1em; }
         .cart-total { color: #d35400; font-weight: bold; font-size: 1.1em; }
         .btn-view-cart { background: #e67e22; color: white; padding: 10px 20px; border-radius: 25px; font-weight: bold; border: none; cursor: pointer; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; }
-        .modal-content { background: white; margin: 15% auto; padding: 25px; width: 85%; max-width: 400px; border-radius: 15px; position: relative; }
-        .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .modal-content { background: white; margin: 10% auto; padding: 25px; width: 85%; max-width: 400px; border-radius: 15px; position: relative; }
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;}
         .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="auth-bar" id="auth-status">
-    Đang kiểm tra duyên lành...
-</div>
+<div class="auth-bar" id="auth-status">Đang kiểm tra duyên lành...</div>
 
 <div class="header">
     <a href="https://veggiesaigon.com" class="lang-switch">🇬🇧 English</a>
@@ -104,13 +92,9 @@
         <div class="about-media">
             <img id="about-img" src="https://via.placeholder.com/600x400?text=Pho+But" alt="Phở Bụt">
         </div>
-        
         <div class="about-content">
             <div class="message-box" id="dynamic-message" style="display: none;"></div>
-            
-            <div class="social-links" id="social-links">
-                </div>
-            
+            <div class="social-links" id="social-links"></div>
             <div class="contact-box">
                 <p>📍 <b>Địa chỉ:</b> 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
                 <p>📞 <b>Điện thoại:</b> 0968 107 788</p>
@@ -121,7 +105,6 @@
 
     <div class="core-about-card">
         Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
-        
         <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
         Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
         <ul>
@@ -129,10 +112,8 @@
             <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
             <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
         </ul>
-
         <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
         Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
-
         <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
         Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
         <ul>
@@ -140,7 +121,6 @@
             <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
             <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
         </ul>
-
         <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
         Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏
     </div>
@@ -155,7 +135,7 @@
 
 <div class="cart-bar">
     <div class="cart-info">🛒 <b><span id="cart-count">0</span> món</b> <br><span class="cart-total" id="cart-total">0đ</span></div>
-    <button class="btn-view-cart" onclick="window.datHang()">Đặt Đơn 🙏</button>
+    <button class="btn-view-cart" onclick="window.moBangGiaoHang()">Đặt Đơn 🙏</button>
 </div>
 
 <div id="login-modal" class="modal">
@@ -165,7 +145,25 @@
         <input type="password" id="pass" class="modal-input" placeholder="Mật khẩu (ít nhất 6 ký tự)">
         <button class="btn-login" onclick="window.xuLyAuth()">Vào Bếp</button>
         <p style="font-size:0.75em; color:#888; text-align:center; margin-top:10px;">Nếu chưa có tài khoản, hệ thống sẽ tự tạo mới cho con nghen.</p>
-        <button onclick="window.dongModal()" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Để sau nghen</button>
+        <button onclick="document.getElementById('login-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Để sau nghen</button>
+    </div>
+</div>
+
+<div id="checkout-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="margin-top:0; color:#e67e22; text-align:center;">🛵 Thông Tin Nhận Hàng</h2>
+        <input type="text" id="ship-phone" class="modal-input" placeholder="Số điện thoại của con (*)" required>
+        
+        <div style="display: flex; gap: 10px;">
+            <input type="text" id="ship-zalo" class="modal-input" placeholder="Số Zalo (tùy duyên)">
+            <input type="text" id="ship-whatsapp" class="modal-input" placeholder="Số WhatsApp (tùy duyên)">
+        </div>
+
+        <textarea id="ship-address" class="modal-input" rows="2" placeholder="Địa chỉ giao hàng (*)" required></textarea>
+        <textarea id="ship-note" class="modal-input" rows="2" placeholder="Lời nhắn cho bếp (ít cay, xin thêm ớt...)"></textarea>
+        
+        <button id="btn-submit-order" class="btn-login" style="background:#e67e22;" onclick="window.xacNhanDatHang()">🚀 Chốt Đơn & Gửi Bếp</button>
+        <button onclick="document.getElementById('checkout-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại chọn thêm</button>
     </div>
 </div>
 
@@ -181,49 +179,36 @@
 
     let current_user = null;
     let cart = {};
+    let thongTinQuan = {}; 
 
-    // 1. Tải Thông Tin Quán từ Admin
     async function loadThongTinQuan() {
         const snap = await getDoc(doc(db, "Settings", "info"));
         if (snap.exists()) {
             const data = snap.data();
-            
-            // Xử lý Lời giới thiệu (Thông điệp)
+            thongTinQuan.whatsapp = data.admin_whatsapp || "";
+            thongTinQuan.zalo = data.admin_zalo || "";
+            thongTinQuan.email = data.admin_email || "";
+
             if(data.loi_gioi_thieu && data.loi_gioi_thieu.trim() !== "") {
                 const msgBox = document.getElementById('dynamic-message');
                 msgBox.innerHTML = data.loi_gioi_thieu.replace(/\n/g, '<br>');
                 msgBox.style.display = 'block';
             }
-            
-            // Xử lý Hình đại diện
-            if(data.hinh_dai_dien) {
-                document.getElementById('about-img').src = data.hinh_dai_dien;
-            }
-            
-            // Xử lý Nút Google Maps
+            if(data.hinh_dai_dien) document.getElementById('about-img').src = data.hinh_dai_dien;
             if(data.link_map) {
                 const btnMap = document.getElementById('btn-map');
-                btnMap.href = data.link_map;
-                btnMap.style.display = 'inline-block';
+                btnMap.href = data.link_map; btnMap.style.display = 'inline-block';
             }
-            
-            // Xử lý Video YouTube bằng thuật toán mới mạnh mẽ hơn
             if(data.link_youtube && data.link_youtube.trim() !== "") {
-                let ytId = "";
-                const url = data.link_youtube;
-                if(url.includes("v=")) {
-                    ytId = url.split("v=")[1].substring(0,11);
-                } else if(url.includes("youtu.be/")) {
-                    ytId = url.split("youtu.be/")[1].substring(0,11);
-                }
+                let ytId = ""; const url = data.link_youtube;
+                if(url.includes("v=")) ytId = url.split("v=")[1].substring(0,11);
+                else if(url.includes("youtu.be/")) ytId = url.split("youtu.be/")[1].substring(0,11);
                 
                 if (ytId) {
                     document.getElementById('youtube-container').style.display = 'block';
                     document.getElementById('youtube-container').innerHTML = `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>`;
                 }
             }
-            
-            // Xử lý Nút Mạng xã hội
             let socialsHTML = '';
             if(data.link_fb) socialsHTML += `<a href="${data.link_fb}" target="_blank" class="social-btn bg-fb">📘 Facebook</a>`;
             if(data.link_tiktok) socialsHTML += `<a href="${data.link_tiktok}" target="_blank" class="social-btn bg-tiktok">🎵 TikTok</a>`;
@@ -232,7 +217,6 @@
         }
     }
 
-    // 2. Theo dõi đăng nhập
     onAuthStateChanged(auth, (user) => {
         const bar = document.getElementById('auth-status');
         if (user) {
@@ -240,12 +224,9 @@
             bar.innerHTML = `Chào con, <b>${user.email}</b> | <span onclick="window.logout()" style="text-decoration:underline; cursor:pointer;">Thoát</span>`;
         } else {
             current_user = null;
-            bar.innerHTML = `<span onclick="window.moLogin()" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập để đặt hàng</span>`;
+            bar.innerHTML = `<span onclick="document.getElementById('login-modal').style.display='block'" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập để đặt hàng</span>`;
         }
     });
-
-    window.moLogin = () => document.getElementById('login-modal').style.display = 'block';
-    window.dongModal = () => document.getElementById('login-modal').style.display = 'none';
 
     window.xuLyAuth = async () => {
         const email = document.getElementById('email').value;
@@ -253,18 +234,16 @@
         if(!email || !pass) return alert("Con bận điền đủ thông tin nghen!");
         try {
             await signInWithEmailAndPassword(auth, email, pass);
-            window.dongModal();
+            document.getElementById('login-modal').style.display='none';
         } catch (err) {
             if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
-                try { await createUserWithEmailAndPassword(auth, email, pass); window.dongModal(); } 
+                try { await createUserWithEmailAndPassword(auth, email, pass); document.getElementById('login-modal').style.display='none'; } 
                 catch (e) { alert("Lỗi tạo tài khoản: " + e.message); }
             } else { alert("Lỗi đăng nhập: " + err.message); }
         }
     };
-
     window.logout = () => signOut(auth);
 
-    // 3. Tải thực đơn
     async function fetchMenu() {
         const snap = await getDocs(collection(db, "Menus"));
         const list = document.getElementById('menu-list');
@@ -285,7 +264,6 @@
         });
     }
 
-    // 4. Giỏ hàng & Đặt món
     window.addToCart = (ten, gia) => {
         if(cart[ten]) cart[ten].sl++; else cart[ten] = { gia, sl: 1 };
         updateCartUI();
@@ -298,15 +276,97 @@
         document.getElementById('cart-total').innerText = total.toLocaleString() + 'đ';
     }
 
-    window.datHang = async () => {
-        if(!current_user) { Swal.fire("Con bận đăng nhập nghen!"); window.moLogin(); return; }
+    window.moBangGiaoHang = () => {
+        if(!current_user) { Swal.fire("Con bận đăng nhập nghen!"); document.getElementById('login-modal').style.display='block'; return; }
         if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng đang trống ráo trọi!");
+        
+        document.getElementById('checkout-modal').style.display = 'block';
+    };
+
+    window.xacNhanDatHang = async () => {
+        const phone = document.getElementById('ship-phone').value;
+        const zalo = document.getElementById('ship-zalo').value;
+        const whatsapp = document.getElementById('ship-whatsapp').value;
+        const address = document.getElementById('ship-address').value;
+        const note = document.getElementById('ship-note').value;
+        const btnSubmit = document.getElementById('btn-submit-order');
+
+        if(!phone || !address) return alert("Con điền đủ số điện thoại và địa chỉ đặng quán biết đường giao nghen!");
 
         try {
-            await addDoc(collection(db, "Orders"), { khach_hang: current_user.email, chi_tiet: cart, thoi_gian: serverTimestamp(), trang_thai: "Đang chờ" });
-            Swal.fire("🙏 Đã nhận đơn!", "Bếp đang làm cho con đây.", "success");
+            btnSubmit.innerText = "⌛ Đang chốt đơn ráo trọi...";
+            btnSubmit.disabled = true;
+
+            let total = 0;
+            let tinNhanOrder = `🙏 Dạ chào Phở Bụt, con đặt món giao tới nghen:\n\n`;
+
+            for(let key in cart) { 
+                let thanhTien = cart[key].sl * cart[key].gia;
+                total += thanhTien; 
+                tinNhanOrder += `- ${cart[key].sl} x ${key} (${thanhTien.toLocaleString()}đ)\n`;
+            }
+
+            // 1. Lưu đơn vô kho Firebase
+            await addDoc(collection(db, "Orders"), { 
+                khach_hang: current_user.email,
+                dien_thoai: phone,
+                so_zalo: zalo,
+                so_whatsapp: whatsapp,
+                dia_chi: address,
+                ghi_chu: note,
+                chi_tiet: cart, 
+                tong_tien: total,
+                thoi_gian: serverTimestamp(), 
+                trang_thai: "Đang chờ" 
+            });
+
+            // Gom góp nội dung thư
+            let thongTinGiao = `\n💰 Tổng cộng: ${total.toLocaleString()}đ\n`;
+            thongTinGiao += `📍 Giao tới: ${address}\n`;
+            thongTinGiao += `📞 SĐT: ${phone}\n`;
+            if(note) thongTinGiao += `📝 Lời dặn: ${note}\n`;
+
+            let thuChoQuan = `Có đơn hàng mới ráo trọi nghen Bếp ơi!\n\n${tinNhanOrder}${thongTinGiao}`;
+            let thuChoKhach = `Mô Phật, Phở Bụt cảm ơn duyên lành của con nghen. Bếp đã nhận đơn hàng và đang chuẩn bị ráo trọi rồi.\n\nChi tiết đơn hàng của con:\n\n${tinNhanOrder}${thongTinGiao}`;
+
+            // 2. Tự động gửi Email qua trạm bưu điện EmailJS
+            const emailjsServiceID = "service_j8kubcd";
+            const emailjsTemplateID = "template_3ee7url";
+
+            // Gửi cho Quán (nếu Admin có nhập email vô kho)
+            if(thongTinQuan.email) {
+                emailjs.send(emailjsServiceID, emailjsTemplateID, {
+                    to_email: thongTinQuan.email,
+                    subject: `[ĐƠN MỚI] Khách: ${phone} - ${current_user.email}`,
+                    message: thuChoQuan
+                });
+            }
+
+            // Gửi biên lai cho Khách
+            emailjs.send(emailjsServiceID, emailjsTemplateID, {
+                to_email: current_user.email,
+                subject: `Phở Bụt đã nhận đơn hàng của bạn 🙏`,
+                message: thuChoKhach
+            });
+
+            // 3. Mở WhatsApp hoặc Zalo đặng nhắn thẳng cho quán
+            let tinNhanWhatsappZalo = tinNhanOrder + thongTinGiao;
+            if (thongTinQuan.whatsapp) {
+                window.open(`https://wa.me/${thongTinQuan.whatsapp}?text=${encodeURIComponent(tinNhanWhatsappZalo)}`, '_blank');
+            } else if (thongTinQuan.zalo) {
+                window.open(`https://zalo.me/${thongTinQuan.zalo}`, '_blank');
+            }
+            
+            Swal.fire("🙏 Đã chốt đơn!", "Đơn hàng đã được ghi nhận và gửi email. Bếp đang chuẩn bị nghen con.", "success");
             cart = {}; updateCartUI();
-        } catch (e) { alert("Lỗi gửi đơn: " + e.message); }
+            document.getElementById('checkout-modal').style.display = 'none';
+
+        } catch (e) { 
+            alert("Lỗi gửi đơn: " + e.message); 
+        } finally {
+            btnSubmit.innerText = "🚀 Chốt Đơn & Gửi Bếp";
+            btnSubmit.disabled = false;
+        }
     };
 
     loadThongTinQuan();
