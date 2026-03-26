@@ -21,10 +21,13 @@
         .container { max-width: 1000px; margin: auto; padding: 15px; }
         .section-title { color: var(--main-color); border-left: 5px solid #e67e22; padding-left: 12px; margin: 30px 0 20px; font-weight: bold; font-size: 1.5em; }
         
-        /* Thông tin liên hệ & Giới thiệu */
+        /* Thông tin liên hệ, Lời nhắn & Giới thiệu */
         .dynamic-section { background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 25px; }
         @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 35px; } }
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
+        
+        /* Khung lời nhắn từ nhà hàng */
+        .message-box { background: #f0fdf4; border: 2px solid var(--main-color); border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: var(--main-color); }
         
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .social-btn { padding: 8px 16px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.85em; display: inline-flex; align-items: center; }
@@ -78,6 +81,8 @@
     <div class="dynamic-section">
         <div class="about-media"><img id="about-img" src=""></div>
         <div class="about-content">
+            <div class="message-box" id="dynamic-message" style="display: none;"></div>
+            
             <div id="social-links" class="social-links"></div>
             <div class="contact-box">
                 <p>📍 <b>Địa chỉ:</b> <span id="display-address">...</span></p>
@@ -149,6 +154,12 @@
                 if(d.brand_logo) { document.getElementById('brand-logo').src = d.brand_logo; document.getElementById('brand-logo').style.display='block'; }
                 if(d.hinh_dai_dien) document.getElementById('about-img').src = d.hinh_dai_dien;
                 document.getElementById('core-about-card').innerHTML = d.bai_gioi_thieu_chinh || "Chào mừng quý khách!";
+                
+                // HIỆN LỜI NHẮN TỪ NHÀ HÀNG (lời ngỏ)
+                if(d.loi_gioi_thieu) { 
+                    document.getElementById('dynamic-message').innerHTML = d.loi_gioi_thieu.replace(/\n/g, '<br>'); 
+                    document.getElementById('dynamic-message').style.display='block'; 
+                }
                 
                 document.getElementById('display-address').innerText = d.store_address || "Chưa cập nhật";
                 document.getElementById('display-phone').innerText = d.store_phone || "Chưa cập nhật";
@@ -247,20 +258,28 @@
             const tax = Math.round(sub * ((dI.vat_rate||0)/100));
             const tongCong = sub + tax;
             
+            // LƯU ĐƠN VÀO FIREBASE
             await addDoc(collection(db, "Orders"), { 
                 khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, 
                 gia_tam_tinh: sub, tien_thue: tax, phan_tram_thue: dI.vat_rate||0, 
                 tong_tien: tongCong, tong_von: von, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" 
             });
             
-            // GỬI EMAIL CHUẨN ĐÚNG KHUÔN (to_email, subject, message)
+            // 1. GỬI EMAIL BÁO CHO CHỦ QUÁN (ADMIN)
             await emailjs.send("service_j8kubcd", "template_3ee7url", { 
                 to_email: dI.admin_email || ADMIN_EMAIL, 
                 subject: `🚨 [ĐƠN MỚI] Khách hàng: ${ph}`, 
                 message: `Kính báo Admin,\n\nQuán vừa nhận được một đơn đặt hàng mới.\n\n👤 THÔNG TIN KHÁCH HÀNG:\n- Email: ${currentUser.email}\n- SĐT: ${ph}\n- Địa chỉ: ${ad}\n\n📦 CHI TIẾT ĐƠN HÀNG:\n${msg}\n💰 TỔNG THU (Đã gồm VAT): ${tongCong.toLocaleString()}đ\n\nThí chủ hãy vào trang Quản lý đơn hàng (orders.html) để xem nghen!` 
             });
+
+            // 2. GỬI EMAIL XÁC NHẬN CHO KHÁCH HÀNG ĐẶT
+            await emailjs.send("service_j8kubcd", "template_3ee7url", { 
+                to_email: currentUser.email, 
+                subject: `✅ Xác nhận đặt hàng thành công tại ${tenQuan}`, 
+                message: `Kính chào quý khách,\n\nCảm ơn quý khách đã tin tưởng và đặt hàng tại ${tenQuan}.\n\n📦 CHI TIẾT ĐƠN HÀNG CỦA QUÝ KHÁCH:\n${msg}\n💰 TỔNG THANH TOÁN: ${tongCong.toLocaleString()}đ\n\nChúng tôi sẽ sớm liên hệ qua số điện thoại ${ph} để giao hàng.\n\nKính chúc quý khách thân tâm an lạc!` 
+            });
             
-            Swal.fire("Thành công!", "Đã gửi đơn hàng.", "success"); 
+            Swal.fire("Thành công!", "Đã gửi đơn hàng. Quý khách vui lòng kiểm tra email nghen!", "success"); 
             cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
         } catch (e) { 
             alert(e.message); 
@@ -269,7 +288,7 @@
     };
 
     window.moLogin = () => { document.getElementById('auth-form-container').innerHTML = `<h2>Đăng Nhập</h2><input id="lE" class="modal-input" placeholder="Email"><input id="lP" type="password" class="modal-input" placeholder="Mật khẩu"><button class="btn-login" onclick="window.doLogin()">Vào Cửa Hàng</button>`; document.getElementById('auth-modal').style.display='block'; };
-    window.doLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } catch (e) { alert("Sai thông tin!"); } };
+    window.doLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } catch (e) { alert("Sai thông tin đăng nhập!"); } };
     window.logout = () => signOut(auth);
     init();
 </script>
