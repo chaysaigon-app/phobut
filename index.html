@@ -19,38 +19,41 @@
         .halal-icon { color: white; font-size: 1.4em; line-height: 1; }
         .badge-allium { background: #ffffff; color: #2e7d32; border: 1px solid #2e7d32; }
         .allium-icons { font-size: 1.2em; display: flex; gap: 3px; }
-        .container { max-width: 500px; margin: auto; padding: 15px; }
+        
+        /* Mở rộng khung giới hạn để dàn trải thanh thoát hơn */
+        .container { max-width: 1000px; margin: auto; padding: 15px; }
         .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 25px 0 15px; font-size: 1.3em; font-weight: bold; }
         
-        /* About Section */
-        .about-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .about-img-square { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+        /* Giới hạn lại phần Về Chúng Tôi đặng không bị bè ra quá trớn */
+        .about-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 0 auto 25px; max-width: 700px; }
+        .about-img-square { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
         .about-text { padding: 20px; font-size: 1em; line-height: 1.6; color: #444; text-align: justify; }
         .about-text b { color: #2e7d32; }
         .about-text ul { padding-left: 18px; margin: 10px 0; list-style-type: none; }
         .about-text ul li { position: relative; margin-bottom: 5px; }
         .about-text ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
         
-        /* Location Section */
-        .location-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; margin-bottom: 25px; }
+        .location-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; margin: 0 auto 25px; max-width: 700px; }
         .btn-maps { display: inline-block; background: #2e7d32; color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .contact-btns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
         .btn-qr { color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
         .btn-qr-zalo { background: #0068ff; }
         .btn-qr-wa { background: #25D366; }
 
-        /* Menu Section */
-        .menu-list { display: flex; flex-direction: column; gap: 20px; }
-        .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* Pháp Tùy Duyên: Dàn ngang thực đơn ra nhiều cột */
+        .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
         .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-        .card-content { padding: 15px; }
-        .name-vi { margin: 0 0 5px 0; font-size: 1.2em; color: #111; font-weight: bold; }
-        .price { color: #d35400; font-weight: bold; font-size: 1.2em; margin-bottom: 15px; }
-        .btn-add { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
+        .card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+        .name-vi { margin: 0 0 5px 0; font-size: 1.1em; color: #111; font-weight: bold; text-align: center; }
+        .price { color: #d35400; font-weight: bold; font-size: 1.1em; margin-bottom: 15px; margin-top: auto; text-align: center; }
+        .btn-add { background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; transition: 0.2s; }
+        .btn-add:active { transform: scale(0.95); }
         
         /* Cart Bar & Modal */
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-top: 2px solid #2e7d32; z-index: 1000; }
-        .cart-total { color: #d35400; font-weight: bold; font-size: 1.2em; }
+        .cart-info { font-size: 1.1em; }
+        .cart-total { color: #d35400; font-weight: bold; font-size: 1.1em; }
         .btn-view-cart { background: #e67e22; color: white; padding: 10px 20px; border-radius: 25px; font-weight: bold; border: none; cursor: pointer; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; }
@@ -109,7 +112,7 @@
 
     <div class="section-title">🍜 Thực Đơn</div>
     <div id="menu-list" class="menu-list">
-        <p style="text-align:center; color:#888;">Đang tải thực đơn, con đợi xíu nghen...</p>
+        <p style="text-align:center; color:#888; grid-column: 1 / -1;">Đang tải thực đơn, con đợi xíu nghen...</p>
     </div>
 
     <div class="section-title">🏠 Địa Chỉ & Liên Hệ</div>
@@ -195,7 +198,10 @@
         const snap = await getDocs(collection(db, "Menus"));
         const list = document.getElementById('menu-list');
         list.innerHTML = "";
-        if(snap.empty) list.innerHTML = "<p style='text-align:center;'>Bếp chưa dọn món ráo trọi, con quay lại sau nghen!</p>";
+        if(snap.empty) {
+            list.innerHTML = "<p style='text-align:center; grid-column: 1 / -1;'>Bếp chưa dọn món ráo trọi, con quay lại sau nghen!</p>";
+            return;
+        }
         
         snap.forEach(doc => {
             const m = doc.data();
@@ -211,7 +217,7 @@
         });
     }
 
-    // 3. Xử lý ái dục... à nhầm, xử lý Giỏ hàng
+    // 3. Xử lý Giỏ hàng
     window.addToCart = (ten, gia) => {
         if(cart[ten]) cart[ten].sl++;
         else cart[ten] = { gia, sl: 1 };
