@@ -19,25 +19,34 @@
         .container { max-width: 1000px; margin: auto; padding: 15px; }
         .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 30px 0 20px; font-size: 1.5em; font-weight: bold; }
         
-        /* Cấu trúc mới cho phần Giới Thiệu đặng lên máy tính cho đẹp */
-        .about-section { background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 30px; }
-        @media (min-width: 768px) { .about-section { grid-template-columns: 1fr 1fr; gap: 40px; } }
+        /* Cấu trúc phần Động (Hình ảnh, Video, Thông điệp, Liên hệ) */
+        .dynamic-section { background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 20px; }
+        @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 40px; } }
         
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3; }
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-top: 15px; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        .about-content { display: flex; flex-direction: column; justify-content: space-between; }
-        .about-text { color: #444; font-size: 1.05em; margin-bottom: 20px; text-align: justify; }
+        .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
-        /* Mạng xã hội & Liên hệ */
+        /* Khung Thông Điệp Của Quán */
+        .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
+        .message-box::before { content: "✍️ Thông điệp từ Bếp:"; display: block; font-weight: bold; margin-bottom: 5px; font-style: normal; color: #1b5e20; }
+        
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .social-btn { padding: 8px 15px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.9em; display: inline-flex; align-items: center; }
         .bg-fb { background: #1877F2; } .bg-tiktok { background: #000000; } .bg-yt { background: #FF0000; }
         
-        .contact-box { background: #f9fbf9; border-radius: 10px; padding: 15px; border: 1px dashed #2e7d32; }
+        .contact-box { background: #f9fbf9; border-radius: 10px; padding: 15px; border: 1px dashed #2e7d32; margin-top: auto; }
         .contact-box p { margin: 5px 0; }
         .btn-maps { display: inline-block; background: #e67e22; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; margin-top: 10px; }
+
+        /* Cấu trúc phần Cốt Lõi (Bài giới thiệu cũ) */
+        .core-about-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 30px; text-align: justify; }
+        .core-about-card b { color: #2e7d32; }
+        .core-about-card ul { padding-left: 18px; margin: 10px 0 20px; list-style-type: none; }
+        .core-about-card ul li { position: relative; margin-bottom: 8px; }
+        .core-about-card ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
 
         /* Thực đơn dàn ngang */
         .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
@@ -80,16 +89,14 @@
 <div class="container">
     <div class="section-title">🌿 Về Chúng Tôi</div>
     
-    <div class="about-section">
+    <div class="dynamic-section">
         <div class="about-media">
             <img id="about-img" src="https://via.placeholder.com/600x400?text=Pho+But" alt="Phở Bụt">
             <div id="youtube-container" style="display: none;"></div>
         </div>
         
         <div class="about-content">
-            <div class="about-text" id="about-text">
-                Đang tải những lời chánh niệm từ quán...
-            </div>
+            <div class="message-box" id="dynamic-message" style="display: none;"></div>
             
             <div class="social-links" id="social-links">
                 </div>
@@ -97,9 +104,35 @@
             <div class="contact-box">
                 <p>📍 <b>Địa chỉ:</b> 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
                 <p>📞 <b>Điện thoại:</b> 0968 107 788</p>
-                <a href="https://maps.app.goo.gl/tqJb7M6hQ1qHq7aL7" target="_blank" class="btn-maps">🗺️ Chỉ đường Google Maps</a>
+                <a href="https://www.google.com/maps/search/?api=1&query=76+Thủ+Khoa+Huân+Đà+Nẵng" target="_blank" class="btn-maps">🗺️ Chỉ đường Google Maps</a>
             </div>
         </div>
+    </div>
+
+    <div class="core-about-card">
+        Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
+        
+        <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
+        Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
+        <ul>
+            <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
+            <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
+            <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
+        </ul>
+
+        <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
+        Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
+
+        <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
+        Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
+        <ul>
+            <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
+            <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
+            <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
+        </ul>
+
+        <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
+        Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏
     </div>
 
     <div class="section-title">🍜 Thực Đơn</div>
@@ -143,9 +176,11 @@
         if (snap.exists()) {
             const data = snap.data();
             
-            // Xử lý Lời giới thiệu
-            if(data.loi_gioi_thieu) {
-                document.getElementById('about-text').innerHTML = data.loi_gioi_thieu.replace(/\n/g, '<br>');
+            // Xử lý Lời giới thiệu (Thông điệp)
+            if(data.loi_gioi_thieu && data.loi_gioi_thieu.trim() !== "") {
+                const msgBox = document.getElementById('dynamic-message');
+                msgBox.innerHTML = data.loi_gioi_thieu.replace(/\n/g, '<br>');
+                msgBox.style.display = 'block';
             }
             
             // Xử lý Hình đại diện
