@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Hệ Thống Quản Trị Phở Bụt</title>
+    <title>Hệ Thống Quản Trị - Phở Bụt</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
         
@@ -23,24 +23,38 @@
         .btn-edit { background: #fff3e0; color: #e67e22; margin-right: 5px; }
         .btn-del { background: #ffeded; color: #d32f2f; }
         .btn-logout { position: absolute; top: 20px; right: 25px; background: #d32f2f; color: white; border-radius: 20px; padding: 8px 15px; }
+        .btn-link-orders { background: #3498db; color: white; text-decoration: none; padding: 10px 20px; border-radius: 8px; display: inline-block; font-weight: bold; margin-bottom: 20px; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
-        .order-card { border-left: 5px solid #e67e22; background: #fffdf9; padding: 15px; margin-bottom: 15px; border-radius: 8px; font-size: 0.95em; line-height: 1.5;}
-        .order-card ul { margin: 5px 0 10px 0; padding-left: 20px; }
+        
+        .staff-item { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 10px 15px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #eee; }
     </style>
 </head>
 <body>
 
 <div id="admin-login-screen">
-    <h2>Hệ Thống Quản Trị</h2>
-    <p>Vui lòng đăng nhập bằng tài khoản Google (Gmail) để truy cập.</p>
+    <h2>Trang Quản Trị Cấp Cao</h2>
+    <p>Chỉ dành cho Quản lý (Admin). Vui lòng đăng nhập bằng Google.</p>
     <button class="btn-google" onclick="window.dangNhapGoogle()">Đăng Nhập Bằng Google</button>
 </div>
 
 <div class="admin-wrapper">
+    <a href="orders.html" target="_blank" class="btn-link-orders">📦 Đi đến Trang Quản Lý Đơn Hàng</a>
+    <button class="btn-logout" onclick="window.dangXuatAdmin()">Đăng Xuất</button>
+    
     <div class="card">
-        <button class="btn-logout" onclick="window.dangXuatAdmin()">Đăng Xuất</button>
+        <h2>👥 Quản Lý Nhân Viên (Xử lý đơn hàng)</h2>
+        <p style="font-size: 0.9em; color: #666;">Thêm email nhân viên vào đây để họ có thể đăng nhập vào trang <b>orders.html</b>.</p>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="email" id="newStaffEmail" placeholder="Nhập email nhân viên (ví dụ: nhanvien@gmail.com)">
+            <button class="btn-primary" style="width: auto; margin: 0;" onclick="window.themNhanVien()">Thêm</button>
+        </div>
+        <div id="staff-list">Đang tải danh sách...</div>
+    </div>
+
+    <div class="card">
         <h2>Cài Đặt Thông Tin Cửa Hàng</h2>
         
         <h3>Thông Tin Nhận Đơn Hàng</h3>
@@ -128,16 +142,11 @@
             <tbody id="menu-body"></tbody>
         </table>
     </div>
-
-    <div class="card">
-        <h2>Danh Sách Đơn Hàng Mới</h2>
-        <div id="order-list">Đang tải danh sách đơn hàng...</div>
-    </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
@@ -152,26 +161,6 @@
     let current_img_url = "";
     let current_avatar_url = "";
 
-    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. <br><br>
-<b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
-Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
-<ul>
-    <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-    <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ.</li>
-    <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
-</ul>
-<b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
-Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
-<b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
-Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
-<ul>
-    <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
-    <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
-    <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
-</ul>
-<b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
-Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật.`;
-
     onAuthStateChanged(auth, (user) => {
         if (user) {
             if (user.email === EMAIL_CHUYEN_TRACH) {
@@ -179,8 +168,9 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                 document.querySelector('.admin-wrapper').style.display = 'block';
                 loadThongTin();
                 loadData();
+                loadDanhSachNhanVien();
             } else {
-                alert("Truy cập bị từ chối! Tài khoản này không có quyền quản trị.");
+                alert("Truy cập bị từ chối! Tài khoản này không có quyền Quản trị viên.");
                 signOut(auth);
             }
         } else {
@@ -189,106 +179,126 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         }
     });
 
-    window.dangNhapGoogle = async () => {
-        try { await signInWithPopup(auth, provider); } catch (error) { alert("Lỗi đăng nhập: " + error.message); }
-    };
-
+    window.dangNhapGoogle = async () => { try { await signInWithPopup(auth, provider); } catch (error) { alert("Lỗi đăng nhập: " + error.message); } };
     window.dangXuatAdmin = () => { signOut(auth); };
 
+    // -- QUẢN LÝ NHÂN VIÊN --
+    async function loadDanhSachNhanVien() {
+        const snap = await getDoc(doc(db, "Settings", "staff"));
+        const listDiv = document.getElementById('staff-list');
+        listDiv.innerHTML = "";
+        
+        if (snap.exists() && snap.data().emails) {
+            let emails = snap.data().emails;
+            if (emails.length === 0) {
+                listDiv.innerHTML = "<p>Chưa có nhân viên nào.</p>";
+            } else {
+                emails.forEach(email => {
+                    listDiv.innerHTML += `
+                        <div class="staff-item">
+                            <span>${email}</span>
+                            <button class="btn-del" onclick="window.xoaNhanVien('${email}')">Xóa</button>
+                        </div>`;
+                });
+            }
+        } else {
+            listDiv.innerHTML = "<p>Chưa có nhân viên nào.</p>";
+        }
+    }
+
+    window.themNhanVien = async () => {
+        const newEmail = document.getElementById('newStaffEmail').value.trim();
+        if(!newEmail) return alert("Vui lòng nhập email.");
+        
+        const snap = await getDoc(doc(db, "Settings", "staff"));
+        let emails = [];
+        if(snap.exists() && snap.data().emails) emails = snap.data().emails;
+        
+        if(!emails.includes(newEmail)) {
+            emails.push(newEmail);
+            await setDoc(doc(db, "Settings", "staff"), { emails: emails }, { merge: true });
+            document.getElementById('newStaffEmail').value = "";
+            loadDanhSachNhanVien();
+        } else {
+            alert("Email này đã có trong danh sách rồi.");
+        }
+    };
+
+    window.xoaNhanVien = async (emailToDel) => {
+        if(confirm(`Bạn có chắc muốn gỡ bỏ quyền của ${emailToDel}?`)) {
+            const snap = await getDoc(doc(db, "Settings", "staff"));
+            let emails = snap.data().emails || [];
+            emails = emails.filter(e => e !== emailToDel);
+            await setDoc(doc(db, "Settings", "staff"), { emails: emails }, { merge: true });
+            loadDanhSachNhanVien();
+        }
+    };
+
+    // Các hàm quản lý Cửa hàng và Menu giữ nguyên
     async function uploadToCloudinary(file) {
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", uploadPreset);
+        formData.append("file", file); formData.append("upload_preset", uploadPreset);
         const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
-        const data = await res.json();
-        return data.secure_url;
+        const data = await res.json(); return data.secure_url;
     }
 
     async function loadThongTin() {
         const docSnap = await getDoc(doc(db, "Settings", "info"));
         if (docSnap.exists()) {
             const data = docSnap.data();
-            
             document.getElementById('adminEmail').value = data.admin_email || "";
             document.getElementById('adminZalo').value = data.admin_zalo || "";
             document.getElementById('adminWhatsapp').value = data.admin_whatsapp || "";
-
             document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
-            document.getElementById('baiGioiThieuChinh').value = data.bai_gioi_thieu_chinh || defaultBaiGioiThieu;
-
+            document.getElementById('baiGioiThieuChinh').value = data.bai_gioi_thieu_chinh || "";
             document.getElementById('linkYoutube').value = data.link_youtube || "";
             document.getElementById('linkMap').value = data.link_map || "";
             document.getElementById('linkFb').value = data.link_fb || "";
             document.getElementById('linkTiktok').value = data.link_tiktok || "";
             document.getElementById('linkYtChannel').value = data.link_yt_channel || "";
-            
             if(data.hinh_dai_dien) {
                 current_avatar_url = data.hinh_dai_dien;
-                const img = document.getElementById('previewDaiDien');
-                img.src = current_avatar_url;
-                img.style.display = "block";
+                document.getElementById('previewDaiDien').src = current_avatar_url;
+                document.getElementById('previewDaiDien').style.display = "block";
             }
-        } else {
-            document.getElementById('baiGioiThieuChinh').value = defaultBaiGioiThieu;
         }
     }
 
     window.luuThongTin = async () => {
-        const adminEmail = document.getElementById('adminEmail').value;
-        const adminZalo = document.getElementById('adminZalo').value;
-        const adminWhatsapp = document.getElementById('adminWhatsapp').value;
-
-        const loi = document.getElementById('loiGioiThieu').value;
-        const baiChinh = document.getElementById('baiGioiThieuChinh').value;
-        const linkYtVideo = document.getElementById('linkYoutube').value;
-        const linkMap = document.getElementById('linkMap').value;
-        const linkFb = document.getElementById('linkFb').value;
-        const linkTiktok = document.getElementById('linkTiktok').value;
-        const linkYtChannel = document.getElementById('linkYtChannel').value;
-        const file = document.getElementById('fileAnhDaiDien').files[0];
         const btn = document.getElementById('btn-luu-thong-tin');
-        
         try {
             btn.innerText = "Đang lưu thông tin...";
             let url = current_avatar_url;
-            if(file) { url = await uploadToCloudinary(file); }
-
+            if(document.getElementById('fileAnhDaiDien').files[0]) { 
+                url = await uploadToCloudinary(document.getElementById('fileAnhDaiDien').files[0]); 
+            }
             await setDoc(doc(db, "Settings", "info"), {
-                admin_email: adminEmail,
-                admin_zalo: adminZalo,
-                admin_whatsapp: adminWhatsapp,
-                loi_gioi_thieu: loi,
-                bai_gioi_thieu_chinh: baiChinh,
-                link_youtube: linkYtVideo,
-                link_map: linkMap,
-                link_fb: linkFb,
-                link_tiktok: linkTiktok,
-                link_yt_channel: linkYtChannel,
+                admin_email: document.getElementById('adminEmail').value,
+                admin_zalo: document.getElementById('adminZalo').value,
+                admin_whatsapp: document.getElementById('adminWhatsapp').value,
+                loi_gioi_thieu: document.getElementById('loiGioiThieu').value,
+                bai_gioi_thieu_chinh: document.getElementById('baiGioiThieuChinh').value,
+                link_youtube: document.getElementById('linkYoutube').value,
+                link_map: document.getElementById('linkMap').value,
+                link_fb: document.getElementById('linkFb').value,
+                link_tiktok: document.getElementById('linkTiktok').value,
+                link_yt_channel: document.getElementById('linkYtChannel').value,
                 hinh_dai_dien: url
             }, { merge: true });
-
-            alert("Đã cập nhật thông tin thành công!");
-            btn.innerText = "Lưu Thông Tin";
-            loadThongTin();
-        } catch(e) { 
-            alert("Lỗi khi lưu thông tin: " + e.message); 
-            btn.innerText = "Lưu Thông Tin"; 
-        }
+            alert("Đã cập nhật thông tin thành công!"); btn.innerText = "Lưu Thông Tin"; loadThongTin();
+        } catch(e) { alert("Lỗi khi lưu: " + e.message); btn.innerText = "Lưu Thông Tin"; }
     };
 
     window.luuMon = async (isUpdate) => {
         const ten = document.getElementById('tenVi').value;
         const gia = document.getElementById('gia').value;
-        const file = document.getElementById('fileAnh').files[0];
         const id = document.getElementById('edit-id').value;
         const status = document.getElementById('status-text');
-
         if(!ten || !gia) return alert("Vui lòng nhập tên và giá món ăn!");
-
         try {
             status.style.display = "block";
             let url = current_img_url;
-            if(file) { url = await uploadToCloudinary(file); }
+            if(document.getElementById('fileAnh').files[0]) { url = await uploadToCloudinary(document.getElementById('fileAnh').files[0]); }
             if(!url && !isUpdate) { status.style.display = "none"; return alert("Vui lòng chọn hình ảnh cho món mới!"); }
 
             if(isUpdate) {
@@ -333,35 +343,9 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                     </td>
                 </tr>`;
         });
-
-        const qO = query(collection(db, "Orders"), orderBy("thoi_gian", "desc"));
-        const snapO = await getDocs(qO);
-        const divO = document.getElementById('order-list');
-        divO.innerHTML = "";
-        snapO.forEach(d => {
-            const o = d.data();
-            let items = ""; for(let k in o.chi_tiet) items += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
-            
-            let infoHTML = `<b>Email khách:</b> ${o.khach_hang} <br>
-                            <b>SĐT:</b> ${o.dien_thoai || '<span style="color:red">Chưa nhập</span>'}`;
-            if(o.so_zalo) infoHTML += ` | <b>Zalo:</b> <a href="https://zalo.me/${o.so_zalo}" target="_blank">${o.so_zalo}</a>`;
-            if(o.so_whatsapp) infoHTML += ` | <b>WhatsApp:</b> ${o.so_whatsapp}`;
-            infoHTML += `<br><b>Giao tới:</b> ${o.dia_chi || '<span style="color:red">Chưa nhập</span>'}<br>`;
-            if(o.ghi_chu) infoHTML += `<b>Lời nhắn:</b> <i>${o.ghi_chu}</i><br>`;
-
-            divO.innerHTML += `
-                <div class="order-card">
-                    ${infoHTML}
-                    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 10px 0;">
-                    <b>Chi tiết món:</b>
-                    <ul>${items}</ul>
-                    <b style="color:#d35400;">Tổng thu: ${(o.tong_tien || 0).toLocaleString()}đ</b>
-                </div>`;
-        });
     }
 
     window.xoaMon = async (id) => { if(confirm("Bạn có chắc chắn muốn xóa món này không?")) { await deleteDoc(doc(db, "Menus", id)); location.reload(); } };
-    
 </script>
 </body>
 </html>
