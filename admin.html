@@ -93,7 +93,7 @@
         <button class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Toàn Bộ Cấu Hình Hệ Thống</button>
     </div>
 
-    <div class="card">
+    <div class="card" id="khu-vuc-menu">
         <h2>🍜 Quản Lý Thực Đơn (Menu)</h2>
         <input type="hidden" id="edit-id">
         <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;">
@@ -101,9 +101,20 @@
             <div class="form-group"><label>Giá bán:</label><input type="number" id="gia"></div>
             <div class="form-group"><label>Giá vốn:</label><input type="number" id="giaVon"></div>
         </div>
-        <div class="form-group"><label>Hình ảnh món:</label><input type="file" id="fileAnh"></div>
+        
+        <div class="form-group" style="display: flex; gap: 10px; align-items: center;">
+            <div style="flex: 1;">
+                <label>Hình ảnh món:</label>
+                <input type="file" id="fileAnh">
+            </div>
+            <img id="view-item-img" class="img-preview" style="display:none; margin-top: 0;">
+        </div>
+        
         <button id="btn-add" class="btn-primary" onclick="window.luuMon(false)">Thêm Món Mới</button>
-        <button id="btn-up" style="display:none; background:#e67e22; color:white; width:100%;" onclick="window.luuMon(true)">Cập Nhật Thay Đổi</button>
+        <div id="btn-up-group" style="display:none;">
+            <button id="btn-up" style="background:#e67e22; color:white; width: 70%;" onclick="window.luuMon(true)">Cập Nhật Thay Đổi</button>
+            <button style="background:#7f8c8d; color:white; width: 28%;" onclick="window.huySua()">Hủy</button>
+        </div>
         
         <table id="menu-table">
             <thead><tr><th>Hình</th><th>Tên Món</th><th>Giá Bán</th><th>Giá Vốn</th><th>Thao tác</th></tr></thead>
@@ -211,13 +222,13 @@
         snap.forEach(d => {
             const m = d.data();
             body.innerHTML += `<tr>
-                <td><img src="${m.hinh_anh}" class="img-preview"></td>
+                <td><img src="${m.hinh_anh}" class="img-preview" style="width:50px; height:50px; margin:0;"></td>
                 <td>${m.ten_tieng_viet}</td>
                 <td>${m.gia_tien}</td>
                 <td>${m.gia_von||0}</td>
                 <td>
-                    <button onclick="window.sua('${d.id}','${m.ten_tieng_viet}',${m.gia_tien},${m.gia_von||0},'${m.hinh_anh}')">Sửa</button>
-                    <button onclick="window.xoaMon('${d.id}')" style="color:red">Xóa</button>
+                    <button style="background:#3498db; color:white; padding: 5px 10px;" onclick="window.sua('${d.id}','${m.ten_tieng_viet}',${m.gia_tien},${m.gia_von||0},'${m.hinh_anh}')">Sửa</button>
+                    <button style="background:#e74c3c; color:white; padding: 5px 10px;" onclick="window.xoaMon('${d.id}')">Xóa</button>
                 </td>
             </tr>`;
         });
@@ -226,29 +237,77 @@
     window.luuMon = async (isUp) => {
         let url = url_item;
         const file = document.getElementById('fileAnh').files[0];
-        if(file) url = await uploadCloud(file);
-        const data = { 
-            ten_tieng_viet: document.getElementById('tenVi').value, 
-            gia_tien: Number(document.getElementById('gia').value), 
-            gia_von: Number(document.getElementById('giaVon').value), 
-            hinh_anh: url 
-        };
-        if(isUp) await updateDoc(doc(db, "Menus", document.getElementById('edit-id').value), data);
-        else { data.ton_kho = 0; await addDoc(collection(db, "Menus"), data); }
-        location.reload();
+        
+        // Đổi nút thành "Đang tải..." đặng thí chủ khỏi bấm lộn
+        const btnId = isUp ? 'btn-up' : 'btn-add';
+        const originalText = document.getElementById(btnId).innerText;
+        document.getElementById(btnId).innerText = "Đang xử lý...";
+        document.getElementById(btnId).disabled = true;
+
+        try {
+            if(file) url = await uploadCloud(file);
+            const data = { 
+                ten_tieng_viet: document.getElementById('tenVi').value, 
+                gia_tien: Number(document.getElementById('gia').value), 
+                gia_von: Number(document.getElementById('giaVon').value), 
+                hinh_anh: url 
+            };
+            if(isUp) {
+                await updateDoc(doc(db, "Menus", document.getElementById('edit-id').value), data);
+                alert("Cập nhật thành công!");
+            } else { 
+                data.ton_kho = 0; 
+                await addDoc(collection(db, "Menus"), data); 
+                alert("Thêm món thành công!");
+            }
+            location.reload();
+        } catch (e) {
+            alert("Lỗi: " + e.message);
+            document.getElementById(btnId).innerText = originalText;
+            document.getElementById(btnId).disabled = false;
+        }
     };
 
+    // ĐÃ SỬA: HÀM SỬA MÓN RẠCH RÒI, CUỘN MÀN HÌNH LÊN ĐỂ THÍ CHỦ THẤY
     window.sua = (id, ten, gia, von, hinh) => {
-        document.getElementById('edit-id').value = id; document.getElementById('tenVi').value = ten;
-        document.getElementById('gia').value = gia; document.getElementById('giaVon').value = von;
-        url_item = hinh; document.getElementById('btn-add').style.display='none'; document.getElementById('btn-up').style.display='block';
+        document.getElementById('edit-id').value = id; 
+        document.getElementById('tenVi').value = ten;
+        document.getElementById('gia').value = gia; 
+        document.getElementById('giaVon').value = von;
+        url_item = hinh; 
+        
+        // Hiện ảnh cũ cho dễ nhìn
+        if(hinh) {
+            document.getElementById('view-item-img').src = hinh;
+            document.getElementById('view-item-img').style.display = 'block';
+        }
+        
+        // Hiện nút Cập Nhật
+        document.getElementById('btn-add').style.display = 'none'; 
+        document.getElementById('btn-up-group').style.display = 'flex';
+        
+        // Cuộn màn hình lên chỗ sửa
+        document.getElementById('khu-vuc-menu').scrollIntoView({ behavior: 'smooth' });
     };
+
+    window.huySua = () => {
+        document.getElementById('edit-id').value = ""; 
+        document.getElementById('tenVi').value = "";
+        document.getElementById('gia').value = ""; 
+        document.getElementById('giaVon').value = "";
+        document.getElementById('fileAnh').value = "";
+        document.getElementById('view-item-img').style.display = 'none';
+        url_item = "";
+        
+        document.getElementById('btn-add').style.display = 'block'; 
+        document.getElementById('btn-up-group').style.display = 'none';
+    }
 
     async function loadStaff() {
         const snap = await getDoc(doc(db, "Settings", "staff"));
         const div = document.getElementById('staff-list'); div.innerHTML = "";
         if(snap.exists() && snap.data().emails) {
-            snap.data().emails.forEach(em => { div.innerHTML += `<div class="staff-item"><span>${em}</span><button onclick="window.xoaStaff('${em}')" style="color:red">Gỡ</button></div>`; });
+            snap.data().emails.forEach(em => { div.innerHTML += `<div class="staff-item"><span>${em}</span><button onclick="window.xoaStaff('${em}')" style="color:red; background:none; border:none; padding:0;">Gỡ</button></div>`; });
         }
     }
 
@@ -256,7 +315,7 @@
         const em = document.getElementById('newStaffEmail').value; if(!em) return;
         const snap = await getDoc(doc(db, "Settings", "staff"));
         let list = snap.exists() ? snap.data().emails : [];
-        if(!list.includes(em)) { list.push(em); await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff(); }
+        if(!list.includes(em)) { list.push(em); await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff(); document.getElementById('newStaffEmail').value = ""; }
     };
 
     window.xoaStaff = async (em) => {
@@ -265,7 +324,7 @@
         await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff();
     };
 
-    window.xoaMon = async (id) => { if(confirm("Xóa món?")) { await deleteDoc(doc(db, "Menus", id)); loadData(); } };
+    window.xoaMon = async (id) => { if(confirm("Chắc chắn xóa món này ráo trọi?")) { await deleteDoc(doc(db, "Menus", id)); loadData(); } };
 </script>
 </body>
 </html>
