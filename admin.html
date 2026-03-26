@@ -30,8 +30,11 @@
     <button onclick="window.logout()" style="float:right; background:#d32f2f; color:white;">Đăng Xuất</button>
     
     <div class="card">
-        <h2>🏠 Cấu Hình Thương Hiệu</h2>
-        <div class="form-group"><label>Tên Thương Hiệu:</label><input type="text" id="brandName"></div>
+        <h2>🏠 Cấu Hình Thương Hiệu & Thuế</h2>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+            <div class="form-group"><label>Tên Thương Hiệu:</label><input type="text" id="brandName"></div>
+            <div class="form-group"><label>Thuế VAT (%):</label><input type="number" id="vatRate" placeholder="Ví dụ: 8 hoặc 10"></div>
+        </div>
         <div class="form-group"><label>Slogan quán:</label><input type="text" id="brandSlogan"></div>
         <div class="form-group"><label>Link Logo (Hoặc tải file bên dưới):</label><input type="text" id="brandLogoUrl"></div>
         <div class="form-group"><label>Tải Logo mới:</label><input type="file" id="fileLogo" accept="image/*"></div>
@@ -113,6 +116,7 @@
             document.getElementById('storePhone').value = d.store_phone || "";
             document.getElementById('adminEmail').value = d.admin_email || "";
             document.getElementById('baiGioiThieuChinh').value = d.bai_gioi_thieu_chinh || "";
+            document.getElementById('vatRate').value = d.vat_rate || 0;
             current_logo_url = d.brand_logo || "";
         }
     }
@@ -128,7 +132,8 @@
             store_address: document.getElementById('storeAddress').value,
             store_phone: document.getElementById('storePhone').value,
             admin_email: document.getElementById('adminEmail').value,
-            bai_gioi_thieu_chinh: document.getElementById('baiGioiThieuChinh').value
+            bai_gioi_thieu_chinh: document.getElementById('baiGioiThieuChinh').value,
+            vat_rate: Number(document.getElementById('vatRate').value)
         }, { merge: true });
         alert("Đã lưu cấu hình!"); loadThongTin();
     };
@@ -162,11 +167,7 @@
             hinh_anh: url 
         };
         if(isUp) await updateDoc(doc(db, "Menus", document.getElementById('edit-id').value), data);
-        else {
-            // Khi thêm món mới, mặc định tồn kho là 100 hoặc 0 tùy bạn chọn
-            data.ton_kho = 0; 
-            await addDoc(collection(db, "Menus"), data);
-        }
+        else { data.ton_kho = 0; await addDoc(collection(db, "Menus"), data); }
         location.reload();
     };
 
@@ -180,9 +181,7 @@
         const snap = await getDoc(doc(db, "Settings", "staff"));
         const div = document.getElementById('staff-list'); div.innerHTML = "";
         if(snap.exists() && snap.data().emails) {
-            snap.data().emails.forEach(em => {
-                div.innerHTML += `<div class="staff-item"><span>${em}</span><button onclick="window.xoaStaff('${em}')" style="color:red">Gỡ</button></div>`;
-            });
+            snap.data().emails.forEach(em => { div.innerHTML += `<div class="staff-item"><span>${em}</span><button onclick="window.xoaStaff('${em}')" style="color:red">Gỡ</button></div>`; });
         }
     }
 
@@ -199,7 +198,7 @@
         await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff();
     };
 
-    window.xoaMon = async (id) => { if(confirm("Xóa món này khỏi Menu?")) { await deleteDoc(doc(db, "Menus", id)); loadData(); } };
+    window.xoaMon = async (id) => { if(confirm("Xóa món?")) { await deleteDoc(doc(db, "Menus", id)); loadData(); } };
 </script>
 </body>
 </html>
