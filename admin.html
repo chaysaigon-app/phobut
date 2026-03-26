@@ -2,38 +2,32 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Trị Phở Bụt - Ẩm Thực Tỉnh Thức</title>
+    <title>Quản Trị Phở Bụt - Chỉnh Sửa Thực Đơn</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
         .admin-wrapper { max-width: 900px; margin: auto; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; }
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
-        
-        /* Form styling */
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-primary { background: #2e7d32; color: white; width: 100%; }
-        .btn-primary:hover { background: #1b5e20; }
-        
-        /* Table styling */
+        button { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-primary { background: #2e7d32; color: white; width: 100%; margin-top: 10px; }
+        .btn-update { background: #e67e22; color: white; width: 100%; margin-top: 10px; display: none; }
+        .btn-edit { background: #fff3e0; color: #e67e22; margin-right: 5px; }
+        .btn-del { background: #ffeded; color: #d32f2f; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f9f9f9; color: #2e7d32; }
         .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
-        .btn-del { background: #ffeded; color: #d32f2f; }
-        
-        /* Order Card */
         .order-card { border-left: 5px solid #e67e22; background: #fffdf9; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
-        .status-badge { background: #e67e22; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
     </style>
 </head>
 <body>
 
 <div class="admin-wrapper">
     <div class="card">
-        <h2>➕ Thêm Món Mới (Tải ảnh lên Cloudinary)</h2>
+        <h2 id="form-title">➕ Thêm/Sửa Món Ăn</h2>
+        <input type="hidden" id="edit-id">
         <div class="form-group">
             <label>Tên món ăn:</label>
             <input type="text" id="tenVi" placeholder="Ví dụ: Bún Huế Chay">
@@ -43,24 +37,20 @@
             <input type="number" id="gia" placeholder="Ví dụ: 45000">
         </div>
         <div class="form-group">
-            <label>Chọn hình ảnh từ máy:</label>
+            <label>Hình ảnh (Để trống nếu không muốn đổi hình):</label>
             <input type="file" id="fileAnh" accept="image/*">
         </div>
-        <p id="status-text" style="color: #e67e22; font-weight: bold; display: none;">⌛ Đang chuyển hình về kho, con đợi xíu nghen...</p>
-        <button class="btn-primary" onclick="window.themMoi()">Lưu Vào Thực Đơn</button>
+        <p id="status-text" style="color: #e67e22; font-weight: bold; display: none;">⌛ Đang xử lý, con đợi xíu nghen...</p>
+        
+        <button id="btn-add-submit" class="btn-primary" onclick="window.luuMon(false)">Lưu Món Mới</button>
+        <button id="btn-update-submit" class="btn-update" onclick="window.luuMon(true)">Cập Nhật Thay Đổi</button>
+        <button id="btn-cancel" style="display:none; background:#ccc; width:100%; margin-top:5px;" onclick="window.resetForm()">Hủy Bỏ</button>
     </div>
 
     <div class="card">
-        <h2>📋 Quản Lý Thực Đơn</h2>
-        <table id="menu-table">
-            <thead>
-                <tr>
-                    <th>Hình</th>
-                    <th>Tên Món</th>
-                    <th>Giá</th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
+        <h2>📋 Danh Sách Thực Đơn</h2>
+        <table>
+            <thead><tr><th>Hình</th><th>Tên Món</th><th>Giá</th><th>Thao tác</th></tr></thead>
             <tbody id="menu-body"></tbody>
         </table>
     </div>
@@ -73,23 +63,16 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Cấu hình Firebase của con
-    const firebaseConfig = { 
-        apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", 
-        authDomain: "phobut-95574.firebaseapp.com", 
-        projectId: "phobut-95574"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // --- THÔNG TIN CLOUDINARY CỦA CON ---
-    const cloudName = "dym7dwnji"; 
-    const uploadPreset = "qjrpdbhs"; 
+    const cloudName = "dym7dwnji", uploadPreset = "qjrpdbhs";
+    let current_img_url = "";
 
-    // Hàm tải ảnh lên Cloudinary
-    async function uploadAnh(file) {
+    async function uploadToCloudinary(file) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", uploadPreset);
@@ -98,30 +81,47 @@
         return data.secure_url;
     }
 
-    // Hàm thêm món mới
-    window.themMoi = async () => {
+    window.luuMon = async (isUpdate) => {
         const ten = document.getElementById('tenVi').value;
         const gia = document.getElementById('gia').value;
         const file = document.getElementById('fileAnh').files[0];
+        const id = document.getElementById('edit-id').value;
         const status = document.getElementById('status-text');
 
-        if(!file || !ten || !gia) return alert("Con bận điền đủ thông tin và chọn ảnh nghen!");
+        if(!ten || !gia) return alert("Con điền tên với giá cho bếp biết nghen!");
 
         try {
             status.style.display = "block";
-            const urlHinh = await uploadAnh(file);
-            await addDoc(collection(db, "Menus"), {
-                ten_tieng_viet: ten,
-                gia_tien: Number(gia),
-                hinh_anh: urlHinh
-            });
-            alert("Đã thêm món thành công rồi nghen!");
+            let url = current_img_url;
+            if(file) { url = await uploadToCloudinary(file); }
+            if(!url && !isUpdate) { status.style.display = "none"; return alert("Món mới bận chọn cái hình cho đẹp nghen!"); }
+
+            if(isUpdate) {
+                await updateDoc(doc(db, "Menus", id), { ten_tieng_viet: ten, gia_tien: Number(gia), hinh_anh: url });
+                alert("Đã cập nhật xong rồi nghen!");
+            } else {
+                await addDoc(collection(db, "Menus"), { ten_tieng_viet: ten, gia_tien: Number(gia), hinh_anh: url });
+                alert("Đã thêm món mới thành công!");
+            }
             location.reload();
-        } catch (e) { alert("Lỗi: " + e.message); }
+        } catch (e) { alert("Lỗi: " + e.message); status.style.display = "none"; }
     };
 
-    // Tải danh sách món
-    async function loadMenu() {
+    window.chuanBiSua = (id, ten, gia, hinh) => {
+        document.getElementById('form-title').innerText = "✏️ Chỉnh Sửa Món";
+        document.getElementById('edit-id').value = id;
+        document.getElementById('tenVi').value = ten;
+        document.getElementById('gia').value = gia;
+        current_img_url = hinh;
+        document.getElementById('btn-add-submit').style.display = 'none';
+        document.getElementById('btn-update-submit').style.display = 'block';
+        document.getElementById('btn-cancel').style.display = 'block';
+        window.scrollTo(0,0);
+    };
+
+    window.resetForm = () => location.reload();
+
+    async function loadData() {
         const snap = await getDocs(collection(db, "Menus"));
         const tbody = document.getElementById('menu-body');
         tbody.innerHTML = "";
@@ -132,44 +132,26 @@
                     <td><img src="${m.hinh_anh}" class="img-preview"></td>
                     <td><b>${m.ten_tieng_viet}</b></td>
                     <td>${m.gia_tien.toLocaleString()}đ</td>
-                    <td><button class="btn-del" onclick="window.xoaMon('${d.id}')">Xóa</button></td>
+                    <td>
+                        <button class="btn-edit" onclick="window.chuanBiSua('${d.id}', '${m.ten_tieng_viet}', ${m.gia_tien}, '${m.hinh_anh}')">Sửa</button>
+                        <button class="btn-del" onclick="window.xoaMon('${d.id}')">Xóa</button>
+                    </td>
                 </tr>`;
         });
-    }
 
-    window.xoaMon = async (id) => {
-        if(confirm("Xóa món này là không lấy lại được đâu nghen con?")) {
-            await deleteDoc(doc(db, "Menus", id));
-            location.reload();
-        }
-    };
-
-    // Tải danh sách đơn hàng
-    async function loadOrders() {
-        const q = query(collection(db, "Orders"), orderBy("thoi_gian", "desc"));
-        const snap = await getDocs(q);
-        const div = document.getElementById('order-list');
-        div.innerHTML = "";
-        
-        if(snap.empty) div.innerHTML = "Chưa có đơn hàng nào ráo trọi.";
-
-        snap.forEach(d => {
+        const qO = query(collection(db, "Orders"), orderBy("thoi_gian", "desc"));
+        const snapO = await getDocs(qO);
+        const divO = document.getElementById('order-list');
+        divO.innerHTML = "";
+        snapO.forEach(d => {
             const o = d.data();
-            let monAn = "";
-            for(let key in o.chi_tiet) {
-                monAn += `<li>${key} x ${o.chi_tiet[key].sl}</li>`;
-            }
-            div.innerHTML += `
-                <div class="order-card">
-                    <div><b>Khách:</b> ${o.khach_hang} <span class="status-badge">${o.trang_thai}</span></div>
-                    <ul style="margin:5px 0; font-size:0.9em;">${monAn}</ul>
-                    <small style="color:#888;">${o.thoi_gian.toDate().toLocaleString('vi-VN')}</small>
-                </div>`;
+            let items = ""; for(let k in o.chi_tiet) items += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
+            divO.innerHTML += `<div class="order-card"><b>${o.khach_hang}</b>: <ul>${items}</ul></div>`;
         });
     }
 
-    loadMenu();
-    loadOrders();
+    window.xoaMon = async (id) => { if(confirm("Xóa thiệt nghen con?")) { await deleteDoc(doc(db, "Menus", id)); location.reload(); } };
+    loadData();
 </script>
 </body>
 </html>
