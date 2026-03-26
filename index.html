@@ -34,7 +34,6 @@
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
-        /* Khung thông điệp ngắn đã được khôi phục */
         .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
         
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -117,7 +116,6 @@
         </div>
         <div class="about-content">
             <div class="message-box" id="dynamic-message" style="display: none;"></div>
-            
             <div class="social-links" id="social-links"></div>
             <div class="contact-box">
                 <p>📍 <b>Địa chỉ:</b> 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
@@ -246,12 +244,17 @@
     let cart = {};
     let thongTinQuan = {}; 
 
+    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo.`;
+
     async function loadThongTinQuan() {
         const snap = await getDoc(doc(db, "Settings", "info"));
         if (snap.exists()) {
             const data = snap.data();
             thongTinQuan.email = data.admin_email || "";
-            document.getElementById('core-about-card').innerHTML = data.bai_gioi_thieu_chinh || "";
+            
+            // Sửa lỗi ở đây: Phải đảm bảo luôn lấy nội dung hoặc fallback về mặc định
+            document.getElementById('core-about-card').innerHTML = data.bai_gioi_thieu_chinh || defaultBaiGioiThieu;
+
             if(data.hinh_dai_dien) document.getElementById('about-img').src = data.hinh_dai_dien;
             
             if(data.loi_gioi_thieu && data.loi_gioi_thieu.trim() !== "") {
@@ -277,6 +280,8 @@
             if(data.admin_zalo) socialsHTML += `<a href="https://zalo.me/${data.admin_zalo}" target="_blank" class="social-btn bg-zalo">💬 Nhắn Zalo</a>`;
             if(data.admin_whatsapp) socialsHTML += `<a href="https://wa.me/${data.admin_whatsapp}" target="_blank" class="social-btn bg-wa">💬 WhatsApp</a>`;
             document.getElementById('social-links').innerHTML = socialsHTML;
+        } else {
+            document.getElementById('core-about-card').innerHTML = defaultBaiGioiThieu;
         }
     }
 
@@ -409,6 +414,9 @@
             await setDoc(doc(db, "Users", current_user.email), { phone: phone, address: address }, { merge: true });
             user_profile = { phone, address };
             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã lưu thông tin', showConfirmButton: false, timer: 1500 });
+            
+            // Sửa lỗi Popup không tắt ở đây
+            document.getElementById('profile-modal').style.display = 'none';
         } catch(e) { alert("Lỗi lưu thông tin: " + e.message); }
     };
 
