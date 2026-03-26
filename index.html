@@ -47,6 +47,9 @@
         .core-about-card ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
 
         #youtube-container { max-width: 800px; margin: 0 auto 30px auto; }
+        /* YouTube Shorts often have a different aspect ratio (9:16), 
+           but to keep the layout clean on a desktop, we will use a standard responsive container 
+           or let YouTube handle the letterboxing */
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
@@ -204,9 +207,16 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                 btnMap.href = data.link_map; btnMap.style.display = 'inline-block';
             }
             if(data.link_youtube && data.link_youtube.trim() !== "") {
-                let ytId = ""; const url = data.link_youtube;
-                if(url.includes("v=")) ytId = url.split("v=")[1].substring(0,11);
-                else if(url.includes("youtu.be/")) ytId = url.split("youtu.be/")[1].substring(0,11);
+                let ytId = ""; 
+                const url = data.link_youtube;
+                // Thuật toán nhận diện mã video được cập nhật để hỗ trợ cả định dạng Shorts
+                if(url.includes("v=")) {
+                    ytId = url.split("v=")[1].substring(0,11);
+                } else if(url.includes("youtu.be/")) {
+                    ytId = url.split("youtu.be/")[1].substring(0,11);
+                } else if(url.includes("shorts/")) {
+                    ytId = url.split("shorts/")[1].substring(0,11);
+                }
                 
                 if (ytId) {
                     document.getElementById('youtube-container').style.display = 'block';
