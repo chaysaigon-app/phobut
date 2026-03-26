@@ -4,268 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phở Bụt - Ẩm Thực Chay Tỉnh Thức</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; }
-        .header { background: #2e7d32; color: white; padding: 35px 20px 25px; text-align: center; position: relative; }
-        .header h1 { margin: 0; font-size: 2.2em; letter-spacing: 1px; }
-        .header p { margin: 5px 0 15px; font-style: italic; opacity: 0.9; font-size: 1.1em; }
-        .lang-switch { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85em; font-weight: bold; border: 1px solid rgba(255,255,255,0.5); }
-        .dietary-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-        .badge { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-transform: uppercase; }
-        .badge-vegan { background: #4caf50; color: white; border: 1px solid #388e3c; }
-        .badge-halal { background: #f1c40f; color: #333; border: 1px solid #d4ac0d; }
-        .halal-icon { color: white; font-size: 1.4em; line-height: 1; }
-        .badge-allium { background: #ffffff; color: #2e7d32; border: 1px solid #2e7d32; }
-        .allium-icons { font-size: 1.2em; display: flex; gap: 3px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 80px; color: #333; }
+        .header { background: #2e7d32; color: white; padding: 30px 20px; text-align: center; border-bottom: 4px solid #e67e22; }
+        .auth-bar { background: #1b5e20; color: white; padding: 10px; text-align: right; font-size: 0.85em; }
         .container { max-width: 500px; margin: auto; padding: 15px; }
-        .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 25px 0 15px; font-size: 1.3em; font-weight: bold; }
-        .about-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .about-img-square { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-        .about-text { padding: 20px; font-size: 1em; line-height: 1.6; color: #444; text-align: justify; }
-        .about-text b { color: #2e7d32; }
-        .about-text ul { padding-left: 18px; margin: 10px 0; list-style-type: none; }
-        .about-text ul li { position: relative; margin-bottom: 5px; }
-        .about-text ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
-        .location-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; margin-bottom: 25px; }
-        .btn-maps { display: inline-block; background: #2e7d32; color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .menu-list { display: flex; flex-direction: column; gap: 20px; }
-        .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        /* Menu Card */
+        .menu-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); margin-bottom: 20px; transition: 0.3s; }
         .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-        .card-content { padding: 15px; }
-        .name-vi { margin: 0 0 5px 0; font-size: 1.2em; color: #111; font-weight: bold; }
-        .name-en { margin: 0 0 10px 0; font-size: 0.9em; color: #666; font-style: italic; }
+        .card-content { padding: 15px; text-align: center; }
+        .card-content h3 { margin: 0 0 10px; color: #2e7d32; font-size: 1.2em; }
         .price { color: #d35400; font-weight: bold; font-size: 1.2em; margin-bottom: 15px; }
-        .btn-add { background: #2e7d32; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; }
-        .contact-btns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .btn-qr { color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
-        .btn-qr-zalo { background: #0068ff; }
-        .btn-qr-wa { background: #25D366; }
-        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-top: 2px solid #2e7d32; z-index: 1000; cursor: pointer; }
-        .cart-total { color: #d35400; font-weight: bold; font-size: 1.2em; }
-        .btn-view-cart { background: #e67e22; color: white; padding: 10px 20px; border-radius: 25px; font-weight: bold; border: none; }
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
-        .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; width: 90%; max-width: 400px; border-radius: 15px; position: relative; }
-        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; font-size: 0.95em; }
-        .qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
-        .btn-qty { background: #eee; border: 1px solid #ddd; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .btn-add { background: #2e7d32; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 1em; }
+        .btn-add:active { background: #1b5e20; transform: scale(0.98); }
+
+        /* Cart Bar */
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #2e7d32; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); box-sizing: border-box; z-index: 100; }
+        .cart-info { font-size: 1em; }
+        .btn-checkout { background: #e67e22; color: white; border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; }
+
+        /* Login Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; }
+        .modal-content { background: white; margin: 20% auto; padding: 25px; width: 85%; max-width: 350px; border-radius: 15px; position: relative; }
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
+<div class="auth-bar" id="auth-status">
+    Đang kiểm tra duyên lành...
+</div>
+
 <div class="header">
-    <a href="https://veggiesaigon.com" class="lang-switch">🇬🇧 English</a>
-    <h1>🌱 Phở Bụt</h1>
-    <p>Ẩm Thực Chay Tinh Khiết & Tỉnh Thức</p>
-    <div class="dietary-badges">
-        <div class="badge badge-vegan">🌱 Thuần Chay</div>
-        <div class="badge badge-halal"><span class="halal-icon">حلال</span> Halal</div>
-        <div class="badge badge-allium"><span class="allium-icons">🧅🌿🧄</span> Không Ngũ Vị Tân</div>
-    </div>
+    <h1 style="margin:0;">🌱 Phở Bụt</h1>
+    <p style="margin:5px 0 0; opacity:0.9; font-style:italic;">Ẩm thực chay tinh khiết & tỉnh thức</p>
 </div>
 
-<div class="container">
-    <div class="section-title">🌿 Về Chúng Tôi</div>
-    <div class="about-card">
-        <img src="https://scontent.fdad1-2.fna.fbcdn.net/v/t39.30808-6/648093393_913420674737698_4812098189760785095_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=dd6889&_nc_ohc=rpPf2GbuMxAQ7kNvwG7tPMm&_nc_oc=Admlx3Kr1ARAwPEmqN3qvaONsU3b_1SQQ2qncZEqnWG3Rea1OsTgFS1yjHEbfWMuQ28&_nc_zt=23&_nc_ht=scontent.fdad1-2.fna&_nc_gid=-aUhE-ErZMpgdrUFqMzZNw&_nc_ss=8&oh=00_AfxdrwkonKxv8WPEk9vE291t6vSdaF6FG4xPwpNy0gfr8w&oe=69B04367" alt="Phở Bụt" class="about-img-square">
-        <div class="about-text">
-            Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
-            
-            <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
-            Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
-            <ul>
-                <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-                <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
-                <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
-            </ul>
-
-            <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
-            Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa, mang đến hương vị vừa quen thuộc vừa mới lạ, sang trọng.<br><br>
-
-            <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
-            Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
-            <ul>
-                <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
-                <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
-                <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
-            </ul>
-
-            <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
-            Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏
-        </div>
-    </div>
-
-    <div class="section-title">🍜 Thực Đơn</div>
-    <div id="menu-list" class="menu-list">
-        <p id="loading-msg" style="text-align:center; color:#888;">Đang tải thực đơn...</p>
-    </div>
-
-    <div class="section-title">🏠 Địa Chỉ & Liên Hệ</div>
-    <div class="location-card">
-        <strong style="font-size: 1.1em; color: #2e7d32;">Phở Bụt Vegan - Quán Chay Da Nang</strong><br>
-        <p style="margin: 10px 0; color: #555;">📍 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
-        <a href="https://maps.google.com/?cid=15303706977129985620&g_mp=CiVnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLkdldFBsYWNl" target="_blank" class="btn-maps">🗺️ Xem trên Google Maps</a>
-    </div>
-
-    <div class="contact-btns">
-        <button class="btn-qr btn-qr-zalo" onclick="window.hienThiQR('zalo')">📱 Zalo QR</button>
-        <button class="btn-qr btn-qr-wa" onclick="window.hienThiQR('wa')">💬 WhatsApp QR</button>
-    </div>
+<div class="container" id="menu-list">
+    <p style="text-align:center; color:#888;">Đang tải thực đơn, con đợi xíu nghen...</p>
 </div>
 
-<div class="cart-bar" onclick="window.moGioHang()">
-    <div class="cart-info">🛒 <b><span id="cart-count">0</span> món</b> <br><span class="cart-total" id="cart-total">0 VND</span></div>
-    <button class="btn-view-cart">Xem Giỏ Hàng 📋</button>
+<div class="cart-bar">
+    <div class="cart-info">🛒 <b id="cart-count">0</b> món | <span id="cart-total" style="color:#d35400; font-weight:bold;">0đ</span></div>
+    <button class="btn-checkout" onclick="window.datHang()">Đặt Đơn 🙏</button>
 </div>
 
-<div id="cart-modal" class="modal">
+<div id="login-modal" class="modal">
     <div class="modal-content">
-        <span class="close-btn" onclick="window.dongModal('cart-modal')">×</span>
-        <h2 style="color: #2e7d32; margin-top: 0;">🛒 Giỏ Hàng</h2>
-        <div id="cart-items-list" style="max-height: 350px; overflow-y: auto; margin-bottom: 15px;"></div>
-        <h3 style="color: #d35400; text-align: right; border-top: 2px solid #eee; padding-top: 10px;">Tổng: <span id="modal-total">0 VND</span></h3>
-        <button style="background: #0068ff; color: white; border: none; padding: 15px; border-radius: 10px; width: 100%; font-size: 1.1em; font-weight: bold; cursor: pointer;" onclick="window.guiZalo()">📱 Gửi Đơn & Copy Qua Zalo</button>
-    </div>
-</div>
-
-<div id="qr-modal" class="modal">
-    <div class="modal-content" style="text-align: center;">
-        <span class="close-btn" onclick="window.dongModal('qr-modal')">×</span>
-        <h2 id="qr-title" style="margin-top: 0;">Quét để Trò Chuyện</h2>
-        <img id="qr-image" src="" alt="QR Code" style="width: 100%; max-width: 220px; border-radius: 10px; margin: 15px 0;">
-        <p id="qr-number" style="font-weight: bold; font-size: 1.2em; color: #333;"></p>
+        <h2 style="margin-top:0; color:#2e7d32; text-align:center;">🙏 Đăng Nhập</h2>
+        <input type="email" id="email" class="modal-input" placeholder="Nhập Email của con">
+        <input type="password" id="pass" class="modal-input" placeholder="Mật khẩu (ít nhất 6 ký tự)">
+        <button class="btn-login" onclick="window.xuLyAuth()">Vào Bếp</button>
+        <p style="font-size:0.75em; color:#888; text-align:center; margin-top:10px;">Nếu chưa có tài khoản, hệ thống sẽ tự tạo mới cho con lần đầu nghen.</p>
+        <button onclick="window.dongModal()" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Để sau nghen</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574", storageBucket: "phobut-95574.firebasestorage.app", messagingSenderId: "588108977874", appId: "1:588108977874:web:91eaa1d51fa3ddfbf6ff0b" };
+    import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // Cấu hình Firebase
+    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    window.gioHang = {};
-    let tongTienGioHang = 0;
+    let current_user = null;
+    let cart = {};
 
-    async function chayWeb() {
+    // 1. Kiểm tra đăng nhập
+    onAuthStateChanged(auth, (user) => {
+        const bar = document.getElementById('auth-status');
+        if (user) {
+            current_user = user;
+            bar.innerHTML = `Chào con, <b>${user.email}</b> | <span onclick="window.logout()" style="text-decoration:underline; cursor:pointer;">Thoát</span>`;
+        } else {
+            current_user = null;
+            bar.innerHTML = `<span onclick="window.moLogin()" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập để đặt hàng</span>`;
+        }
+    });
+
+    window.moLogin = () => document.getElementById('login-modal').style.display = 'block';
+    window.dongModal = () => document.getElementById('login-modal').style.display = 'none';
+
+    window.xuLyAuth = async () => {
+        const email = document.getElementById('email').value;
+        const pass = document.getElementById('pass').value;
+        if(!email || !pass) return alert("Con bận điền đủ thông tin nghen!");
+        
         try {
-            const mSnap = await getDocs(collection(db, "Menus"));
-            const menuDiv = document.getElementById('menu-list'); menuDiv.innerHTML = "";
-            mSnap.forEach(doc => {
-                const m = doc.data();
-                const tenVi = String(m.ten_tieng_viet || 'Món Chay');
-                const tenEn = String(m.ten_tieng_anh || '');
-                const gia = Number(m.gia_tien) || 0;
-                const hinh = m.hinh_anh || "https://via.placeholder.com/500x500?text=Pho+But";
-                
-                menuDiv.innerHTML += `
-                    <div class="menu-card">
-                        <img src="${hinh}">
-                        <div class="card-content">
-                            <h3 class="name-vi">${tenVi}</h3>
-                            <p class="name-en">${tenEn}</p>
-                            <p class="price">${gia.toLocaleString()} VND</p>
-                            <button class="btn-add" onclick="window.themVaoGio('${tenVi.replace(/'/g, "")}', ${gia})">➕ Thêm vào giỏ</button>
-                        </div>
-                    </div>`;
+            await signInWithEmailAndPassword(auth, email, pass);
+            window.dongModal();
+        } catch (err) {
+            if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+                try {
+                    await createUserWithEmailAndPassword(auth, email, pass);
+                    window.dongModal();
+                } catch (e) { alert("Lỗi tạo tài khoản: " + e.message); }
+            } else { alert("Lỗi đăng nhập: " + err.message); }
+        }
+    };
+
+    window.logout = () => signOut(auth);
+
+    // 2. Tải thực đơn
+    async function fetchMenu() {
+        const snap = await getDocs(collection(db, "Menus"));
+        const list = document.getElementById('menu-list');
+        list.innerHTML = "";
+        if(snap.empty) list.innerHTML = "<p style='text-align:center;'>Bếp chưa dọn món ráo trọi, con quay lại sau nghen!</p>";
+        
+        snap.forEach(doc => {
+            const m = doc.data();
+            list.innerHTML += `
+                <div class="menu-card">
+                    <img src="${m.hinh_anh}" alt="${m.ten_tieng_viet}">
+                    <div class="card-content">
+                        <h3>${m.ten_tieng_viet}</h3>
+                        <p class="price">${m.gia_tien.toLocaleString()}đ</p>
+                        <button class="btn-add" onclick="window.addToCart('${m.ten_tieng_viet}', ${m.gia_tien})">➕ Thêm vào giỏ</button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    // 3. Giỏ hàng
+    window.addToCart = (ten, gia) => {
+        if(cart[ten]) cart[ten].sl++;
+        else cart[ten] = { gia, sl: 1 };
+        updateCartUI();
+    };
+
+    function updateCartUI() {
+        let count = 0, total = 0;
+        for(let key in cart) { count += cart[key].sl; total += (cart[key].sl * cart[key].gia); }
+        document.getElementById('cart-count').innerText = count;
+        document.getElementById('cart-total').innerText = total.toLocaleString() + 'đ';
+    }
+
+    // 4. Gửi đơn hàng
+    window.datHang = async () => {
+        if(!current_user) {
+            Swal.fire("Con bận đăng nhập đặng bếp biết ai đặt món nghen!");
+            window.moLogin();
+            return;
+        }
+        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng đang trống, con chọn món đã nghen!");
+
+        try {
+            await addDoc(collection(db, "Orders"), {
+                khach_hang: current_user.email,
+                chi_tiet: cart,
+                thoi_gian: serverTimestamp(),
+                trang_thai: "Đang chờ"
             });
-        } catch(e) { console.error(e); }
-    }
-
-    window.capNhatThanhGioHang = () => {
-        let tongSoLuong = 0;
-        tongTienGioHang = 0;
-        for (let m in window.gioHang) {
-            tongSoLuong += window.gioHang[m].soLuong;
-            tongTienGioHang += (window.gioHang[m].soLuong * window.gioHang[m].gia);
-        }
-        document.getElementById('cart-count').innerText = tongSoLuong;
-        document.getElementById('cart-total').innerText = tongTienGioHang.toLocaleString() + ' VND';
-        document.getElementById('modal-total').innerText = tongTienGioHang.toLocaleString() + ' VND';
+            Swal.fire("🙏 Đã nhận đơn!", "Bếp Phở Bụt đang bắt đầu làm cho con đây.", "success");
+            cart = {}; updateCartUI();
+        } catch (e) { alert("Lỗi gửi đơn: " + e.message); }
     };
 
-    window.themVaoGio = (ten, gia) => {
-        if (window.gioHang[ten]) { window.gioHang[ten].soLuong++; } 
-        else { window.gioHang[ten] = { gia: gia, soLuong: 1 }; }
-        window.capNhatThanhGioHang();
-    };
-
-    window.doiSoLuong = (ten, delta) => {
-        if (window.gioHang[ten]) {
-            window.gioHang[ten].soLuong += delta;
-            if (window.gioHang[ten].soLuong <= 0) { delete window.gioHang[ten]; }
-        }
-        window.moGioHang();
-        window.capNhatThanhGioHang();
-    };
-
-    window.moGioHang = () => { 
-        const listDiv = document.getElementById('cart-items-list'); 
-        listDiv.innerHTML = ""; 
-        let hasItem = false;
-        for (let m in window.gioHang) { 
-            hasItem = true;
-            listDiv.innerHTML += `
-                <div class="cart-item">
-                    <div>
-                        <b>${m}</b><br>
-                        ${window.gioHang[m].gia.toLocaleString()} VND
-                        <div class="qty-controls">
-                            <button class="btn-qty" onclick="window.doiSoLuong('${m}', -1)">-</button>
-                            <span><b>${window.gioHang[m].soLuong}</b></span>
-                            <button class="btn-qty" onclick="window.doiSoLuong('${m}', 1)">+</button>
-                        </div>
-                    </div>
-                    <div style="font-weight:bold; color:#d35400;">
-                        ${(window.gioHang[m].soLuong * window.gioHang[m].gia).toLocaleString()} VND
-                    </div>
-                </div>`; 
-        } 
-        if(!hasItem) listDiv.innerHTML = "<p style='text-align:center; color:#888;'>Giỏ hàng đang trống</p>";
-        document.getElementById('cart-modal').style.display = "block"; 
-    };
-
-    window.dongModal = (id) => document.getElementById(id).style.display = "none";
-
-    window.guiZalo = () => {
-        if (Object.keys(window.gioHang).length === 0) { alert("Giỏ hàng đang trống!"); return; }
-        let text = "🙏 Chào Phở Bụt, tôi muốn đặt đơn hàng:\n--------------------------\n";
-        for (let m in window.gioHang) { text += `• ${m}: ${window.gioHang[m].soLuong} phần\n`; }
-        text += `--------------------------\n💰 Tổng: ${tongTienGioHang.toLocaleString()} VND\n\nCảm ơn!`;
-
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert("✅ Đã copy đơn hàng! Đang chuyển đến Zalo...");
-                window.location.href = "https://zalo.me/0968107788";
-            }).catch(() => { thucHienCopyCu(text); });
-        } else { thucHienCopyCu(text); }
-    };
-
-    function thucHienCopyCu(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        alert("✅ Đã copy đơn hàng! Đang chuyển đến Zalo...");
-        window.location.href = "https://zalo.me/0968107788";
-    }
-
-    window.hienThiQR = (type) => { 
-        const img = document.getElementById('qr-image'); 
-        const num = document.getElementById('qr-number'); 
-        if(type === 'zalo') { 
-            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://zalo.me/0968107788"; 
-            num.innerText = "0968 107 788 (Zalo)"; 
-        } else { 
-            img.src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://wa.me/84968107788"; 
-            num.innerText = "0968 107 788 (WhatsApp)"; 
-        } 
-        document.getElementById('qr-modal').style.display = "block"; 
-    };
-    
-    chayWeb();
+    fetchMenu();
 </script>
 </body>
 </html>
