@@ -2,18 +2,19 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Cấu Hình Hệ Thống - Admin</title>
+    <title>Cài Đặt Hệ Thống Toàn Diện - Admin</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
         .admin-wrapper { max-width: 900px; margin: auto; display: none; } 
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; position: relative; }
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; }
+        h3 { color: #e67e22; font-size: 1.1em; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-top: 20px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
         button { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn-primary { background: #2e7d32; color: white; width: 100%; }
-        .img-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd; }
+        .btn-primary { background: #2e7d32; color: white; width: 100%; margin-top: 10px; }
+        .img-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
         .staff-item { display: flex; justify-content: space-between; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 5px; }
@@ -22,26 +23,50 @@
 <body>
 
 <div id="admin-login-screen" style="text-align:center; margin-top:100px;">
-    <h2>🔐 Đăng Nhập Quản Trị Hệ Thống</h2>
-    <button onclick="window.dangNhapGoogle()" style="padding:15px 30px; background:#e67e22; color:white; border-radius:30px; border:none; font-weight:bold; cursor:pointer;">Bắt Đầu</button>
+    <h2>🔐 Đăng Nhập Quản Trị Cấp Cao</h2>
+    <button onclick="window.dangNhapGoogle()" style="padding:15px 30px; background:#e67e22; color:white; border-radius:30px; border:none; font-weight:bold; cursor:pointer;">🔑 Đăng Nhập Bằng Google</button>
 </div>
 
 <div class="admin-wrapper" id="main-content">
     <button onclick="window.logout()" style="float:right; background:#d32f2f; color:white;">Đăng Xuất</button>
-    
+    <a href="orders.html" target="_blank" style="background:#3498db; color:white; padding:10px 15px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; margin-bottom:20px;">📦 Qua Trang Đơn Hàng & Kho</a>
+
     <div class="card">
-        <h2>🏠 Cấu Hình Thương Hiệu & Thuế</h2>
+        <h2>🏠 Cấu Hình Thương Hiệu & Thông Tin Quán</h2>
+        
+        <h3>✨ Nhận Diện & Thuế</h3>
         <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
             <div class="form-group"><label>Tên Thương Hiệu:</label><input type="text" id="brandName"></div>
-            <div class="form-group"><label>Thuế VAT (%):</label><input type="number" id="vatRate" placeholder="Ví dụ: 8 hoặc 10"></div>
+            <div class="form-group"><label>Thuế VAT (%):</label><input type="number" id="vatRate"></div>
         </div>
         <div class="form-group"><label>Slogan quán:</label><input type="text" id="brandSlogan"></div>
-        <div class="form-group"><label>Link Logo (Hoặc tải file bên dưới):</label><input type="text" id="brandLogoUrl"></div>
-        <div class="form-group"><label>Tải Logo mới:</label><input type="file" id="fileLogo" accept="image/*"></div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                <label>Logo quán (Hình tròn):</label>
+                <input type="file" id="fileLogo" accept="image/*">
+                <img id="viewLogo" class="img-preview" style="display:none;">
+            </div>
+            <div class="form-group">
+                <label>Hình đại diện giới thiệu:</label>
+                <input type="file" id="fileAvatar" accept="image/*">
+                <img id="viewAvatar" class="img-preview" style="display:none;">
+            </div>
+        </div>
+
+        <h3>📍 Liên Hệ & Mạng Xã Hội</h3>
         <div class="form-group"><label>Địa chỉ hiển thị:</label><input type="text" id="storeAddress"></div>
-        <div class="form-group"><label>Hotline liên hệ:</label><input type="text" id="storePhone"></div>
-        <div class="form-group"><label>Email nhận đơn báo:</label><input type="email" id="adminEmail"></div>
+        <div class="form-group"><label>Hotline / Zalo (Số hiện trên web):</label><input type="text" id="storePhone"></div>
+        <div class="form-group"><label>Link Facebook Fanpage:</label><input type="text" id="linkFb"></div>
+        <div class="form-group"><label>Số WhatsApp (Mã vùng 84...):</label><input type="text" id="adminWhatsapp"></div>
+        
+        <h3>💌 Cài Đặt Nội Bộ</h3>
+        <div class="form-group"><label>Email nhận báo đơn mới:</label><input type="email" id="adminEmail"></div>
+        <div class="form-group"><label>Lời ngỏ ngắn (Khung xanh):</label><textarea id="loiGioiThieu" rows="2"></textarea></div>
         <div class="form-group"><label>Bài giới thiệu chi tiết (HTML):</label><textarea id="baiGioiThieuChinh" rows="6"></textarea></div>
+        <div class="form-group"><label>Link Google Maps (Nút chỉ đường):</label><input type="text" id="linkMap"></div>
+        <div class="form-group"><label>Link YouTube Video:</label><input type="text" id="linkYoutube"></div>
+
         <button class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Toàn Bộ Cấu Hình</button>
     </div>
 
@@ -66,8 +91,8 @@
     <div class="card">
         <h2>👥 Quản Lý Nhân Viên</h2>
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <input type="email" id="newStaffEmail" placeholder="Email Gmail nhân viên">
-            <button class="btn-primary" style="width: auto; margin: 0;" onclick="window.themNhanVien()">Cấp Quyền</button>
+            <input type="email" id="newStaffEmail" placeholder="Gmail nhân viên">
+            <button class="btn-primary" style="width: auto; margin: 0;" onclick="window.themNhanVien()">Thêm</button>
         </div>
         <div id="staff-list"></div>
     </div>
@@ -86,14 +111,14 @@
 
     const ADMIN_EMAIL = "chaysaigon@gmail.com"; 
     const cloudName = "dym7dwnji", uploadPreset = "qjrpdbhs";
-    let current_logo_url = "", current_item_img = "";
+    let url_logo = "", url_avatar = "", url_item = "";
 
     onAuthStateChanged(auth, (user) => {
         if (user && user.email === ADMIN_EMAIL) {
             document.getElementById('admin-login-screen').style.display='none';
             document.getElementById('main-content').style.display='block';
             loadThongTin(); loadData(); loadStaff();
-        } else if(user) { alert("Bạn không có quyền Admin!"); signOut(auth); }
+        } else if(user) { alert("Không có quyền!"); signOut(auth); }
     });
 
     window.dangNhapGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { alert(e.message); } };
@@ -111,31 +136,46 @@
             const d = snap.data();
             document.getElementById('brandName').value = d.brand_name || "";
             document.getElementById('brandSlogan').value = d.brand_slogan || "";
-            document.getElementById('brandLogoUrl').value = d.brand_logo || "";
+            document.getElementById('vatRate').value = d.vat_rate || 0;
             document.getElementById('storeAddress').value = d.store_address || "";
             document.getElementById('storePhone').value = d.store_phone || "";
             document.getElementById('adminEmail').value = d.admin_email || "";
+            document.getElementById('linkFb').value = d.link_fb || "";
+            document.getElementById('adminWhatsapp').value = d.admin_whatsapp || "";
+            document.getElementById('loiGioiThieu').value = d.loi_gioi_thieu || "";
             document.getElementById('baiGioiThieuChinh').value = d.bai_gioi_thieu_chinh || "";
-            document.getElementById('vatRate').value = d.vat_rate || 0;
-            current_logo_url = d.brand_logo || "";
+            document.getElementById('linkMap').value = d.link_map || "";
+            document.getElementById('linkYoutube').value = d.link_youtube || "";
+            
+            if(d.brand_logo) { url_logo = d.brand_logo; document.getElementById('viewLogo').src = d.brand_logo; document.getElementById('viewLogo').style.display = "block"; }
+            if(d.hinh_dai_dien) { url_avatar = d.hinh_dai_dien; document.getElementById('viewAvatar').src = d.hinh_dai_dien; document.getElementById('viewAvatar').style.display = "block"; }
         }
     }
 
     window.luuThongTin = async () => {
-        let url = document.getElementById('brandLogoUrl').value;
-        const file = document.getElementById('fileLogo').files[0];
-        if(file) url = await uploadCloud(file);
+        let logo = url_logo, avatar = url_avatar;
+        const fLogo = document.getElementById('fileLogo').files[0];
+        const fAvatar = document.getElementById('fileAvatar').files[0];
+        if(fLogo) logo = await uploadCloud(fLogo);
+        if(fAvatar) avatar = await uploadCloud(fAvatar);
+
         await setDoc(doc(db, "Settings", "info"), {
             brand_name: document.getElementById('brandName').value,
             brand_slogan: document.getElementById('brandSlogan').value,
-            brand_logo: url,
+            vat_rate: Number(document.getElementById('vatRate').value),
+            brand_logo: logo,
+            hinh_dai_dien: avatar,
             store_address: document.getElementById('storeAddress').value,
             store_phone: document.getElementById('storePhone').value,
+            link_fb: document.getElementById('linkFb').value,
+            admin_whatsapp: document.getElementById('adminWhatsapp').value,
             admin_email: document.getElementById('adminEmail').value,
+            loi_gioi_thieu: document.getElementById('loiGioiThieu').value,
             bai_gioi_thieu_chinh: document.getElementById('baiGioiThieuChinh').value,
-            vat_rate: Number(document.getElementById('vatRate').value)
+            link_map: document.getElementById('linkMap').value,
+            link_youtube: document.getElementById('linkYoutube').value
         }, { merge: true });
-        alert("Đã lưu cấu hình!"); loadThongTin();
+        alert("Đã lưu ráo trọi!"); loadThongTin();
     };
 
     async function loadData() {
@@ -157,7 +197,7 @@
     }
 
     window.luuMon = async (isUp) => {
-        let url = current_item_img;
+        let url = url_item;
         const file = document.getElementById('fileAnh').files[0];
         if(file) url = await uploadCloud(file);
         const data = { 
@@ -174,7 +214,7 @@
     window.sua = (id, ten, gia, von, hinh) => {
         document.getElementById('edit-id').value = id; document.getElementById('tenVi').value = ten;
         document.getElementById('gia').value = gia; document.getElementById('giaVon').value = von;
-        current_item_img = hinh; document.getElementById('btn-add').style.display='none'; document.getElementById('btn-up').style.display='block';
+        url_item = hinh; document.getElementById('btn-add').style.display='none'; document.getElementById('btn-up').style.display='block';
     };
 
     async function loadStaff() {
