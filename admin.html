@@ -1,39 +1,271 @@
-<h3>✨ Nhận Diện & Màu Sắc</h3>
-<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-    <div class="form-group"><label>Tên Thương Hiệu:</label><input type="text" id="brandName"></div>
-    <div class="form-group"><label>Thuế VAT (%):</label><input type="number" id="vatRate"></div>
-    <div class="form-group">
-        <label>Tông màu chủ đạo:</label>
-        <select id="mainColor" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
-            <option value="#2e7d32">Xanh Lá (Chay)</option>
-            <option value="#c62828">Đỏ Đô (Bún/Lẩu)</option>
-            <option value="#f9a825">Vàng Nghệ (Cổ điển)</option>
-            <option value="#6d4c41">Nâu Đất (Cà phê)</option>
-            <option value="#1565c0">Xanh Dương (Hải sản)</option>
-            <option value="#d84315">Cam Đất (Món nướng)</option>
-        </select>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ Thống Quản Trị Toàn Diện - Admin</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        .admin-wrapper { max-width: 1000px; margin: auto; display: none; } 
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; position: relative; }
+        h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; }
+        h3 { color: #e67e22; font-size: 1.1em; border-bottom: 1px dashed #eee; padding-bottom: 5px; margin-top: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input, textarea, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
+        button { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: #2e7d32; color: white; width: 100%; margin-top: 10px; }
+        .img-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        .staff-item { display: flex; justify-content: space-between; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 5px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    </style>
+</head>
+<body>
+
+<div id="admin-login-screen" style="text-align:center; margin-top:100px;">
+    <h2>🔐 Đăng Nhập Quản Trị Cấp Cao</h2>
+    <button onclick="window.dangNhapGoogle()" style="padding:15px 30px; background:#e67e22; color:white; border-radius:30px; border:none; font-weight:bold; cursor:pointer;">🔑 Đăng Nhập Bằng Google</button>
+</div>
+
+<div class="admin-wrapper" id="main-content">
+    <button onclick="window.logout()" style="float:right; background:#d32f2f; color:white;">Đăng Xuất</button>
+    <a href="orders.html" target="_blank" style="background:#3498db; color:white; padding:10px 15px; border-radius:8px; text-decoration:none; font-weight:bold; display:inline-block; margin-bottom:20px;">📦 Qua Trang Đơn Hàng & Kho</a>
+
+    <div class="card">
+        <h2>🏠 Cấu Hình Thương Hiệu & Diện Mạo</h2>
+        
+        <div class="grid-3">
+            <div class="form-group"><label>Tên Thương Hiệu:</label><input type="text" id="brandName"></div>
+            <div class="form-group"><label>Slogan quán:</label><input type="text" id="brandSlogan"></div>
+            <div class="form-group">
+                <label>Tông màu chủ đạo:</label>
+                <select id="mainColor">
+                    <option value="#2e7d32">Xanh Lá (Chay)</option>
+                    <option value="#c62828">Đỏ Đô (Bún/Lẩu)</option>
+                    <option value="#f9a825">Vàng Nghệ (Cổ điển)</option>
+                    <option value="#6d4c41">Nâu Đất (Cà phê)</option>
+                    <option value="#1565c0">Xanh Dương (Hải sản)</option>
+                    <option value="#d84315">Cam Đất (Món nướng)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Logo quán (Hình tròn):</label>
+                <input type="file" id="fileLogo" accept="image/*">
+                <img id="viewLogo" class="img-preview" style="display:none;">
+            </div>
+            <div class="form-group">
+                <label>Hình đại diện thương hiệu (About):</label>
+                <input type="file" id="fileAvatar" accept="image/*">
+                <img id="viewAvatar" class="img-preview" style="display:none;">
+            </div>
+        </div>
+
+        <h3>📍 Liên Hệ & Mạng Xã Hội</h3>
+        <div class="grid-2">
+            <div class="form-group"><label>Địa chỉ hiển thị:</label><input type="text" id="storeAddress"></div>
+            <div class="form-group"><label>Số điện thoại Hotline:</label><input type="text" id="storePhone"></div>
+        </div>
+        <div class="grid-3">
+            <div class="form-group"><label>Link Facebook Fanpage:</label><input type="text" id="linkFb"></div>
+            <div class="form-group"><label>Số Zalo (Nếu khác hotline):</label><input type="text" id="adminZalo"></div>
+            <div class="form-group"><label>Số WhatsApp (Mã vùng 84...):</label><input type="text" id="adminWhatsapp"></div>
+        </div>
+
+        <h3>📝 Nội dung Giới thiệu & Đa phương tiện</h3>
+        <div class="form-group"><label>Lời ngỏ ngắn (Khung xanh):</label><textarea id="loiGioiThieu" rows="2"></textarea></div>
+        <div class="form-group"><label>Bài giới thiệu chi tiết (HTML):</label><textarea id="baiGioiThieuChinh" rows="6"></textarea></div>
+        <div class="grid-2">
+            <div class="form-group"><label>Link Google Maps (Chỉ đường):</label><input type="text" id="linkMap"></div>
+            <div class="form-group"><label>Link YouTube Video (Có hỗ trợ Shorts):</label><input type="text" id="linkYoutube"></div>
+        </div>
+
+        <h3>💰 Cấu Hình Tài Chính</h3>
+        <div class="grid-2">
+            <div class="form-group"><label>Email nhận đơn báo:</label><input type="email" id="adminEmail"></div>
+            <div class="form-group"><label>Thuế VAT (%):</label><input type="number" id="vatRate"></div>
+        </div>
+
+        <button class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Toàn Bộ Cấu Hình Hệ Thống</button>
+    </div>
+
+    <div class="card">
+        <h2>🍜 Quản Lý Thực Đơn (Menu)</h2>
+        <input type="hidden" id="edit-id">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 10px;">
+            <div class="form-group"><label>Tên món:</label><input type="text" id="tenVi"></div>
+            <div class="form-group"><label>Giá bán:</label><input type="number" id="gia"></div>
+            <div class="form-group"><label>Giá vốn:</label><input type="number" id="giaVon"></div>
+        </div>
+        <div class="form-group"><label>Hình ảnh món:</label><input type="file" id="fileAnh"></div>
+        <button id="btn-add" class="btn-primary" onclick="window.luuMon(false)">Thêm Món Mới</button>
+        <button id="btn-up" style="display:none; background:#e67e22; color:white; width:100%;" onclick="window.luuMon(true)">Cập Nhật Thay Đổi</button>
+        
+        <table id="menu-table">
+            <thead><tr><th>Hình</th><th>Tên Món</th><th>Giá Bán</th><th>Giá Vốn</th><th>Thao tác</th></tr></thead>
+            <tbody id="menu-body"></tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>👥 Quản Lý Nhân Viên</h2>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <input type="email" id="newStaffEmail" placeholder="Gmail nhân viên">
+            <button class="btn-primary" style="width: auto; margin: 0;" onclick="window.themNhanVien()">Cấp Quyền</button>
+        </div>
+        <div id="staff-list"></div>
     </div>
 </div>
 
 <script type="module">
-    // ... (Giữ nguyên các hàm khác)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const ADMIN_EMAIL = "chaysaigon@gmail.com"; 
+    const cloudName = "dym7dwnji", uploadPreset = "qjrpdbhs";
+    let url_logo = "", url_avatar = "", url_item = "";
+
+    onAuthStateChanged(auth, (user) => {
+        if (user && user.email === ADMIN_EMAIL) {
+            document.getElementById('admin-login-screen').style.display='none';
+            document.getElementById('main-content').style.display='block';
+            loadThongTin(); loadData(); loadStaff();
+        } else if(user) { alert("Không có quyền!"); signOut(auth); }
+    });
+
+    window.dangNhapGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { alert(e.message); } };
+    window.logout = () => signOut(auth);
+
+    async function uploadCloud(file) {
+        const formData = new FormData(); formData.append("file", file); formData.append("upload_preset", uploadPreset);
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: "POST", body: formData });
+        const d = await res.json(); return d.secure_url;
+    }
+
     async function loadThongTin() {
         const snap = await getDoc(doc(db, "Settings", "info"));
         if (snap.exists()) {
             const d = snap.data();
             document.getElementById('brandName').value = d.brand_name || "";
-            document.getElementById('mainColor').value = d.main_color || "#2e7d32"; // Tải màu đã lưu
-            // ... (Tải các thông tin khác y như cũ)
+            document.getElementById('brandSlogan').value = d.brand_slogan || "";
+            document.getElementById('mainColor').value = d.main_color || "#2e7d32";
+            document.getElementById('vatRate').value = d.vat_rate || 0;
+            document.getElementById('storeAddress').value = d.store_address || "";
+            document.getElementById('storePhone').value = d.store_phone || "";
+            document.getElementById('adminZalo').value = d.admin_zalo || "";
+            document.getElementById('adminEmail').value = d.admin_email || "";
+            document.getElementById('linkFb').value = d.link_fb || "";
+            document.getElementById('adminWhatsapp').value = d.admin_whatsapp || "";
+            document.getElementById('loiGioiThieu').value = d.loi_gioi_thieu || "";
+            document.getElementById('baiGioiThieuChinh').value = d.bai_gioi_thieu_chinh || "";
+            document.getElementById('linkMap').value = d.link_map || "";
+            document.getElementById('linkYoutube').value = d.link_youtube || "";
+            
+            if(d.brand_logo) { url_logo = d.brand_logo; document.getElementById('viewLogo').src = d.brand_logo; document.getElementById('viewLogo').style.display = "block"; }
+            if(d.hinh_dai_dien) { url_avatar = d.hinh_dai_dien; document.getElementById('viewAvatar').src = d.hinh_dai_dien; document.getElementById('viewAvatar').style.display = "block"; }
         }
     }
 
     window.luuThongTin = async () => {
-        // ... (Xử lý upload ảnh y như cũ)
+        let logo = url_logo, avatar = url_avatar;
+        const fLogo = document.getElementById('fileLogo').files[0];
+        const fAvatar = document.getElementById('fileAvatar').files[0];
+        if(fLogo) logo = await uploadCloud(fLogo);
+        if(fAvatar) avatar = await uploadCloud(fAvatar);
+
         await setDoc(doc(db, "Settings", "info"), {
             brand_name: document.getElementById('brandName').value,
-            main_color: document.getElementById('mainColor').value, // Lưu màu được chọn
-            // ... (Lưu các thông tin khác y như cũ)
+            brand_slogan: document.getElementById('brandSlogan').value,
+            main_color: document.getElementById('mainColor').value,
+            vat_rate: Number(document.getElementById('vatRate').value),
+            brand_logo: logo,
+            hinh_dai_dien: avatar,
+            store_address: document.getElementById('storeAddress').value,
+            store_phone: document.getElementById('storePhone').value,
+            admin_zalo: document.getElementById('adminZalo').value,
+            link_fb: document.getElementById('linkFb').value,
+            admin_whatsapp: document.getElementById('adminWhatsapp').value,
+            admin_email: document.getElementById('adminEmail').value,
+            loi_gioi_thieu: document.getElementById('loiGioiThieu').value,
+            bai_gioi_thieu_chinh: document.getElementById('baiGioiThieuChinh').value,
+            link_map: document.getElementById('linkMap').value,
+            link_youtube: document.getElementById('linkYoutube').value
         }, { merge: true });
-        alert("Đã lưu cấu hình và màu sắc mới!");
+        alert("Đã lưu ráo trọi cấu hình!"); loadThongTin();
     };
+
+    async function loadData() {
+        const snap = await getDocs(collection(db, "Menus"));
+        const body = document.getElementById('menu-body'); body.innerHTML = "";
+        snap.forEach(d => {
+            const m = d.data();
+            body.innerHTML += `<tr>
+                <td><img src="${m.hinh_anh}" class="img-preview"></td>
+                <td>${m.ten_tieng_viet}</td>
+                <td>${m.gia_tien}</td>
+                <td>${m.gia_von||0}</td>
+                <td>
+                    <button onclick="window.sua('${d.id}','${m.ten_tieng_viet}',${m.gia_tien},${m.gia_von||0},'${m.hinh_anh}')">Sửa</button>
+                    <button onclick="window.xoaMon('${d.id}')" style="color:red">Xóa</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    window.luuMon = async (isUp) => {
+        let url = url_item;
+        const file = document.getElementById('fileAnh').files[0];
+        if(file) url = await uploadCloud(file);
+        const data = { 
+            ten_tieng_viet: document.getElementById('tenVi').value, 
+            gia_tien: Number(document.getElementById('gia').value), 
+            gia_von: Number(document.getElementById('giaVon').value), 
+            hinh_anh: url 
+        };
+        if(isUp) await updateDoc(doc(db, "Menus", document.getElementById('edit-id').value), data);
+        else { data.ton_kho = 0; await addDoc(collection(db, "Menus"), data); }
+        location.reload();
+    };
+
+    window.sua = (id, ten, gia, von, hinh) => {
+        document.getElementById('edit-id').value = id; document.getElementById('tenVi').value = ten;
+        document.getElementById('gia').value = gia; document.getElementById('giaVon').value = von;
+        url_item = hinh; document.getElementById('btn-add').style.display='none'; document.getElementById('btn-up').style.display='block';
+    };
+
+    async function loadStaff() {
+        const snap = await getDoc(doc(db, "Settings", "staff"));
+        const div = document.getElementById('staff-list'); div.innerHTML = "";
+        if(snap.exists() && snap.data().emails) {
+            snap.data().emails.forEach(em => { div.innerHTML += `<div class="staff-item"><span>${em}</span><button onclick="window.xoaStaff('${em}')" style="color:red">Gỡ</button></div>`; });
+        }
+    }
+
+    window.themNhanVien = async () => {
+        const em = document.getElementById('newStaffEmail').value; if(!em) return;
+        const snap = await getDoc(doc(db, "Settings", "staff"));
+        let list = snap.exists() ? snap.data().emails : [];
+        if(!list.includes(em)) { list.push(em); await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff(); }
+    };
+
+    window.xoaStaff = async (em) => {
+        const snap = await getDoc(doc(db, "Settings", "staff"));
+        let list = snap.data().emails.filter(e => e !== em);
+        await setDoc(doc(db, "Settings", "staff"), { emails: list }); loadStaff();
+    };
+
+    window.xoaMon = async (id) => { if(confirm("Xóa món?")) { await deleteDoc(doc(db, "Menus", id)); loadData(); } };
 </script>
+</body>
+</html>
