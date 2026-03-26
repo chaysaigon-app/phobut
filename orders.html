@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Lý Đơn Hàng & Tài Chính - Admin</title>
+    <title>Quản Lý Đơn Hàng & Tài Chính - Hệ Thống Admin</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript"> (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })(); </script>
     <style>
@@ -56,7 +56,7 @@
 <body>
 
 <div id="login-screen" style="text-align:center; padding-top:100px;">
-    <h2>🔐 ĐĂNG NHẬP QUẢN LÝ</h2>
+    <h2>🔐 ĐĂNG NHẬP QUẢN LÝ ĐƠN HÀNG</h2>
     <button onclick="window.lg()" style="padding:15px 35px; background:#e67e22; border-radius:30px; font-size:1.1em; color:white; border:none; cursor:pointer; font-weight:bold;">VÀO HỆ THỐNG</button>
 </div>
 
@@ -66,26 +66,26 @@
     </div>
 
     <div class="card no-print">
-        <h2>📊 BÁO CÁO TÀI CHÍNH</h2>
+        <h2>📊 BÁO CÁO TÀI CHÍNH (Đơn Hoàn Thành)</h2>
         <div style="margin-bottom:20px;">
             Từ: <input type="date" id="dF"> Đến: <input type="date" id="dT"> 
             <button onclick="window.calc()" style="background:var(--main-color)">LỌC DỮ LIỆU</button>
         </div>
         <div class="report-grid">
             <div class="report-box"><h4>Tổng Thu</h4><p id="sT">0đ</p></div>
-            <div class="report-box"><h4>Thuế VAT thu hộ</h4><p id="sV">0đ</p></div>
+            <div class="report-box"><h4>VAT Thu Hộ</h4><p id="sV" style="color:#d35400;">0đ</p></div>
             <div class="report-box"><h4>Doanh Thu Thuần</h4><p id="sN">0đ</p></div>
             <div class="report-box"><h4>Lợi Nhuận Ròng</h4><p id="sP" style="color:green;">0đ</p></div>
         </div>
     </div>
 
     <div class="card">
-        <h2 class="no-print">📦 ĐƠN HÀNG MỚI</h2>
+        <h2 class="no-print">📦 DANH SÁCH ĐƠN HÀNG</h2>
         <div id="order-list">Đang tải đơn hàng...</div>
     </div>
 
     <div class="card no-print">
-        <h2>🍜 QUẢN LÝ TỒN KHO</h2>
+        <h2>🍜 QUẢN LÝ TỒN KHO (Cập nhật nhanh)</h2>
         <table>
             <thead><tr><th>Tên Món Ăn</th><th>Số Lượng Tồn</th><th>Thao Tác</th></tr></thead>
             <tbody id="stock-list"></tbody>
@@ -111,8 +111,8 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'block';
                 loadTheme(); loadOrders(); loadStock();
-            } else { alert("Không có quyền!"); signOut(auth); }
-        }
+            } else { alert("Tài khoản không có quyền truy cập!"); signOut(auth); }
+        } else { document.getElementById('login-screen').style.display = 'block'; document.getElementById('main-content').style.display = 'none'; }
     });
 
     async function loadTheme() {
@@ -149,13 +149,13 @@
                     <ul class="item-list">${itms}</ul>
                     <div style="text-align:right; font-size:0.9em;">
                         Tạm tính: ${(o.gia_tam_tinh || 0).toLocaleString()}đ | Thuế (${o.phan_tram_thue || 0}%): ${(o.tien_thue || 0).toLocaleString()}đ<br>
-                        <b style="font-size:1.2em; color:#d35400;">TỔNG: ${(o.tong_tien || 0).toLocaleString()}đ</b>
+                        <b style="font-size:1.2em; color:#d35400;">TỔNG THANH TOÁN: ${(o.tong_tien || 0).toLocaleString()}đ</b>
                     </div>
                     <div class="btn-group no-print">
-                        <button class="btn-ship" onclick="window.upS('${o.id}', 'Đang giao')">🚚 Đang giao</button>
-                        <button class="btn-done" onclick="window.upS('${o.id}', 'Đã hoàn thành')">✅ Hoàn thành</button>
-                        <button class="btn-cancel" onclick="window.upS('${o.id}', 'Hủy')">❌ Hủy</button>
-                        <button class="btn-print" onclick="window.printBill('${o.id}')">🖨️ In Bill</button>
+                        <button class="btn-ship" onclick="window.upS('${o.id}', 'Đang giao')">🚚 Giao Hàng</button>
+                        <button class="btn-done" onclick="window.upS('${o.id}', 'Đã hoàn thành')">✅ Hoàn Thành</button>
+                        <button class="btn-cancel" onclick="window.upS('${o.id}', 'Hủy')">❌ Hủy Đơn</button>
+                        <button class="btn-print" onclick="window.printBill('${o.id}')">🖨️ In Hóa Đơn</button>
                     </div>
                 </div>`;
         });
@@ -164,7 +164,19 @@
 
     window.upS = async (id, s) => {
         const o = allOrders.find(x => x.id === id);
+        const btn = event.target;
+        btn.disabled = true;
+        btn.innerText = "Đang xử lý...";
+
         try {
+            // 1. Lấy thông tin quán từ Firebase đặng đưa vô chữ ký Email
+            const infoSnap = await getDoc(doc(db, "Settings", "info"));
+            const dI = infoSnap.exists() ? infoSnap.data() : {};
+            const tenQuan = dI.brand_name || "Cửa hàng của chúng tôi";
+            const sdtQuan = dI.store_phone || "";
+            const dcQuan = dI.store_address || "";
+
+            // 2. Cập nhật tồn kho nếu hoàn thành
             if (s === 'Đã hoàn thành' && o.trang_thai !== 'Đã hoàn thành') {
                 const batch = writeBatch(db);
                 for (let k in o.chi_tiet) {
@@ -174,18 +186,28 @@
                 }
                 await batch.commit();
             }
+
+            // 3. Cập nhật trạng thái
             await updateDoc(doc(db, "Orders", id), { trang_thai: s });
 
-            // Gửi Email thông báo tình trạng đơn cho khách
+            // 4. Tạo chi tiết món ăn đặng khách xem trong mail
+            let chiTietMon = "";
+            for (let tM in o.chi_tiet) { chiTietMon += `- ${tM} (Số lượng: ${o.chi_tiet[tM].sl})\n`; }
+
+            // 5. Gửi Email thông báo có đầy đủ đầu đuôi
             await emailjs.send("service_j8kubcd", "template_3ee7url", {
                 to_email: o.khach_hang,
-                subject: `Cập nhật đơn hàng: ${s}`,
-                message: `Chào bạn, đơn hàng của bạn hiện đang: ${s}. Cảm ơn bạn đã ủng hộ!`
+                subject: `🔔 [${tenQuan}] CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG`,
+                message: `Kính chào quý khách,\n\nChúng tôi xin thông báo đơn hàng của quý khách tại ${tenQuan} hiện đã chuyển sang trạng thái: ${s.toUpperCase()}.\n\n--------------------------\n📦 CHI TIẾT ĐƠN HÀNG:\n${chiTietMon}\n💰 TỔNG CỘNG: ${o.tong_tien.toLocaleString()}đ\n--------------------------\n\nNếu có thắc mắc, quý khách vui lòng liên hệ:\n📞 Hotline: ${sdtQuan}\n📍 Địa chỉ: ${dcQuan}\n\nChân thành cảm ơn quý khách!\nKính chúc quý khách vạn sự như ý.`
             });
 
-            alert("Đã cập nhật trạng thái và gửi Email cho khách!");
+            alert("Đã cập nhật và gửi Email thông báo rạch ròi cho khách!");
             loadOrders(); loadStock();
-        } catch(e) { alert("Lỗi: " + e.message); }
+        } catch(e) { 
+            console.error(e);
+            alert("Cập nhật trạng thái xong nhưng chưa gửi được Email. Thí chủ kiểm tra lại EmailJS nghen!");
+            loadOrders();
+        }
     };
 
     window.calc = () => {
@@ -212,13 +234,13 @@
         const tbody = document.getElementById('stock-list'); tbody.innerHTML = "";
         s.forEach(d => {
             const m = d.data();
-            tbody.innerHTML += `<tr><td>${m.ten_tieng_viet}</td><td><input type="number" id="sk-${d.id}" class="stock-input" value="${m.ton_kho||0}"></td><td><button onclick="window.upK('${d.id}')" style="background:var(--main-color); padding:5px 10px;">Lưu</button></td></tr>`;
+            tbody.innerHTML += `<tr><td>${m.ten_tieng_viet}</td><td><input type="number" id="sk-${d.id}" class="stock-input" value="${m.ton_kho||0}"></td><td><button onclick="window.upK('${d.id}')" style="background:var(--main-color); padding:5px 10px;">Lưu Kho</button></td></tr>`;
         });
     }
 
     window.upK = async id => { 
         await updateDoc(doc(db, "Menus", id), { ton_kho: Number(document.getElementById('sk-'+id).value) }); 
-        alert("Đã cập nhật kho!"); 
+        alert("Đã cập nhật số lượng tồn kho!"); 
     };
 
     window.printBill = (id) => { window.print(); };
