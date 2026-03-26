@@ -11,7 +11,6 @@
     </script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; line-height: 1.6; top: 0px !important; }
-        /* Ẩn thanh banner mặc định của Google Translate để giao diện sạch hơn */
         .goog-te-banner-frame.skiptranslate { display: none !important; }
         
         .auth-bar { background: #1b5e20; color: white; padding: 10px; text-align: right; font-size: 0.85em; }
@@ -19,7 +18,6 @@
         .header h1 { margin: 0; font-size: 2.2em; letter-spacing: 1px; }
         .header p { margin: 5px 0 15px; font-style: italic; opacity: 0.9; font-size: 1.1em; }
         
-        /* Chỉnh lại vị trí khung Google Translate */
         .lang-switch { position: absolute; top: 15px; right: 15px; z-index: 100; }
         
         .dietary-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
@@ -35,7 +33,6 @@
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
-        /* Đã xóa dòng content cứng gây lỗi dịch thuật */
         .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
         
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -74,6 +71,15 @@
         .modal-content { background: white; margin: 10% auto; padding: 25px; width: 85%; max-width: 400px; border-radius: 15px; position: relative; }
         .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;}
         .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* Cập nhật CSS cho các món trong giỏ hàng */
+        .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
+        .cart-item-info { flex-grow: 1; }
+        .cart-item-name { font-weight: bold; margin: 0; color: #333; font-size: 1em;}
+        .cart-item-price { margin: 5px 0 0 0; color: #888; font-size: 0.9em; }
+        .cart-item-controls { display: flex; align-items: center; gap: 12px; }
+        .btn-qty { background: #f0f0f0; border: 1px solid #ddd; width: 28px; height: 28px; border-radius: 5px; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .btn-qty:active { background: #e0e0e0; }
     </style>
 </head>
 <body>
@@ -124,7 +130,7 @@
 
 <div class="cart-bar">
     <div class="cart-info">🛒 <b><span id="cart-count">0</span> món</b> <br><span class="cart-total" id="cart-total">0đ</span></div>
-    <button class="btn-view-cart" onclick="window.moBangGiaoHang()">Đặt Hàng</button>
+    <button class="btn-view-cart" onclick="window.moGioHang()">Xem Giỏ Hàng</button>
 </div>
 
 <div id="login-modal" class="modal">
@@ -135,6 +141,20 @@
         <button class="btn-login" onclick="window.xuLyAuth()">Đăng Nhập</button>
         <p style="font-size:0.75em; color:#888; text-align:center; margin-top:10px;">Nếu chưa có tài khoản, hệ thống sẽ tự động tạo mới cho bạn.</p>
         <button onclick="document.getElementById('login-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Để sau</button>
+    </div>
+</div>
+
+<div id="cart-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="margin-top:0; color:#2e7d32; text-align:center;">Giỏ Hàng Của Bạn</h2>
+        
+        <div id="cart-items-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
+            </div>
+        
+        <h3 style="text-align:right; color:#d35400; margin-top: 10px;">Tổng tiền: <span id="modal-cart-total">0đ</span></h3>
+        
+        <button class="btn-login" style="background:#e67e22;" onclick="window.tienHanhDatHang()">Tiếp Tục Đặt Hàng</button>
+        <button onclick="document.getElementById('cart-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại chọn thêm</button>
     </div>
 </div>
 
@@ -152,7 +172,7 @@
         <textarea id="ship-note" class="modal-input" rows="2" placeholder="Lời nhắn cho cửa hàng (Ví dụ: ít cay...)"></textarea>
         
         <button id="btn-submit-order" class="btn-login" style="background:#e67e22;" onclick="window.xacNhanDatHang()">Xác Nhận Đặt Hàng</button>
-        <button onclick="document.getElementById('checkout-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại</button>
+        <button onclick="window.quayLaiGioHang()" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại giỏ hàng</button>
     </div>
 </div>
 
@@ -225,13 +245,9 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
             if(data.link_youtube && data.link_youtube.trim() !== "") {
                 let ytId = ""; 
                 const url = data.link_youtube;
-                if(url.includes("v=")) {
-                    ytId = url.split("v=")[1].substring(0,11);
-                } else if(url.includes("youtu.be/")) {
-                    ytId = url.split("youtu.be/")[1].substring(0,11);
-                } else if(url.includes("shorts/")) {
-                    ytId = url.split("shorts/")[1].substring(0,11);
-                }
+                if(url.includes("v=")) ytId = url.split("v=")[1].substring(0,11);
+                else if(url.includes("youtu.be/")) ytId = url.split("youtu.be/")[1].substring(0,11);
+                else if(url.includes("shorts/")) ytId = url.split("shorts/")[1].substring(0,11);
                 
                 if (ytId) {
                     document.getElementById('youtube-container').style.display = 'block';
@@ -295,9 +311,13 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         });
     }
 
+    // -- PHẦN QUẢN LÝ GIỎ HÀNG (CẬP NHẬT) --
     window.addToCart = (ten, gia) => {
         if(cart[ten]) cart[ten].sl++; else cart[ten] = { gia, sl: 1 };
         updateCartUI();
+        
+        // Hiện thông báo nhỏ góc màn hình (Toast)
+        Swal.fire({ toast: true, position: 'bottom-end', icon: 'success', title: 'Đã thêm vào giỏ hàng', showConfirmButton: false, timer: 1500 });
     };
 
     function updateCartUI() {
@@ -307,13 +327,75 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         document.getElementById('cart-total').innerText = total.toLocaleString() + 'đ';
     }
 
-    window.moBangGiaoHang = () => {
-        if(!current_user) { Swal.fire("Vui lòng đăng nhập để tiếp tục!"); document.getElementById('login-modal').style.display='block'; return; }
+    // Hiển thị modal giỏ hàng
+    window.moGioHang = () => {
         if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng của bạn đang trống.");
+        window.hienThiChiTietGioHang();
+        document.getElementById('cart-modal').style.display = 'block';
+    };
+
+    // Render HTML cho danh sách món trong giỏ
+    window.hienThiChiTietGioHang = () => {
+        const container = document.getElementById('cart-items-container');
+        let html = '';
+        let total = 0;
+
+        for(let tenMon in cart) {
+            let giaMon = cart[tenMon].gia;
+            let soLuong = cart[tenMon].sl;
+            total += giaMon * soLuong;
+            
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <p class="cart-item-name">${tenMon}</p>
+                        <p class="cart-item-price">${giaMon.toLocaleString()}đ / phần</p>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button class="btn-qty" onclick="window.thayDoiSoLuong('${tenMon}', -1)">-</button>
+                        <span>${soLuong}</span>
+                        <button class="btn-qty" onclick="window.thayDoiSoLuong('${tenMon}', 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+        document.getElementById('modal-cart-total').innerText = total.toLocaleString() + 'đ';
+    }
+
+    // Nút tăng/giảm số lượng trong Modal
+    window.thayDoiSoLuong = (tenMon, thayDoi) => {
+        if(cart[tenMon]) {
+            cart[tenMon].sl += thayDoi;
+            if(cart[tenMon].sl <= 0) {
+                delete cart[tenMon]; // Xóa món nếu số lượng về 0
+            }
+            updateCartUI();
+            
+            // Nếu giỏ hàng trống sau khi xóa thì đóng modal
+            if(Object.keys(cart).length === 0) {
+                document.getElementById('cart-modal').style.display = 'none';
+            } else {
+                window.hienThiChiTietGioHang(); // Vẽ lại giao diện giỏ hàng
+            }
+        }
+    };
+
+    // Chuyển từ Giỏ hàng sang Thanh toán
+    window.tienHanhDatHang = () => {
+        if(!current_user) { Swal.fire("Vui lòng đăng nhập để tiếp tục!"); document.getElementById('login-modal').style.display='block'; return; }
         
+        document.getElementById('cart-modal').style.display = 'none';
         document.getElementById('checkout-modal').style.display = 'block';
     };
 
+    // Quay lại giỏ hàng từ màn hình thanh toán
+    window.quayLaiGioHang = () => {
+        document.getElementById('checkout-modal').style.display = 'none';
+        window.moGioHang();
+    };
+
+    // -- XÁC NHẬN ĐẶT HÀNG --
     window.xacNhanDatHang = async () => {
         const phone = document.getElementById('ship-phone').value;
         const zalo = document.getElementById('ship-zalo').value;
@@ -329,7 +411,7 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
             btnSubmit.disabled = true;
 
             let total = 0;
-            let tinNhanOrder = `Chào Phở Bụt, tôi muốn đặt hàng:\n\n`;
+            let tinNhanOrder = `Chào cửa hàng, tôi muốn đặt hàng:\n\n`;
 
             for(let key in cart) { 
                 let thanhTien = cart[key].sl * cart[key].gia;
@@ -356,7 +438,7 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
             if(note) thongTinGiao += `Ghi chú: ${note}\n`;
 
             let thuChoQuan = `Có đơn hàng mới!\n\n${tinNhanOrder}${thongTinGiao}`;
-            let thuChoKhach = `Cảm ơn bạn đã đặt hàng tại Phở Bụt. Chúng tôi đã nhận được đơn hàng và đang tiến hành chuẩn bị.\n\nChi tiết đơn hàng của bạn:\n\n${tinNhanOrder}${thongTinGiao}`;
+            let thuChoKhach = `Cảm ơn bạn đã đặt hàng. Chúng tôi đã nhận được đơn hàng và đang tiến hành chuẩn bị.\n\nChi tiết đơn hàng của bạn:\n\n${tinNhanOrder}${thongTinGiao}`;
 
             const emailjsServiceID = "service_j8kubcd";
             const emailjsTemplateID = "template_3ee7url";
@@ -371,7 +453,7 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
 
             emailjs.send(emailjsServiceID, emailjsTemplateID, {
                 to_email: current_user.email,
-                subject: `Phở Bụt đã nhận được đơn hàng của bạn`,
+                subject: `Đơn hàng của bạn đã được tiếp nhận`,
                 message: thuChoKhach
             });
 
