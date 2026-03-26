@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Trị Phở Bụt - Chánh Điện</title>
+    <title>Hệ Thống Quản Trị Phở Bụt</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
         
@@ -33,74 +33,74 @@
 <body>
 
 <div id="admin-login-screen">
-    <h2>🙏 Cửa Thiền Quản Trị</h2>
-    <p>Nam mô A Di Đà Phật. Con bận dùng chìa khóa (Gmail) đặng bước vô nghen.</p>
-    <button class="btn-google" onclick="window.dangNhapGoogle()">🔑 Đăng Nhập Bằng Google</button>
+    <h2>Hệ Thống Quản Trị</h2>
+    <p>Vui lòng đăng nhập bằng tài khoản Google (Gmail) để truy cập.</p>
+    <button class="btn-google" onclick="window.dangNhapGoogle()">Đăng Nhập Bằng Google</button>
 </div>
 
 <div class="admin-wrapper">
     <div class="card">
-        <button class="btn-logout" onclick="window.dangXuatAdmin()">🔒 Thoát</button>
-        <h2>🏠 Cài Đặt Thông Tin & Kết Nối</h2>
+        <button class="btn-logout" onclick="window.dangXuatAdmin()">Đăng Xuất</button>
+        <h2>Cài Đặt Thông Tin Cửa Hàng</h2>
         
-        <h3>📞 Thông Tin Nhận Đơn Hàng</h3>
+        <h3>Thông Tin Nhận Đơn Hàng</h3>
         <div class="form-group">
-            <label>Email nhận đơn (ví dụ: chaysaigon@gmail.com):</label>
-            <input type="email" id="adminEmail" placeholder="Điền email đặng nhận thông báo...">
+            <label>Email nhận đơn hàng:</label>
+            <input type="email" id="adminEmail" placeholder="Ví dụ: chaysaigon@gmail.com">
         </div>
         <div class="form-group">
-            <label>Số điện thoại nhận tin Zalo (ví dụ: 0968107788):</label>
-            <input type="text" id="adminZalo" placeholder="Điền số Zalo của quán...">
+            <label>Số điện thoại nhận tin Zalo:</label>
+            <input type="text" id="adminZalo" placeholder="Ví dụ: 0968107788">
         </div>
         <div class="form-group">
-            <label>Số điện thoại nhận tin WhatsApp (Bỏ số 0, thay bằng 84):</label>
-            <input type="text" id="adminWhatsapp" placeholder="Ví dụ: 84968107788...">
+            <label>Số điện thoại nhận tin WhatsApp (thay số 0 bằng 84):</label>
+            <input type="text" id="adminWhatsapp" placeholder="Ví dụ: 84968107788">
         </div>
 
-        <h3>📝 Bài Giới Thiệu Chính (Dài) & Lời Ngỏ (Ngắn)</h3>
+        <h3>Bài Giới Thiệu & Lời Ngỏ</h3>
         <div class="form-group">
-            <label>Thông điệp từ Bếp (Lời ngỏ ngắn gọn nằm trong khung nhỏ):</label>
-            <textarea id="loiGioiThieu" rows="3" placeholder="Viết đôi lời chánh niệm ngắn gọn..."></textarea>
+            <label>Thông điệp ngắn gọn (hiển thị trong khung):</label>
+            <textarea id="loiGioiThieu" rows="3" placeholder="Nhập lời giới thiệu ngắn gọn..."></textarea>
         </div>
         <div class="form-group">
-            <label>Bài Giới Thiệu Chính (Nằm bên dưới hình ảnh):<br>
-            <i style="color:#d35400; font-weight:normal; font-size:0.9em;">(Mẹo: Giữ nguyên mấy cái thẻ như &lt;b&gt;...&lt;/b&gt; đặng in đậm, hay &lt;br&gt; đặng xuống dòng cho nó đẹp nghen con)</i></label>
+            <label>Bài Giới Thiệu Chi Tiết:<br>
+            <i style="color:#d35400; font-weight:normal; font-size:0.9em;">(Lưu ý: Giữ nguyên các thẻ định dạng HTML như &lt;b&gt;...&lt;/b&gt; hoặc &lt;br&gt;)</i></label>
             <textarea id="baiGioiThieuChinh" rows="12" placeholder="Nội dung giới thiệu chi tiết..."></textarea>
         </div>
 
-        <h3>🌐 Đa Phương Tiện & Mạng Xã Hội</h3>
+        <h3>Đa Phương Tiện & Liên Kết</h3>
         <div class="form-group">
-            <label>Hình đại diện quán (Để trống nếu giữ hình cũ):</label>
+            <label>Hình ảnh đại diện (để trống nếu không thay đổi):</label>
             <input type="file" id="fileAnhDaiDien" accept="image/*">
             <br>
             <img id="previewDaiDien" src="" style="width: 150px; margin-top: 15px; border-radius: 10px; display: none; object-fit: cover;">
         </div>
         <div class="form-group">
-            <label>Link Video YouTube (Tự động phát bên dưới bài giới thiệu dài):</label>
+            <label>Đường dẫn Video YouTube:</label>
             <input type="text" id="linkYoutube" placeholder="Ví dụ: https://www.youtube.com/watch?v=...">
         </div>
         <div class="form-group">
-            <label>Link bản đồ Google Maps:</label>
+            <label>Đường dẫn Google Maps:</label>
             <input type="text" id="linkMap" placeholder="Ví dụ: https://goo.gl/maps/...">
         </div>
         <div class="form-group">
-            <label>Link trang Facebook:</label>
+            <label>Đường dẫn Facebook:</label>
             <input type="text" id="linkFb" placeholder="Ví dụ: https://facebook.com/phobut">
         </div>
         <div class="form-group">
-            <label>Link kênh TikTok:</label>
+            <label>Đường dẫn TikTok:</label>
             <input type="text" id="linkTiktok" placeholder="Ví dụ: https://tiktok.com/@phobut">
         </div>
         <div class="form-group">
-            <label>Link kênh YouTube:</label>
+            <label>Đường dẫn YouTube:</label>
             <input type="text" id="linkYtChannel" placeholder="Ví dụ: https://youtube.com/@phobut">
         </div>
 
-        <button id="btn-luu-thong-tin" class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Thay Đổi Thông Tin</button>
+        <button id="btn-luu-thong-tin" class="btn-primary" onclick="window.luuThongTin()">Lưu Thông Tin</button>
     </div>
 
     <div class="card">
-        <h2 id="form-title">➕ Thêm/Sửa Món Ăn</h2>
+        <h2 id="form-title">Thêm/Sửa Món Ăn</h2>
         <input type="hidden" id="edit-id">
         <div class="form-group">
             <label>Tên món ăn:</label>
@@ -111,27 +111,27 @@
             <input type="number" id="gia" placeholder="Ví dụ: 45000">
         </div>
         <div class="form-group">
-            <label>Hình ảnh (Để trống nếu không muốn đổi hình):</label>
+            <label>Hình ảnh (để trống nếu không thay đổi):</label>
             <input type="file" id="fileAnh" accept="image/*">
         </div>
-        <p id="status-text" style="color: #e67e22; font-weight: bold; display: none;">⌛ Đang xử lý, con đợi xíu nghen...</p>
+        <p id="status-text" style="color: #e67e22; font-weight: bold; display: none;">Đang xử lý, vui lòng đợi...</p>
         
-        <button id="btn-add-submit" class="btn-primary" onclick="window.luuMon(false)">Lưu Món Mới</button>
-        <button id="btn-update-submit" class="btn-update" onclick="window.luuMon(true)">Cập Nhật Thay Đổi</button>
+        <button id="btn-add-submit" class="btn-primary" onclick="window.luuMon(false)">Thêm Món Mới</button>
+        <button id="btn-update-submit" class="btn-update" onclick="window.luuMon(true)">Cập Nhật Món Ăn</button>
         <button id="btn-cancel" style="display:none; background:#ccc; width:100%; margin-top:5px;" onclick="window.resetForm()">Hủy Bỏ</button>
     </div>
 
     <div class="card">
-        <h2>📋 Danh Sách Thực Đơn</h2>
+        <h2>Danh Sách Thực Đơn</h2>
         <table>
-            <thead><tr><th>Hình</th><th>Tên Món</th><th>Giá</th><th>Thao tác</th></tr></thead>
+            <thead><tr><th>Hình Ảnh</th><th>Tên Món Ăn</th><th>Giá Tiền</th><th>Thao Tác</th></tr></thead>
             <tbody id="menu-body"></tbody>
         </table>
     </div>
 
     <div class="card">
-        <h2>🛒 Đơn Hàng Mới Nhất</h2>
-        <div id="order-list">Đang tải đơn hàng...</div>
+        <h2>Danh Sách Đơn Hàng Mới</h2>
+        <div id="order-list">Đang tải danh sách đơn hàng...</div>
     </div>
 </div>
 
@@ -152,20 +152,16 @@
     let current_img_url = "";
     let current_avatar_url = "";
 
-    // Cái bài mặc định đặng mồi sẵn cho quán
-    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
-        
+    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. <br><br>
 <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
 Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
 <ul>
     <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-    <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
+    <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ.</li>
     <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
 </ul>
-
 <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
 Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
-
 <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
 Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
 <ul>
@@ -173,9 +169,8 @@ Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn 
     <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
     <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
 </ul>
-
 <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
-Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏`;
+Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật.`;
 
     onAuthStateChanged(auth, (user) => {
         if (user) {
@@ -185,7 +180,7 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                 loadThongTin();
                 loadData();
             } else {
-                alert("Mô Phật! Trạm này chỉ dành riêng cho Bếp trưởng nghen con.");
+                alert("Truy cập bị từ chối! Tài khoản này không có quyền quản trị.");
                 signOut(auth);
             }
         } else {
@@ -219,7 +214,6 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
             document.getElementById('adminWhatsapp').value = data.admin_whatsapp || "";
 
             document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
-            // Tải bài giới thiệu chính, nếu chưa có thì lấy cái mặc định
             document.getElementById('baiGioiThieuChinh').value = data.bai_gioi_thieu_chinh || defaultBaiGioiThieu;
 
             document.getElementById('linkYoutube').value = data.link_youtube || "";
@@ -235,7 +229,6 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                 img.style.display = "block";
             }
         } else {
-            // Chưa có dữ liệu gì ráo thì rải cái mặc định lên
             document.getElementById('baiGioiThieuChinh').value = defaultBaiGioiThieu;
         }
     }
@@ -256,7 +249,7 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         const btn = document.getElementById('btn-luu-thong-tin');
         
         try {
-            btn.innerText = "⌛ Đang lưu...";
+            btn.innerText = "Đang lưu thông tin...";
             let url = current_avatar_url;
             if(file) { url = await uploadToCloudinary(file); }
 
@@ -274,12 +267,12 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                 hinh_dai_dien: url
             }, { merge: true });
 
-            alert("Đã lưu thông tin quán ráo trọi rồi nghen!");
-            btn.innerText = "💾 Lưu Thay Đổi Thông Tin";
+            alert("Đã cập nhật thông tin thành công!");
+            btn.innerText = "Lưu Thông Tin";
             loadThongTin();
         } catch(e) { 
-            alert("Lỗi: " + e.message); 
-            btn.innerText = "💾 Lưu Thay Đổi Thông Tin"; 
+            alert("Lỗi khi lưu thông tin: " + e.message); 
+            btn.innerText = "Lưu Thông Tin"; 
         }
     };
 
@@ -290,27 +283,27 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         const id = document.getElementById('edit-id').value;
         const status = document.getElementById('status-text');
 
-        if(!ten || !gia) return alert("Con điền tên với giá cho bếp biết nghen!");
+        if(!ten || !gia) return alert("Vui lòng nhập tên và giá món ăn!");
 
         try {
             status.style.display = "block";
             let url = current_img_url;
             if(file) { url = await uploadToCloudinary(file); }
-            if(!url && !isUpdate) { status.style.display = "none"; return alert("Món mới bận chọn cái hình cho đẹp nghen!"); }
+            if(!url && !isUpdate) { status.style.display = "none"; return alert("Vui lòng chọn hình ảnh cho món mới!"); }
 
             if(isUpdate) {
                 await updateDoc(doc(db, "Menus", id), { ten_tieng_viet: ten, gia_tien: Number(gia), hinh_anh: url });
-                alert("Đã cập nhật xong rồi nghen!");
+                alert("Đã cập nhật món ăn thành công!");
             } else {
                 await addDoc(collection(db, "Menus"), { ten_tieng_viet: ten, gia_tien: Number(gia), hinh_anh: url });
                 alert("Đã thêm món mới thành công!");
             }
             location.reload();
-        } catch (e) { alert("Lỗi: " + e.message); status.style.display = "none"; }
+        } catch (e) { alert("Lỗi hệ thống: " + e.message); status.style.display = "none"; }
     };
 
     window.chuanBiSua = (id, ten, gia, hinh) => {
-        document.getElementById('form-title').innerText = "✏️ Chỉnh Sửa Món";
+        document.getElementById('form-title').innerText = "Chỉnh Sửa Món Ăn";
         document.getElementById('edit-id').value = id;
         document.getElementById('tenVi').value = ten;
         document.getElementById('gia').value = gia;
@@ -354,7 +347,7 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
             if(o.so_zalo) infoHTML += ` | <b>Zalo:</b> <a href="https://zalo.me/${o.so_zalo}" target="_blank">${o.so_zalo}</a>`;
             if(o.so_whatsapp) infoHTML += ` | <b>WhatsApp:</b> ${o.so_whatsapp}`;
             infoHTML += `<br><b>Giao tới:</b> ${o.dia_chi || '<span style="color:red">Chưa nhập</span>'}<br>`;
-            if(o.ghi_chu) infoHTML += `<b>Lời dặn:</b> <i>${o.ghi_chu}</i><br>`;
+            if(o.ghi_chu) infoHTML += `<b>Lời nhắn:</b> <i>${o.ghi_chu}</i><br>`;
 
             divO.innerHTML += `
                 <div class="order-card">
@@ -362,12 +355,12 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                     <hr style="border: 0; border-top: 1px dashed #ccc; margin: 10px 0;">
                     <b>Chi tiết món:</b>
                     <ul>${items}</ul>
-                    <b style="color:#d35400;">💰 Tổng thu: ${(o.tong_tien || 0).toLocaleString()}đ</b>
+                    <b style="color:#d35400;">Tổng thu: ${(o.tong_tien || 0).toLocaleString()}đ</b>
                 </div>`;
         });
     }
 
-    window.xoaMon = async (id) => { if(confirm("Xóa thiệt nghen con?")) { await deleteDoc(doc(db, "Menus", id)); location.reload(); } };
+    window.xoaMon = async (id) => { if(confirm("Bạn có chắc chắn muốn xóa món này không?")) { await deleteDoc(doc(db, "Menus", id)); location.reload(); } };
     
 </script>
 </body>
