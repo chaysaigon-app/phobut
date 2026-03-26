@@ -2,59 +2,73 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Lý Đơn Hàng - Phở Bụt</title>
+    <title>Quản Lý Đơn Hàng & Báo Cáo - Phở Bụt</title>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script type="text/javascript">
-       (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })();
-    </script>
+    <script type="text/javascript"> (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })(); </script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        
         #admin-login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #e3f2fd; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #admin-login-screen h2 { color: #2980b9; font-size: 2em; margin-bottom: 10px; }
-        .btn-google { background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        
-        .admin-wrapper { max-width: 900px; margin: auto; display: none; } 
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; position: relative; }
+        .btn-google { background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .admin-wrapper { max-width: 1000px; margin: auto; display: none; } 
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; position: relative; }
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
-        .btn-logout { position: absolute; top: 20px; right: 25px; background: #d32f2f; color: white; border-radius: 20px; padding: 8px 15px; border: none; font-weight: bold; cursor: pointer;}
         
-        .order-card { border-left: 5px solid #3498db; background: #fdfefe; padding: 15px; margin-bottom: 20px; border-radius: 8px; font-size: 0.95em; line-height: 1.5; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
-        .order-card ul { margin: 5px 0 10px 0; padding-left: 20px; }
+        /* Giao diện Báo cáo */
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .report-box { background: #f9fbf9; padding: 15px; border-radius: 10px; border: 1px solid #c8e6c9; text-align: center; }
+        .report-box h4 { margin: 0; color: #666; font-size: 0.9em; }
+        .report-box p { margin: 5px 0 0 0; font-size: 1.4em; font-weight: bold; color: #2e7d32; }
+        .filter-area { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 15px; background: #eee; padding: 10px; border-radius: 8px; }
+        .filter-area input { padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
+
+        /* Giao diện Đơn hàng */
+        .order-card { border-left: 5px solid #3498db; background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);}
         .order-header { display: flex; justify-content: space-between; align-items: flex-start; }
-        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.85em; font-weight: bold; background: #eee; }
-        
-        .action-buttons { margin-top: 15px; border-top: 1px solid #eee; padding-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
-        .btn-status { padding: 8px 15px; font-size: 0.85em; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
-        .btn-status:active { transform: scale(0.95); }
-        
-        .bg-contact { background: #9b59b6; } .bg-contact:hover { background: #8e44ad; }
-        .bg-paid { background: #f1c40f; color: #333; } .bg-paid:hover { background: #f39c12; }
-        .bg-deliv { background: #3498db; } .bg-deliv:hover { background: #2980b9; }
-        .bg-done { background: #2ecc71; } .bg-done:hover { background: #27ae60; }
-        .bg-cancel { background: #95a5a6; } .bg-cancel:hover { background: #7f8c8d; }
-        .bg-del { background: #e74c3c; margin-left: auto;} .bg-del:hover { background: #c0392b; } 
+        .status-badge { padding: 4px 10px; border-radius: 15px; font-size: 0.8em; font-weight: bold; color: white; }
+        .action-buttons { margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; display: flex; flex-wrap: wrap; gap: 5px; }
+        .btn-status { padding: 6px 12px; font-size: 0.8em; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; color: white; }
+        .btn-logout { position: absolute; top: 20px; right: 20px; background: #d32f2f; color: white; border-radius: 20px; padding: 6px 15px; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div id="admin-login-screen">
-    <h2>Trang Xử Lý Đơn Hàng</h2>
-    <p>Vui lòng đăng nhập bằng tài khoản được cấp quyền.</p>
-    <button class="btn-google" onclick="window.dangNhapGoogle()">Đăng Nhập Bằng Google</button>
+    <h2>Trang Xử Lý & Báo Cáo</h2>
+    <button class="btn-google" onclick="window.dangNhapGoogle()">🔑 Đăng Nhập Google</button>
 </div>
 
 <div class="admin-wrapper">
+    <button class="btn-logout" onclick="window.dangXuat()">Thoát</button>
+
     <div class="card">
-        <button class="btn-logout" onclick="window.dangXuat()">Đăng Xuất</button>
-        <h2>📦 Danh Sách Đơn Hàng (Đang cập nhật trực tiếp)</h2>
-        <div id="order-list">Đang tải danh sách đơn hàng...</div>
+        <h2>📊 Báo Cáo Doanh Thu (Đơn đã hoàn thành)</h2>
+        <div class="filter-area">
+            <div>
+                <label style="font-size:0.8em; display:block;">Từ ngày:</label>
+                <input type="date" id="date-from">
+            </div>
+            <div>
+                <label style="font-size:0.8em; display:block;">Đến ngày:</label>
+                <input type="date" id="date-to">
+            </div>
+            <button onclick="window.tinhBao Cao()" style="padding: 8px 15px; background: #2e7d32; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">Lọc báo cáo</button>
+        </div>
+        <div class="report-grid">
+            <div class="report-box"><h4>Hôm nay</h4><p id="sum-today">0đ</p></div>
+            <div class="report-box"><h4>Tháng này</h4><p id="sum-month">0đ</p></div>
+            <div class="report-box"><h4>Theo lọc</h4><p id="sum-filter" style="color:#e67e22;">0đ</p></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📦 Đơn Hàng Cần Xử Lý</h2>
+        <div id="order-list">Đang tải...</div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, updateDoc, deleteDoc, doc, query, orderBy, getDoc, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
@@ -63,136 +77,117 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    const EMAIL_CHUYEN_TRACH = "chaysaigon@gmail.com"; 
-    let current_email = "";
-    
-    // Bộ nhớ tạm để lưu chi tiết đơn hàng cho tính năng gửi Email
-    window.danhSachDonHang = {};
+    const ADMIN_EMAIL = "chaysaigon@gmail.com";
+    let currentUserEmail = "";
+    window.allOrders = [];
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            current_email = user.email;
-            const snap = await getDoc(doc(db, "Settings", "staff"));
-            let isStaff = false;
-            if(snap.exists() && snap.data().emails && snap.data().emails.includes(current_email)) {
-                isStaff = true;
-            }
-
-            if (current_email === EMAIL_CHUYEN_TRACH || isStaff) {
+            currentUserEmail = user.email;
+            const staffSnap = await getDoc(doc(db, "Settings", "staff"));
+            const isStaff = staffSnap.exists() && staffSnap.data().emails?.includes(user.email);
+            
+            if (user.email === ADMIN_EMAIL || isStaff) {
                 document.getElementById('admin-login-screen').style.display = 'none';
                 document.querySelector('.admin-wrapper').style.display = 'block';
-                loadDanhSachDonHang();
-            } else {
-                alert("Tài khoản của bạn chưa được cấp quyền truy cập trang này.");
-                signOut(auth);
-            }
-        } else {
-            document.getElementById('admin-login-screen').style.display = 'flex';
-            document.querySelector('.admin-wrapper').style.display = 'none';
-        }
+                loadOrders();
+            } else { alert("Không có quyền!"); signOut(auth); }
+        } else { document.getElementById('admin-login-screen').style.display = 'flex'; }
     });
 
-    window.dangNhapGoogle = async () => { try { await signInWithPopup(auth, provider); } catch (error) { alert("Lỗi đăng nhập: " + error.message); } };
-    window.dangXuat = () => { signOut(auth); };
+    window.dangNhapGoogle = async () => { try { await signInWithPopup(auth, provider); } catch(e) { alert(e.message); } };
+    window.dangXuat = () => signOut(auth);
 
-    async function loadDanhSachDonHang() {
-        const qO = query(collection(db, "Orders"), orderBy("thoi_gian", "desc"));
-        const snapO = await getDocs(qO);
-        const divO = document.getElementById('order-list');
-        divO.innerHTML = "";
-        window.danhSachDonHang = {}; // Làm sạch bộ nhớ
-        
-        if(snapO.empty) { divO.innerHTML = "<p>Chưa có đơn hàng nào.</p>"; return; }
+    async function loadOrders() {
+        const snap = await getDocs(query(collection(db, "Orders"), orderBy("thoi_gian", "desc")));
+        window.allOrders = [];
+        const listDiv = document.getElementById('order-list');
+        listDiv.innerHTML = "";
 
-        snapO.forEach(d => {
-            const o = d.data();
-            window.danhSachDonHang[d.id] = o; // Lưu dữ liệu vào bộ nhớ tạm
+        snap.forEach(d => {
+            const o = { id: d.id, ...d.data() };
+            window.allOrders.push(o);
 
-            let items = ""; for(let k in o.chi_tiet) items += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
-            
-            let infoHTML = `<b>Email khách:</b> ${o.khach_hang} <br>
-                            <b>SĐT:</b> ${o.dien_thoai || '<span style="color:red">Chưa nhập</span>'}<br>
-                            <b>Giao tới:</b> ${o.dia_chi || '<span style="color:red">Chưa nhập</span>'}<br>`;
-            if(o.ghi_chu) infoHTML += `<b>Lời nhắn:</b> <i>${o.ghi_chu}</i><br>`;
+            let itemsHTML = ""; for(let k in o.chi_tiet) itemsHTML += `<li>${k} x ${o.chi_tiet[k].sl}</li>`;
+            let statusColor = o.trang_thai === 'Đã hoàn thành' ? '#2ecc71' : (o.trang_thai === 'Đơn hàng huỷ' ? '#7f8c8d' : '#3498db');
 
-            let currentStatus = o.trang_thai || 'Chờ xác nhận';
-            let statusColor = '#95a5a6';
-            if (currentStatus === 'Đã liên hệ khách hàng') statusColor = '#9b59b6';
-            if (currentStatus === 'Đã thanh toán') statusColor = '#f39c12';
-            if (currentStatus === 'Đang giao hàng') statusColor = '#3498db';
-            if (currentStatus === 'Đã hoàn thành') statusColor = '#2ecc71';
-            if (currentStatus === 'Đơn hàng huỷ') statusColor = '#7f8c8d';
-
-            let nutXoa = '';
-            if(current_email === EMAIL_CHUYEN_TRACH) {
-                nutXoa = `<button class="btn-status bg-del" onclick="window.xoaDonHang('${d.id}')">🗑️ Xóa Đơn</button>`;
-            }
-
-            divO.innerHTML += `
+            listDiv.innerHTML += `
                 <div class="order-card">
                     <div class="order-header">
-                        <div>${infoHTML}</div>
-                        <div class="status-badge" style="background: ${statusColor}; color: white;">${currentStatus}</div>
+                        <div><b>Khách:</b> ${o.khach_hang}<br><b>SĐT:</b> ${o.dien_thoai}<br><b>Địa chỉ:</b> ${o.dia_chi}</div>
+                        <div class="status-badge" style="background:${statusColor}">${o.trang_thai}</div>
                     </div>
-                    <hr style="border: 0; border-top: 1px dashed #ccc; margin: 10px 0;">
-                    <b>Chi tiết món:</b>
-                    <ul>${items}</ul>
-                    <b style="color:#d35400; font-size: 1.1em;">💰 Tổng thu: ${(o.tong_tien || 0).toLocaleString()}đ</b>
-                    
+                    <ul>${itemsHTML}</ul>
+                    <div style="font-weight:bold; color:#d35400;">Tổng thu: ${o.tong_tien.toLocaleString()}đ</div>
                     <div class="action-buttons">
-                        <button class="btn-status bg-contact" onclick="window.capNhatTrangThai('${d.id}', 'Đã liên hệ khách hàng')">Đã liên hệ</button>
-                        <button class="btn-status bg-paid" onclick="window.capNhatTrangThai('${d.id}', 'Đã thanh toán')">Đã thanh toán</button>
-                        <button class="btn-status bg-deliv" onclick="window.capNhatTrangThai('${d.id}', 'Đang giao hàng')">Đang giao hàng</button>
-                        <button class="btn-status bg-done" onclick="window.capNhatTrangThai('${d.id}', 'Đã hoàn thành')">Hoàn thành</button>
-                        <button class="btn-status bg-cancel" onclick="window.capNhatTrangThai('${d.id}', 'Đơn hàng huỷ')">Hủy đơn</button>
-                        ${nutXoa}
+                        <button class="btn-status" style="background:#9b59b6" onclick="window.updateStatus('${o.id}', 'Đã liên hệ')">Liên hệ</button>
+                        <button class="btn-status" style="background:#f1c40f; color:#333" onclick="window.updateStatus('${o.id}', 'Đã thanh toán')">Thanh toán</button>
+                        <button class="btn-status" style="background:#3498db" onclick="window.updateStatus('${o.id}', 'Đang giao')">Giao hàng</button>
+                        <button class="btn-status" style="background:#2ecc71" onclick="window.updateStatus('${o.id}', 'Đã hoàn thành')">Hoàn thành & Trừ kho</button>
+                        <button class="btn-status" style="background:#95a5a6" onclick="window.updateStatus('${o.id}', 'Đơn hàng huỷ')">Hủy</button>
+                        ${currentUserEmail === ADMIN_EMAIL ? `<button class="btn-status" style="background:#e74c3c; margin-left:auto" onclick="window.deleteOrder('${o.id}')">Xóa</button>` : ''}
                     </div>
                 </div>`;
         });
+        window.tinhBaoCao();
     }
 
-    window.capNhatTrangThai = async (id, trangThaiMoi) => {
-        const o = window.danhSachDonHang[id];
-        const emailKhachHang = o.khach_hang;
-
+    window.updateStatus = async (id, newStatus) => {
+        const o = window.allOrders.find(x => x.id === id);
         try {
-            await updateDoc(doc(db, "Orders", id), { trang_thai: trangThaiMoi });
-            
-            // Xây dựng lại danh sách món ăn cho Email
-            let itemsText = ""; 
-            for(let k in o.chi_tiet) {
-                itemsText += `- ${k} (x${o.chi_tiet[k].sl})\n`;
+            // NẾU HOÀN THÀNH -> TỰ ĐỘNG TRỪ KHO
+            if (newStatus === 'Đã hoàn thành' && o.trang_thai !== 'Đã hoàn thành') {
+                const batch = writeBatch(db);
+                for (let tenMon in o.chi_tiet) {
+                    // Tìm món trong bảng Menus để trừ kho
+                    const qMenu = query(collection(db, "Menus"), where("ten_tieng_viet", "==", tenMon));
+                    const menuSnap = await getDocs(qMenu);
+                    menuSnap.forEach(mDoc => {
+                        const newStock = (mDoc.data().ton_kho || 0) - o.chi_tiet[tenMon].sl;
+                        batch.update(doc(db, "Menus", mDoc.id), { ton_kho: Math.max(0, newStock) });
+                    });
+                }
+                await batch.commit();
             }
 
-            const emailjsServiceID = "service_j8kubcd";
-            const emailjsTemplateID = "template_3ee7url";
+            await updateDoc(doc(db, "Orders", id), { trang_thai: newStatus });
             
-            // Cập nhật nội dung thư bao gồm cả chi tiết đơn hàng
-            const noiDungThu = `Xin chào,\n\nCửa hàng Phở Bụt xin thông báo đơn hàng của bạn vừa được cập nhật trạng thái mới:\n\nTrạng thái hiện tại: [ ${trangThaiMoi.toUpperCase()} ]\n\n--- CHI TIẾT ĐƠN HÀNG ---\n${itemsText}\n💰 Tổng tiền: ${(o.tong_tien || 0).toLocaleString()}đ\n📍 Giao tới: ${o.dia_chi}\n📞 SĐT liên hệ: ${o.dien_thoai}\n\nCảm ơn bạn đã lựa chọn món chay tĩnh thức của Phở Bụt!`;
-
-            emailjs.send(emailjsServiceID, emailjsTemplateID, {
-                to_email: emailKhachHang,
-                subject: `Phở Bụt - Cập nhật trạng thái đơn hàng: ${trangThaiMoi}`,
-                message: noiDungThu
+            // Gửi Email thông báo (có chi tiết món)
+            let details = ""; for(let k in o.chi_tiet) details += `- ${k} (x${o.chi_tiet[k].sl})\n`;
+            emailjs.send("service_j8kubcd", "template_3ee7url", {
+                to_email: o.khach_hang,
+                subject: `Cập nhật đơn hàng: ${newStatus}`,
+                message: `Trạng thái mới: ${newStatus}\n\nChi tiết đơn hàng:\n${details}\nTổng tiền: ${o.tong_tien.toLocaleString()}đ`
             });
 
-            alert(`Đã cập nhật thành "${trangThaiMoi}" và gửi email chi tiết cho khách.`);
-            loadDanhSachDonHang(); 
-        } catch (e) {
-            alert("Đã xảy ra lỗi: " + e.message);
-        }
+            alert("Đã cập nhật và gửi thông báo!"); loadOrders();
+        } catch(e) { alert("Lỗi: " + e.message); }
     };
 
-    window.xoaDonHang = async (id) => {
-        if(confirm("XÓA VĨNH VIỄN: Bạn có chắc chắn muốn xóa đơn hàng này khỏi hệ thống không? Hành động này không thể hoàn tác.")) {
-            try {
-                await deleteDoc(doc(db, "Orders", id));
-                loadDanhSachDonHang();
-            } catch (e) {
-                alert("Lỗi khi xóa: " + e.message);
-            }
-        }
+    window.tinhBaoCao = () => {
+        const now = new Date();
+        const startToday = new Date(now.setHours(0,0,0,0)).getTime();
+        const startMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+        
+        const fFrom = document.getElementById('date-from').value ? new Date(document.getElementById('date-from').value).getTime() : 0;
+        const fTo = document.getElementById('date-to').value ? new Date(document.getElementById('date-to').value).setHours(23,59,59,999) : Infinity;
+
+        let sToday = 0, sMonth = 0, sFilter = 0;
+
+        window.allOrders.filter(o => o.trang_thai === 'Đã hoàn thành' && o.thoi_gian).forEach(o => {
+            const time = o.thoi_gian.toMillis();
+            if (time >= startToday) sToday += o.tong_tien;
+            if (time >= startMonth) sMonth += o.tong_tien;
+            if (time >= fFrom && time <= fTo) sFilter += o.tong_tien;
+        });
+
+        document.getElementById('sum-today').innerText = sToday.toLocaleString() + 'đ';
+        document.getElementById('sum-month').innerText = sMonth.toLocaleString() + 'đ';
+        document.getElementById('sum-filter').innerText = sFilter.toLocaleString() + 'đ';
     };
+
+    window.deleteOrder = async (id) => { if(confirm("Xóa vĩnh viễn?")) { await deleteDoc(doc(db, "Orders", id)); loadOrders(); } };
+
 </script>
 </body>
 </html>
