@@ -33,11 +33,10 @@
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
-        .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
-        
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .social-btn { padding: 8px 15px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.9em; display: inline-flex; align-items: center; }
         .bg-fb { background: #1877F2; } .bg-tiktok { background: #000000; } .bg-yt { background: #FF0000; }
+        .bg-zalo { background: #0068ff; } .bg-wa { background: #25D366; }
         
         .contact-box { background: #f9fbf9; border-radius: 10px; padding: 15px; border: 1px dashed #2e7d32; margin-top: auto; }
         .contact-box p { margin: 5px 0; }
@@ -72,7 +71,6 @@
         .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit;}
         .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* Cập nhật CSS cho các món trong giỏ hàng */
         .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 12px 0; }
         .cart-item-info { flex-grow: 1; }
         .cart-item-name { font-weight: bold; margin: 0; color: #333; font-size: 1em;}
@@ -106,11 +104,10 @@
             <img id="about-img" src="https://via.placeholder.com/600x400?text=Pho+But" alt="Phở Bụt">
         </div>
         <div class="about-content">
-            <div class="message-box" id="dynamic-message" style="display: none;"></div>
             <div class="social-links" id="social-links"></div>
             <div class="contact-box">
                 <p>📍 <b>Địa chỉ:</b> 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
-                <p>📞 <b>Điện thoại:</b> 0968 107 788</p>
+                <p>📞 <b>Điện thoại:</b> <span id="display-phone">0968 107 788</span></p>
                 <a href="#" id="btn-map" target="_blank" class="btn-maps" style="display:none;">🗺️ Chỉ đường Google Maps</a>
             </div>
         </div>
@@ -148,8 +145,7 @@
     <div class="modal-content">
         <h2 style="margin-top:0; color:#2e7d32; text-align:center;">Giỏ Hàng Của Bạn</h2>
         
-        <div id="cart-items-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;">
-            </div>
+        <div id="cart-items-container" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
         
         <h3 style="text-align:right; color:#d35400; margin-top: 10px;">Tổng tiền: <span id="modal-cart-total">0đ</span></h3>
         
@@ -162,12 +158,6 @@
     <div class="modal-content">
         <h2 style="margin-top:0; color:#e67e22; text-align:center;">Thông Tin Nhận Hàng</h2>
         <input type="text" id="ship-phone" class="modal-input" placeholder="Số điện thoại của bạn (*)" required>
-        
-        <div style="display: flex; gap: 10px;">
-            <input type="text" id="ship-zalo" class="modal-input" placeholder="Số Zalo (không bắt buộc)">
-            <input type="text" id="ship-whatsapp" class="modal-input" placeholder="Số WhatsApp (không bắt buộc)">
-        </div>
-
         <textarea id="ship-address" class="modal-input" rows="2" placeholder="Địa chỉ giao hàng (*)" required></textarea>
         <textarea id="ship-note" class="modal-input" rows="2" placeholder="Lời nhắn cho cửa hàng (Ví dụ: ít cay...)"></textarea>
         
@@ -202,41 +192,16 @@
     let cart = {};
     let thongTinQuan = {}; 
 
-    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. <br><br>
-<b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
-Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
-<ul>
-    <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-    <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ.</li>
-    <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
-</ul>
-<b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
-Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
-<b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
-Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
-<ul>
-    <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
-    <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
-    <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
-</ul>
-<b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
-Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật.`;
+    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo.`;
 
     async function loadThongTinQuan() {
         const snap = await getDoc(doc(db, "Settings", "info"));
         if (snap.exists()) {
             const data = snap.data();
-            thongTinQuan.whatsapp = data.admin_whatsapp || "";
-            thongTinQuan.zalo = data.admin_zalo || "";
             thongTinQuan.email = data.admin_email || "";
 
             document.getElementById('core-about-card').innerHTML = data.bai_gioi_thieu_chinh || defaultBaiGioiThieu;
 
-            if(data.loi_gioi_thieu && data.loi_gioi_thieu.trim() !== "") {
-                const msgBox = document.getElementById('dynamic-message');
-                msgBox.innerHTML = data.loi_gioi_thieu.replace(/\n/g, '<br>');
-                msgBox.style.display = 'block';
-            }
             if(data.hinh_dai_dien) document.getElementById('about-img').src = data.hinh_dai_dien;
             if(data.link_map) {
                 const btnMap = document.getElementById('btn-map');
@@ -254,11 +219,16 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                     document.getElementById('youtube-container').innerHTML = `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>`;
                 }
             }
+            
+            // Xây dựng nút Mạng xã hội & Chat
             let socialsHTML = '';
             if(data.link_fb) socialsHTML += `<a href="${data.link_fb}" target="_blank" class="social-btn bg-fb">📘 Facebook</a>`;
             if(data.link_tiktok) socialsHTML += `<a href="${data.link_tiktok}" target="_blank" class="social-btn bg-tiktok">🎵 TikTok</a>`;
             if(data.link_yt_channel) socialsHTML += `<a href="${data.link_yt_channel}" target="_blank" class="social-btn bg-yt">▶️ YouTube</a>`;
+            if(data.admin_zalo) socialsHTML += `<a href="https://zalo.me/${data.admin_zalo}" target="_blank" class="social-btn bg-zalo">💬 Nhắn Zalo</a>`;
+            if(data.admin_whatsapp) socialsHTML += `<a href="https://wa.me/${data.admin_whatsapp}" target="_blank" class="social-btn bg-wa">💬 WhatsApp</a>`;
             document.getElementById('social-links').innerHTML = socialsHTML;
+            
         } else {
             document.getElementById('core-about-card').innerHTML = defaultBaiGioiThieu;
         }
@@ -311,12 +281,9 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         });
     }
 
-    // -- PHẦN QUẢN LÝ GIỎ HÀNG (CẬP NHẬT) --
     window.addToCart = (ten, gia) => {
         if(cart[ten]) cart[ten].sl++; else cart[ten] = { gia, sl: 1 };
         updateCartUI();
-        
-        // Hiện thông báo nhỏ góc màn hình (Toast)
         Swal.fire({ toast: true, position: 'bottom-end', icon: 'success', title: 'Đã thêm vào giỏ hàng', showConfirmButton: false, timer: 1500 });
     };
 
@@ -327,14 +294,12 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         document.getElementById('cart-total').innerText = total.toLocaleString() + 'đ';
     }
 
-    // Hiển thị modal giỏ hàng
     window.moGioHang = () => {
         if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng của bạn đang trống.");
         window.hienThiChiTietGioHang();
         document.getElementById('cart-modal').style.display = 'block';
     };
 
-    // Render HTML cho danh sách món trong giỏ
     window.hienThiChiTietGioHang = () => {
         const container = document.getElementById('cart-items-container');
         let html = '';
@@ -363,43 +328,35 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
         document.getElementById('modal-cart-total').innerText = total.toLocaleString() + 'đ';
     }
 
-    // Nút tăng/giảm số lượng trong Modal
     window.thayDoiSoLuong = (tenMon, thayDoi) => {
         if(cart[tenMon]) {
             cart[tenMon].sl += thayDoi;
             if(cart[tenMon].sl <= 0) {
-                delete cart[tenMon]; // Xóa món nếu số lượng về 0
+                delete cart[tenMon]; 
             }
             updateCartUI();
             
-            // Nếu giỏ hàng trống sau khi xóa thì đóng modal
             if(Object.keys(cart).length === 0) {
                 document.getElementById('cart-modal').style.display = 'none';
             } else {
-                window.hienThiChiTietGioHang(); // Vẽ lại giao diện giỏ hàng
+                window.hienThiChiTietGioHang(); 
             }
         }
     };
 
-    // Chuyển từ Giỏ hàng sang Thanh toán
     window.tienHanhDatHang = () => {
         if(!current_user) { Swal.fire("Vui lòng đăng nhập để tiếp tục!"); document.getElementById('login-modal').style.display='block'; return; }
-        
         document.getElementById('cart-modal').style.display = 'none';
         document.getElementById('checkout-modal').style.display = 'block';
     };
 
-    // Quay lại giỏ hàng từ màn hình thanh toán
     window.quayLaiGioHang = () => {
         document.getElementById('checkout-modal').style.display = 'none';
         window.moGioHang();
     };
 
-    // -- XÁC NHẬN ĐẶT HÀNG --
     window.xacNhanDatHang = async () => {
         const phone = document.getElementById('ship-phone').value;
-        const zalo = document.getElementById('ship-zalo').value;
-        const whatsapp = document.getElementById('ship-whatsapp').value;
         const address = document.getElementById('ship-address').value;
         const note = document.getElementById('ship-note').value;
         const btnSubmit = document.getElementById('btn-submit-order');
@@ -422,14 +379,12 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
             await addDoc(collection(db, "Orders"), { 
                 khach_hang: current_user.email,
                 dien_thoai: phone,
-                so_zalo: zalo,
-                so_whatsapp: whatsapp,
                 dia_chi: address,
                 ghi_chu: note,
                 chi_tiet: cart, 
                 tong_tien: total,
                 thoi_gian: serverTimestamp(), 
-                trang_thai: "Đang chờ" 
+                trang_thai: "Chờ xác nhận" 
             });
 
             let thongTinGiao = `\nTổng cộng: ${total.toLocaleString()}đ\n`;
@@ -456,15 +411,8 @@ Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian
                 subject: `Đơn hàng của bạn đã được tiếp nhận`,
                 message: thuChoKhach
             });
-
-            let tinNhanWhatsappZalo = tinNhanOrder + thongTinGiao;
-            if (thongTinQuan.whatsapp) {
-                window.open(`https://wa.me/${thongTinQuan.whatsapp}?text=${encodeURIComponent(tinNhanWhatsappZalo)}`, '_blank');
-            } else if (thongTinQuan.zalo) {
-                window.open(`https://zalo.me/${thongTinQuan.zalo}`, '_blank');
-            }
             
-            Swal.fire("Đã đặt hàng thành công!", "Đơn hàng của bạn đã được ghi nhận. Chúng tôi sẽ chuẩn bị ngay.", "success");
+            Swal.fire("Đã đặt hàng thành công!", "Đơn hàng của bạn đã được ghi nhận. Vui lòng kiểm tra email để xem thông tin.", "success");
             cart = {}; updateCartUI();
             document.getElementById('checkout-modal').style.display = 'none';
 
