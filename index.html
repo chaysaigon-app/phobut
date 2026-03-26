@@ -6,51 +6,50 @@
     <title>Phở Bụt - Ẩm Thực Chay Tỉnh Thức</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; line-height: 1.6; }
         .auth-bar { background: #1b5e20; color: white; padding: 10px; text-align: right; font-size: 0.85em; }
         .header { background: #2e7d32; color: white; padding: 35px 20px 25px; text-align: center; position: relative; }
         .header h1 { margin: 0; font-size: 2.2em; letter-spacing: 1px; }
         .header p { margin: 5px 0 15px; font-style: italic; opacity: 0.9; font-size: 1.1em; }
         .lang-switch { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85em; font-weight: bold; border: 1px solid rgba(255,255,255,0.5); }
         .dietary-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-        .badge { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-transform: uppercase; }
-        .badge-vegan { background: #4caf50; color: white; border: 1px solid #388e3c; }
-        .badge-halal { background: #f1c40f; color: #333; border: 1px solid #d4ac0d; }
-        .halal-icon { color: white; font-size: 1.4em; line-height: 1; }
-        .badge-allium { background: #ffffff; color: #2e7d32; border: 1px solid #2e7d32; }
-        .allium-icons { font-size: 1.2em; display: flex; gap: 3px; }
+        .badge { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-transform: uppercase; background: white; color: #2e7d32; }
+        .badge-vegan { background: #4caf50; color: white; border: none; }
         
-        /* Mở rộng khung giới hạn để dàn trải thanh thoát hơn */
         .container { max-width: 1000px; margin: auto; padding: 15px; }
-        .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 25px 0 15px; font-size: 1.3em; font-weight: bold; }
+        .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 30px 0 20px; font-size: 1.5em; font-weight: bold; }
         
-        /* Giới hạn lại phần Về Chúng Tôi đặng không bị bè ra quá trớn */
-        .about-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin: 0 auto 25px; max-width: 700px; }
-        .about-img-square { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
-        .about-text { padding: 20px; font-size: 1em; line-height: 1.6; color: #444; text-align: justify; }
-        .about-text b { color: #2e7d32; }
-        .about-text ul { padding-left: 18px; margin: 10px 0; list-style-type: none; }
-        .about-text ul li { position: relative; margin-bottom: 5px; }
-        .about-text ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
+        /* Cấu trúc mới cho phần Giới Thiệu đặng lên máy tính cho đẹp */
+        .about-section { background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 30px; }
+        @media (min-width: 768px) { .about-section { grid-template-columns: 1fr 1fr; gap: 40px; } }
         
-        .location-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; margin: 0 auto 25px; max-width: 700px; }
-        .btn-maps { display: inline-block; background: #2e7d32; color: white; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .contact-btns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .btn-qr { color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
-        .btn-qr-zalo { background: #0068ff; }
-        .btn-qr-wa { background: #25D366; }
+        .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 4/3; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-top: 15px; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        .about-content { display: flex; flex-direction: column; justify-content: space-between; }
+        .about-text { color: #444; font-size: 1.05em; margin-bottom: 20px; text-align: justify; }
+        
+        /* Mạng xã hội & Liên hệ */
+        .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .social-btn { padding: 8px 15px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.9em; display: inline-flex; align-items: center; }
+        .bg-fb { background: #1877F2; } .bg-tiktok { background: #000000; } .bg-yt { background: #FF0000; }
+        
+        .contact-box { background: #f9fbf9; border-radius: 10px; padding: 15px; border: 1px dashed #2e7d32; }
+        .contact-box p { margin: 5px 0; }
+        .btn-maps { display: inline-block; background: #e67e22; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; font-weight: bold; font-size: 0.9em; margin-top: 10px; }
 
-        /* Pháp Tùy Duyên: Dàn ngang thực đơn ra nhiều cột */
+        /* Thực đơn dàn ngang */
         .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; }
-        .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-        .card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-        .name-vi { margin: 0 0 5px 0; font-size: 1.1em; color: #111; font-weight: bold; text-align: center; }
-        .price { color: #d35400; font-weight: bold; font-size: 1.1em; margin-bottom: 15px; margin-top: auto; text-align: center; }
+        .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); display: flex; flex-direction: column; justify-content: space-between; }
+        .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; text-align: center; }
+        .name-vi { margin: 0 0 5px 0; font-size: 1.1em; color: #111; font-weight: bold; }
+        .price { color: #d35400; font-weight: bold; font-size: 1.1em; margin-bottom: 15px; margin-top: auto; }
         .btn-add { background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1em; width: 100%; transition: 0.2s; }
         .btn-add:active { transform: scale(0.95); }
         
-        /* Cart Bar & Modal */
+        /* Giỏ hàng & Modal */
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border-top: 2px solid #2e7d32; z-index: 1000; }
         .cart-info { font-size: 1.1em; }
         .cart-total { color: #d35400; font-weight: bold; font-size: 1.1em; }
@@ -74,57 +73,38 @@
     <p>Ẩm Thực Chay Tinh Khiết & Tỉnh Thức</p>
     <div class="dietary-badges">
         <div class="badge badge-vegan">🌱 Thuần Chay</div>
-        <div class="badge badge-halal"><span class="halal-icon">حلال</span> Halal</div>
-        <div class="badge badge-allium"><span class="allium-icons">🧅🌿🧄</span> Không Ngũ Vị Tân</div>
+        <div class="badge">🧅 Không Ngũ Vị Tân</div>
     </div>
 </div>
 
 <div class="container">
     <div class="section-title">🌿 Về Chúng Tôi</div>
-    <div class="about-card">
-        <img src="https://scontent.fdad1-2.fna.fbcdn.net/v/t39.30808-6/648093393_913420674737698_4812098189760785095_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=dd6889&_nc_ohc=rpPf2GbuMxAQ7kNvwG7tPMm&_nc_oc=Admlx3Kr1ARAwPEmqN3qvaONsU3b_1SQQ2qncZEqnWG3Rea1OsTgFS1yjHEbfWMuQ28&_nc_zt=23&_nc_ht=scontent.fdad1-2.fna&_nc_gid=-aUhE-ErZMpgdrUFqMzZNw&_nc_ss=8&oh=00_AfxdrwkonKxv8WPEk9vE291t6vSdaF6FG4xPwpNy0gfr8w&oe=69B04367" alt="Phở Bụt" class="about-img-square">
-        <div class="about-text">
-            Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
+    
+    <div class="about-section">
+        <div class="about-media">
+            <img id="about-img" src="https://via.placeholder.com/600x400?text=Pho+But" alt="Phở Bụt">
+            <div id="youtube-container" style="display: none;"></div>
+        </div>
+        
+        <div class="about-content">
+            <div class="about-text" id="about-text">
+                Đang tải những lời chánh niệm từ quán...
+            </div>
             
-            <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
-            Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
-            <ul>
-                <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-                <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
-                <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
-            </ul>
-
-            <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
-            Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
-
-            <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
-            Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
-            <ul>
-                <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
-                <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
-                <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
-            </ul>
-
-            <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
-            Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏
+            <div class="social-links" id="social-links">
+                </div>
+            
+            <div class="contact-box">
+                <p>📍 <b>Địa chỉ:</b> 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
+                <p>📞 <b>Điện thoại:</b> 0968 107 788</p>
+                <a href="https://maps.app.goo.gl/tqJb7M6hQ1qHq7aL7" target="_blank" class="btn-maps">🗺️ Chỉ đường Google Maps</a>
+            </div>
         </div>
     </div>
 
     <div class="section-title">🍜 Thực Đơn</div>
     <div id="menu-list" class="menu-list">
         <p style="text-align:center; color:#888; grid-column: 1 / -1;">Đang tải thực đơn, con đợi xíu nghen...</p>
-    </div>
-
-    <div class="section-title">🏠 Địa Chỉ & Liên Hệ</div>
-    <div class="location-card">
-        <strong style="font-size: 1.1em; color: #2e7d32;">Phở Bụt Vegan - Quán Chay Da Nang</strong><br>
-        <p style="margin: 10px 0; color: #555;">📍 76 Thủ Khoa Huân, An Hải Đông, Sơn Trà, Đà Nẵng</p>
-        <a href="https://www.google.com/maps/search/?api=1&query=76+Thủ+Khoa+Huân+Đà+Nẵng" target="_blank" class="btn-maps">🗺️ Xem trên Google Maps</a>
-    </div>
-
-    <div class="contact-btns">
-        <button class="btn-qr btn-qr-zalo" onclick="alert('Đang nâng cấp mã QR nghen con!')">📱 Zalo QR</button>
-        <button class="btn-qr btn-qr-wa" onclick="alert('Đang nâng cấp mã QR nghen con!')">💬 WhatsApp QR</button>
     </div>
 </div>
 
@@ -146,10 +126,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, serverTimestamp, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Cấu hình Firebase
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -158,7 +137,42 @@
     let current_user = null;
     let cart = {};
 
-    // 1. Theo dõi duyên lành (Đăng nhập)
+    // 1. Tải Thông Tin Quán từ Admin
+    async function loadThongTinQuan() {
+        const snap = await getDoc(doc(db, "Settings", "info"));
+        if (snap.exists()) {
+            const data = snap.data();
+            
+            // Xử lý Lời giới thiệu
+            if(data.loi_gioi_thieu) {
+                document.getElementById('about-text').innerHTML = data.loi_gioi_thieu.replace(/\n/g, '<br>');
+            }
+            
+            // Xử lý Hình đại diện
+            if(data.hinh_dai_dien) {
+                document.getElementById('about-img').src = data.hinh_dai_dien;
+            }
+            
+            // Xử lý Video YouTube
+            if(data.link_youtube) {
+                const ytMatch = data.link_youtube.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=))([^"&?\/\s]{11})/i);
+                if (ytMatch && ytMatch[1]) {
+                    const ytId = ytMatch[1];
+                    document.getElementById('youtube-container').style.display = 'block';
+                    document.getElementById('youtube-container').innerHTML = `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe></div>`;
+                }
+            }
+            
+            // Xử lý Nút Mạng xã hội
+            let socialsHTML = '';
+            if(data.link_fb) socialsHTML += `<a href="${data.link_fb}" target="_blank" class="social-btn bg-fb">📘 Facebook</a>`;
+            if(data.link_tiktok) socialsHTML += `<a href="${data.link_tiktok}" target="_blank" class="social-btn bg-tiktok">🎵 TikTok</a>`;
+            if(data.link_yt_channel) socialsHTML += `<a href="${data.link_yt_channel}" target="_blank" class="social-btn bg-yt">▶️ YouTube</a>`;
+            document.getElementById('social-links').innerHTML = socialsHTML;
+        }
+    }
+
+    // 2. Theo dõi đăng nhập
     onAuthStateChanged(auth, (user) => {
         const bar = document.getElementById('auth-status');
         if (user) {
@@ -177,31 +191,25 @@
         const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
         if(!email || !pass) return alert("Con bận điền đủ thông tin nghen!");
-        
         try {
             await signInWithEmailAndPassword(auth, email, pass);
             window.dongModal();
         } catch (err) {
             if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
-                try {
-                    await createUserWithEmailAndPassword(auth, email, pass);
-                    window.dongModal();
-                } catch (e) { alert("Lỗi tạo tài khoản: " + e.message); }
+                try { await createUserWithEmailAndPassword(auth, email, pass); window.dongModal(); } 
+                catch (e) { alert("Lỗi tạo tài khoản: " + e.message); }
             } else { alert("Lỗi đăng nhập: " + err.message); }
         }
     };
 
     window.logout = () => signOut(auth);
 
-    // 2. Tải thực đơn từ Firebase
+    // 3. Tải thực đơn
     async function fetchMenu() {
         const snap = await getDocs(collection(db, "Menus"));
         const list = document.getElementById('menu-list');
         list.innerHTML = "";
-        if(snap.empty) {
-            list.innerHTML = "<p style='text-align:center; grid-column: 1 / -1;'>Bếp chưa dọn món ráo trọi, con quay lại sau nghen!</p>";
-            return;
-        }
+        if(snap.empty) { list.innerHTML = "<p style='text-align:center; grid-column: 1 / -1;'>Bếp chưa dọn món ráo trọi!</p>"; return; }
         
         snap.forEach(doc => {
             const m = doc.data();
@@ -217,10 +225,9 @@
         });
     }
 
-    // 3. Xử lý Giỏ hàng
+    // 4. Giỏ hàng & Đặt món
     window.addToCart = (ten, gia) => {
-        if(cart[ten]) cart[ten].sl++;
-        else cart[ten] = { gia, sl: 1 };
+        if(cart[ten]) cart[ten].sl++; else cart[ten] = { gia, sl: 1 };
         updateCartUI();
     };
 
@@ -231,27 +238,18 @@
         document.getElementById('cart-total').innerText = total.toLocaleString() + 'đ';
     }
 
-    // 4. Gởi gắm đơn hàng
     window.datHang = async () => {
-        if(!current_user) {
-            Swal.fire("Con bận đăng nhập đặng bếp biết ai đặt món nghen!");
-            window.moLogin();
-            return;
-        }
-        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng đang trống, con chọn món đã nghen!");
+        if(!current_user) { Swal.fire("Con bận đăng nhập nghen!"); window.moLogin(); return; }
+        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng đang trống ráo trọi!");
 
         try {
-            await addDoc(collection(db, "Orders"), {
-                khach_hang: current_user.email,
-                chi_tiet: cart,
-                thoi_gian: serverTimestamp(),
-                trang_thai: "Đang chờ"
-            });
-            Swal.fire("🙏 Đã nhận đơn!", "Bếp Phở Bụt đang bắt đầu làm cho con đây.", "success");
+            await addDoc(collection(db, "Orders"), { khach_hang: current_user.email, chi_tiet: cart, thoi_gian: serverTimestamp(), trang_thai: "Đang chờ" });
+            Swal.fire("🙏 Đã nhận đơn!", "Bếp đang làm cho con đây.", "success");
             cart = {}; updateCartUI();
         } catch (e) { alert("Lỗi gửi đơn: " + e.message); }
     };
 
+    loadThongTinQuan();
     fetchMenu();
 </script>
 </body>
