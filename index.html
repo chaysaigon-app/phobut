@@ -19,7 +19,7 @@
         .container { max-width: 1000px; margin: auto; padding: 15px; }
         .section-title { color: var(--main-color); border-left: 5px solid #e67e22; padding-left: 12px; margin: 30px 0 20px; font-weight: bold; font-size: 1.5em; }
         
-        /* Thông tin liên hệ, Lời nhắn & Giới thiệu */
+        /* Thông tin liên hệ & Giới thiệu */
         .dynamic-section { background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 25px; }
         @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 35px; } }
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
@@ -57,15 +57,17 @@
         
         /* Modals & Lịch sử đơn */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; }
-        .modal-content { background: white; margin: 5vh auto; padding: 25px; width: 90%; max-width: 460px; border-radius: 20px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-content { background: white; margin: 5vh auto; padding: 35px 25px 25px; width: 90%; max-width: 460px; border-radius: 20px; max-height: 85vh; overflow-y: auto; position: relative; }
         .modal-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .btn-login { width: 100%; padding: 12px; background: var(--main-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
         
         .history-item { background: #f9f9f9; padding: 12px; border-radius: 10px; border-left: 4px solid var(--main-color); margin-bottom: 10px; font-size: 0.9em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .history-item.cancel { border-left-color: #e74c3c; opacity: 0.7; }
         
-        /* Chữ thông báo nổi bật */
-        .highlight-notice { background: #fff3cd; color: #856404; padding: 12px 15px; border-radius: 8px; border-left: 5px solid #ffeeba; margin-bottom: 20px; font-weight: bold; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* Chữ thông báo nổi bật & Nút Đóng */
+        .highlight-notice { background: #fff3cd; color: #856404; padding: 12px 15px; border-radius: 8px; border-left: 5px solid #ffeeba; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); line-height: 1.5; }
+        .close-btn { position: absolute; top: 12px; right: 18px; font-size: 26px; font-weight: bold; cursor: pointer; color: #888; transition: 0.2s; line-height: 1; }
+        .close-btn:hover { color: #d32f2f; }
     </style>
 </head>
 <body>
@@ -126,13 +128,16 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, serverTimestamp, getDoc, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, serverTimestamp, getDoc, doc, setDoc, query, where, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
     const app = initializeApp(firebaseConfig); const db = getFirestore(app); const auth = getAuth(app);
     const ADMIN_EMAIL = "chaysaigon@gmail.com";
     let currentUser = null, userProfile = {}, cart = {};
+    
+    let soDienThoaiQuan = "Chưa cập nhật";
+    let soZaloQuan = "";
 
     function updateTheme(color) {
         if(!color) return;
@@ -151,6 +156,10 @@
             if (snap.exists()) {
                 const d = snap.data();
                 updateTheme(d.main_color);
+                
+                soDienThoaiQuan = d.store_phone || "Chưa cập nhật";
+                soZaloQuan = d.admin_zalo || d.store_phone || "";
+
                 document.getElementById('brand-h1').innerText = d.brand_name || "Cửa Hàng";
                 document.getElementById('brand-slogan').innerText = d.brand_slogan || "Ẩm Thực Tỉnh Thức";
                 document.getElementById('footer-brand').innerText = d.brand_name || "Cửa Hàng";
@@ -164,11 +173,11 @@
                 }
                 
                 document.getElementById('display-address').innerText = d.store_address || "Chưa cập nhật";
-                document.getElementById('display-phone').innerText = d.store_phone || "Chưa cập nhật";
+                document.getElementById('display-phone').innerText = soDienThoaiQuan;
                 if(d.link_map) { document.getElementById('btn-map').href = d.link_map; document.getElementById('btn-map').style.display='inline-block'; }
                 if(d.store_phone) {
                     document.getElementById('float-phone').href = "tel:" + d.store_phone;
-                    document.getElementById('float-zalo').href = "https://zalo.me/" + (d.admin_zalo || d.store_phone);
+                    document.getElementById('float-zalo').href = "https://zalo.me/" + soZaloQuan;
                 }
 
                 if(d.link_youtube) {
@@ -201,7 +210,7 @@
     onAuthStateChanged(auth, async (user) => {
         const bar = document.getElementById('auth-status');
         if (user) {
-            currentUser = user; bar.innerHTML = `Chào, <b>${user.email.split('@')[0]}</b> | <span onclick="window.moTaiKhoan()" style="cursor:pointer;text-decoration:underline;">Tài khoản</span> | <span onclick="window.logout()" style="cursor:pointer;">Thoát</span>`;
+            currentUser = user; bar.innerHTML = `Xin chào, <b>${user.email.split('@')[0]}</b> | <span onclick="window.moTaiKhoan()" style="cursor:pointer;text-decoration:underline;">Tài khoản</span> | <span onclick="window.logout()" style="cursor:pointer;">Đăng xuất</span>`;
             const uSnap = await getDoc(doc(db, "Users", user.email)); if(uSnap.exists()) userProfile = uSnap.data();
         } else { currentUser = null; bar.innerHTML = `<span onclick="window.moLogin()" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập</span>`; }
     });
@@ -210,25 +219,33 @@
         const sSnap = await getDoc(doc(db, "Settings", "staff"));
         const isS = sSnap.exists() && sSnap.data().emails?.includes(currentUser.email);
         const isA = currentUser.email === ADMIN_EMAIL;
-        let az = (isA || isS) ? `<div class="admin-zone" style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:15px; border-left:4px solid #3498db;"><h3>Quản lý</h3><a href="orders.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#3498db">📦 Đơn Hàng & Kho</a>${isA ? '<a href="admin.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#2e7d32">⚙️ Cài Đặt</a>' : ''}</div>` : "";
+        let az = (isA || isS) ? `<div class="admin-zone" style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:15px; border-left:4px solid #3498db;"><h3>Quản lý hệ thống</h3><a href="orders.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#3498db">📦 Đơn Hàng & Kho</a>${isA ? '<a href="admin.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#2e7d32">⚙️ Cài Đặt Cửa Hàng</a>' : ''}</div>` : "";
         
-        // CHÈN DÒNG CHỮ VÀNG BÁO KHÁCH GỌI ĐIỆN VÀO ĐÂY
-        const loiNhan = `<div class="highlight-notice">🔔 Thí chủ hoan hỷ liên hệ trực tiếp với quán đặng đơn hàng được bếp xử lý nhanh chóng nhất ráo trọi nghen!</div>`;
+        const soZaloIn = soZaloQuan ? ` hoặc Zalo <b>${soZaloQuan}</b>` : "";
+        const loiNhan = `<div class="highlight-notice">🔔 Quý khách vui lòng liên hệ Hotline <b>${soDienThoaiQuan}</b>${soZaloIn} để nhà hàng xác nhận và xử lý đơn hàng nhanh chóng nhất. Xin cảm ơn!</div>`;
+        const closeBtn = `<span class="close-btn" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span>`;
 
-        document.getElementById('profile-container').innerHTML = `${az}<h2>Tài Khoản</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button><div style="margin-top:25px; border-top:1px dashed #ccc; padding-top:15px;">${loiNhan}<h3 style="color:var(--main-color); margin-bottom:15px;">📜 Lịch Sử Đơn Hàng</h3><div id="order-history-list">Đang tải lịch sử...</div><button onclick="document.getElementById('profile-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">Đóng</button></div>`;
+        document.getElementById('profile-container').innerHTML = `${closeBtn}${az}<h2 style="margin-top:0;">Tài Khoản Của Bạn</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="Số điện thoại nhận hàng"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ giao hàng">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button><div style="margin-top:25px; border-top:1px dashed #ccc; padding-top:15px;">${loiNhan}<h3 style="color:var(--main-color); margin-bottom:15px;">📜 Lịch Sử Đơn Hàng</h3><div id="order-history-list">Đang tải danh sách...</div></div>`;
         document.getElementById('profile-modal').style.display='block';
 
         try {
+            const uSnap = await getDoc(doc(db, "Users", currentUser.email));
+            const hiddenOrders = (uSnap.exists() && uSnap.data().hidden_orders) ? uSnap.data().hidden_orders : [];
+
             const q = query(collection(db, "Orders"), where("khach_hang", "==", currentUser.email));
             const snap = await getDocs(q);
             let orders = [];
-            snap.forEach(d => orders.push({id: d.id, ...d.data()}));
+            snap.forEach(d => {
+                if(!hiddenOrders.includes(d.id)) {
+                    orders.push({id: d.id, ...d.data()});
+                }
+            });
             
             orders.sort((a,b) => (b.thoi_gian?.toMillis() || 0) - (a.thoi_gian?.toMillis() || 0));
 
             let hHTML = "";
             if(orders.length === 0) {
-                hHTML = "<p style='color:#888; font-style:italic;'>Thí chủ chưa đặt đơn nào ráo.</p>";
+                hHTML = "<p style='color:#888; font-style:italic;'>Quý khách chưa có đơn hàng nào hoặc đã xóa toàn bộ lịch sử.</p>";
             } else {
                 orders.forEach(o => {
                     const time = o.thoi_gian ? o.thoi_gian.toDate().toLocaleString('vi-VN') : "Vừa xong";
@@ -243,40 +260,59 @@
                             <span style="color:#d35400; font-weight:bold;">${(o.tong_tien||0).toLocaleString()}đ</span>
                         </div>
                         <div style="color:#666; font-size:0.9em; margin-bottom:5px;">${mon}</div>
-                        <div>Trạng thái: <b>${o.trang_thai}</b></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span>Trạng thái: <b style="text-transform:uppercase;">${o.trang_thai}</b></span>
+                            <button onclick="window.xoaLichSuDon('${o.id}')" style="background:#e74c3c; color:white; border:none; padding:5px 12px; border-radius:5px; cursor:pointer; font-weight:bold; font-size:0.85em;">Xóa</button>
+                        </div>
                     </div>`;
                 });
             }
             document.getElementById('order-history-list').innerHTML = hHTML;
         } catch(e) {
-            document.getElementById('order-history-list').innerHTML = "<p style='color:red;'>Lỗi tải đơn hàng: " + e.message + "</p>";
+            document.getElementById('order-history-list').innerHTML = "<p style='color:red;'>Lỗi tải đơn hàng. Vui lòng kiểm tra quyền truy cập (Rules) trong Firebase: " + e.message + "</p>";
         }
     };
 
-    window.saveP = async () => { await setDoc(doc(db, "Users", currentUser.email), { phone: document.getElementById('pPh').value, address: document.getElementById('pAd').value }, { merge: true }); Swal.fire("Đã lưu!"); };
+    window.xoaLichSuDon = async (orderId) => {
+        if(confirm("Bạn có chắc chắn muốn xóa đơn hàng này khỏi lịch sử của mình không?")) {
+            try {
+                await setDoc(doc(db, "Users", currentUser.email), { 
+                    hidden_orders: arrayUnion(orderId) 
+                }, { merge: true });
+                window.moTaiKhoan(); 
+            } catch(e) {
+                alert("Lỗi khi xóa lịch sử: " + e.message);
+            }
+        }
+    };
+
+    window.saveP = async () => { await setDoc(doc(db, "Users", currentUser.email), { phone: document.getElementById('pPh').value, address: document.getElementById('pAd').value }, { merge: true }); Swal.fire("Đã lưu thông tin cá nhân!"); };
     window.addToCart = (n, p) => { if(cart[n]) cart[n].sl++; else cart[n] = { gia: p, sl: 1 }; updateUI(); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã thêm ' + n, showConfirmButton:false, timer:1000}); };
     function updateUI() { let c = 0, t = 0; for(let k in cart) { c += cart[k].sl; t += (cart[k].sl * cart[k].gia); } document.getElementById('cC').innerText = c; document.getElementById('cT').innerText = t.toLocaleString() + 'đ'; }
     window.qty = (k, v) => { cart[k].sl += v; if(cart[k].sl<=0) delete cart[k]; if(Object.keys(cart).length === 0) document.getElementById('cart-modal').style.display='none'; else window.moGioHang(); updateUI(); };
     
     window.moGioHang = () => {
-        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng trống!");
-        let h = '<h2>🛒 Giỏ Hàng</h2>', t = 0;
+        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng của bạn đang trống!");
+        const closeBtn = `<span class="close-btn" onclick="document.getElementById('cart-modal').style.display='none'">&times;</span>`;
+        let h = `${closeBtn}<h2 style="margin-top:0;">🛒 Giỏ Hàng</h2>`;
+        let t = 0;
         for(let k in cart) { t += cart[k].sl * cart[k].gia; h += `<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;"><span>${k}</span><div><button onclick="window.qty('${k}',-1)" style="width:30px; height:30px; border-radius:50%; border:none; cursor:pointer;">-</button> <b>${cart[k].sl}</b> <button onclick="window.qty('${k}',1)" style="width:30px; height:30px; border-radius:50%; border:none; cursor:pointer;">+</button></div></div>`; }
-        h += `<h3 style="text-align:right;">Tổng: ${t.toLocaleString()}đ</h3><button class="btn-login" style="background:#e67e22" onclick="window.checkOut()">ĐẶT ĐƠN</button>`;
+        h += `<h3 style="text-align:right;">Tổng thanh toán: ${t.toLocaleString()}đ</h3><button class="btn-login" style="background:#e67e22" onclick="window.checkOut()">ĐẶT ĐƠN NGAY</button>`;
         document.getElementById('cart-container').innerHTML = h; document.getElementById('cart-modal').style.display='block';
     };
 
     window.checkOut = () => { 
         if(!currentUser) return window.moLogin(); 
         document.getElementById('cart-modal').style.display='none'; 
-        document.getElementById('checkout-container').innerHTML = `<h2>Giao Hàng</h2><input id="sPh" class="modal-input" placeholder="SĐT (*)" value="${userProfile.phone||''}"><textarea id="sAd" class="modal-input" rows="2" placeholder="Địa chỉ (*)">${userProfile.address||''}</textarea><button id="btn-sub" class="btn-login" style="background:#e67e22" onclick="window.confirmOrder()">XÁC NHẬN ĐƠN</button>`; 
+        const closeBtn = `<span class="close-btn" onclick="document.getElementById('checkout-modal').style.display='none'">&times;</span>`;
+        document.getElementById('checkout-container').innerHTML = `${closeBtn}<h2 style="margin-top:0;">Thông Tin Giao Hàng</h2><input id="sPh" class="modal-input" placeholder="SĐT người nhận (*)" value="${userProfile.phone||''}"><textarea id="sAd" class="modal-input" rows="2" placeholder="Địa chỉ giao hàng (*)">${userProfile.address||''}</textarea><button id="btn-sub" class="btn-login" style="background:#e67e22" onclick="window.confirmOrder()">XÁC NHẬN ĐƠN HÀNG</button>`; 
         document.getElementById('checkout-modal').style.display='block'; 
     };
 
     window.confirmOrder = async () => {
         const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value; 
-        if(!ph || !ad) return Swal.fire("Thiếu tin", "Vui lòng nhập SĐT và Địa chỉ", "warning");
-        const btn = document.getElementById('btn-sub'); btn.disabled = true; btn.innerText = "Đang gửi đơn...";
+        if(!ph || !ad) return Swal.fire("Thiếu thông tin", "Vui lòng nhập SĐT và Địa chỉ để chúng tôi giao hàng.", "warning");
+        const btn = document.getElementById('btn-sub'); btn.disabled = true; btn.innerText = "Đang xử lý...";
         
         try {
             const iSnap = await getDoc(doc(db, "Settings", "info")); 
@@ -288,8 +324,8 @@
             let sub = 0, von = 0;
             for(let k in cart) { 
                 if(cart[k].sl > mD[k].ton) {
-                    btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN";
-                    return Swal.fire("Hết món", `Xin lỗi, món ${k} không đủ kho`, "error"); 
+                    btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN HÀNG";
+                    return Swal.fire("Sản phẩm tạm hết", `Xin lỗi, món ${k} không đủ số lượng trong kho.`, "error"); 
                 } 
                 sub += cart[k].sl*cart[k].gia; von += cart[k].sl*mD[k].von; 
             }
@@ -297,23 +333,27 @@
             const tax = Math.round(sub * ((dI.vat_rate||0)/100));
             const tongCong = sub + tax;
             
-            // CHỈ LƯU ĐƠN VÀO FIREBASE - ĐÃ GỠ RÁO TRỌI EMAILJS BÊN PHÍA KHÁCH
             await addDoc(collection(db, "Orders"), { 
                 khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, 
                 gia_tam_tinh: sub, tien_thue: tax, phan_tram_thue: dI.vat_rate||0, 
                 tong_tien: tongCong, tong_von: von, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" 
             });
             
-            Swal.fire("Thành công!", "Đã lên đơn ráo trọi! Thí chủ hoan hỷ theo dõi tình trạng trong phần Tài Khoản nghen.", "success"); 
+            Swal.fire("Đặt hàng thành công!", "Quý khách vui lòng theo dõi tình trạng đơn hàng trong phần Tài Khoản.", "success"); 
             cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
+            window.moTaiKhoan();
         } catch (e) { 
-            alert(e.message); 
-            btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN"; 
+            alert("Đã xảy ra lỗi: " + e.message); 
+            btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN HÀNG"; 
         }
     };
 
-    window.moLogin = () => { document.getElementById('auth-form-container').innerHTML = `<h2>Đăng Nhập</h2><input id="lE" class="modal-input" placeholder="Email"><input id="lP" type="password" class="modal-input" placeholder="Mật khẩu"><button class="btn-login" onclick="window.doLogin()">Vào Cửa Hàng</button>`; document.getElementById('auth-modal').style.display='block'; };
-    window.doLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } catch (e) { alert("Sai thông tin đăng nhập!"); } };
+    window.moLogin = () => { 
+        const closeBtn = `<span class="close-btn" onclick="document.getElementById('auth-modal').style.display='none'">&times;</span>`;
+        document.getElementById('auth-form-container').innerHTML = `${closeBtn}<h2 style="margin-top:0;">Đăng Nhập</h2><input id="lE" class="modal-input" placeholder="Email của bạn"><input id="lP" type="password" class="modal-input" placeholder="Mật khẩu"><button class="btn-login" onclick="window.doLogin()">Đăng Nhập</button>`; 
+        document.getElementById('auth-modal').style.display='block'; 
+    };
+    window.doLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } catch (e) { alert("Thông tin đăng nhập không chính xác!"); } };
     window.logout = () => signOut(auth);
     init();
 </script>
