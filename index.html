@@ -30,7 +30,7 @@
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
         .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
-        .message-box::before { content: "✍️ Thông điệp từ Bếp:"; display: block; font-weight: bold; margin-bottom: 5px; font-style: normal; color: #1b5e20; }
+        .message-box::before { content: "Thông điệp từ cửa hàng:"; display: block; font-weight: bold; margin-bottom: 5px; font-style: normal; color: #1b5e20; }
         
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .social-btn { padding: 8px 15px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.9em; display: inline-flex; align-items: center; }
@@ -72,7 +72,7 @@
 </head>
 <body>
 
-<div class="auth-bar" id="auth-status">Đang kiểm tra duyên lành...</div>
+<div class="auth-bar" id="auth-status">Đang tải dữ liệu...</div>
 
 <div class="header">
     <a href="https://veggiesaigon.com" class="lang-switch">🇬🇧 English</a>
@@ -103,67 +103,49 @@
         </div>
     </div>
 
-    <div class="core-about-card">
-        Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. 🌿<br><br>
-        <b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
-        Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
-        <ul>
-            <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
-            <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ (tăm).</li>
-            <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
-        </ul>
-        <b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
-        Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
-        <b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
-        Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
-        <ul>
-            <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
-            <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
-            <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
-        </ul>
-        <b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
-        Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật. 🙏
+    <div class="core-about-card" id="core-about-card">
+        Đang tải thông tin giới thiệu...
     </div>
 
     <div id="youtube-container" style="display: none;"></div>
 
     <div class="section-title">🍜 Thực Đơn</div>
     <div id="menu-list" class="menu-list">
-        <p style="text-align:center; color:#888; grid-column: 1 / -1;">Đang tải thực đơn, con đợi xíu nghen...</p>
+        <p style="text-align:center; color:#888; grid-column: 1 / -1;">Đang tải thực đơn, vui lòng đợi...</p>
     </div>
 </div>
 
 <div class="cart-bar">
     <div class="cart-info">🛒 <b><span id="cart-count">0</span> món</b> <br><span class="cart-total" id="cart-total">0đ</span></div>
-    <button class="btn-view-cart" onclick="window.moBangGiaoHang()">Đặt Đơn 🙏</button>
+    <button class="btn-view-cart" onclick="window.moBangGiaoHang()">Đặt Hàng</button>
 </div>
 
 <div id="login-modal" class="modal">
     <div class="modal-content">
-        <h2 style="margin-top:0; color:#2e7d32; text-align:center;">🙏 Đăng Nhập</h2>
-        <input type="email" id="email" class="modal-input" placeholder="Nhập Email của con">
+        <h2 style="margin-top:0; color:#2e7d32; text-align:center;">Đăng Nhập</h2>
+        <input type="email" id="email" class="modal-input" placeholder="Nhập Email của bạn">
         <input type="password" id="pass" class="modal-input" placeholder="Mật khẩu (ít nhất 6 ký tự)">
-        <button class="btn-login" onclick="window.xuLyAuth()">Vào Bếp</button>
-        <p style="font-size:0.75em; color:#888; text-align:center; margin-top:10px;">Nếu chưa có tài khoản, hệ thống sẽ tự tạo mới cho con nghen.</p>
-        <button onclick="document.getElementById('login-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Để sau nghen</button>
+        <button class="btn-login" onclick="window.xuLyAuth()">Đăng Nhập</button>
+        <p style="font-size:0.75em; color:#888; text-align:center; margin-top:10px;">Nếu chưa có tài khoản, hệ thống sẽ tự động tạo mới cho bạn.</p>
+        <button onclick="document.getElementById('login-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Để sau</button>
     </div>
 </div>
 
 <div id="checkout-modal" class="modal">
     <div class="modal-content">
-        <h2 style="margin-top:0; color:#e67e22; text-align:center;">🛵 Thông Tin Nhận Hàng</h2>
-        <input type="text" id="ship-phone" class="modal-input" placeholder="Số điện thoại của con (*)" required>
+        <h2 style="margin-top:0; color:#e67e22; text-align:center;">Thông Tin Nhận Hàng</h2>
+        <input type="text" id="ship-phone" class="modal-input" placeholder="Số điện thoại của bạn (*)" required>
         
         <div style="display: flex; gap: 10px;">
-            <input type="text" id="ship-zalo" class="modal-input" placeholder="Số Zalo (tùy duyên)">
-            <input type="text" id="ship-whatsapp" class="modal-input" placeholder="Số WhatsApp (tùy duyên)">
+            <input type="text" id="ship-zalo" class="modal-input" placeholder="Số Zalo (không bắt buộc)">
+            <input type="text" id="ship-whatsapp" class="modal-input" placeholder="Số WhatsApp (không bắt buộc)">
         </div>
 
         <textarea id="ship-address" class="modal-input" rows="2" placeholder="Địa chỉ giao hàng (*)" required></textarea>
-        <textarea id="ship-note" class="modal-input" rows="2" placeholder="Lời nhắn cho bếp (ít cay, xin thêm ớt...)"></textarea>
+        <textarea id="ship-note" class="modal-input" rows="2" placeholder="Lời nhắn cho cửa hàng (Ví dụ: ít cay...)"></textarea>
         
-        <button id="btn-submit-order" class="btn-login" style="background:#e67e22;" onclick="window.xacNhanDatHang()">🚀 Chốt Đơn & Gửi Bếp</button>
-        <button onclick="document.getElementById('checkout-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại chọn thêm</button>
+        <button id="btn-submit-order" class="btn-login" style="background:#e67e22;" onclick="window.xacNhanDatHang()">Xác Nhận Đặt Hàng</button>
+        <button onclick="document.getElementById('checkout-modal').style.display='none'" style="width:100%; background:none; border:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại</button>
     </div>
 </div>
 
@@ -181,6 +163,26 @@
     let cart = {};
     let thongTinQuan = {}; 
 
+    const defaultBaiGioiThieu = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. <br><br>
+<b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>
+Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:
+<ul>
+    <li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li>
+    <li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ.</li>
+    <li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li>
+</ul>
+<b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>
+Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br>
+<b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>
+Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:
+<ul>
+    <li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li>
+    <li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li>
+    <li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li>
+</ul>
+<b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>
+Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật.`;
+
     async function loadThongTinQuan() {
         const snap = await getDoc(doc(db, "Settings", "info"));
         if (snap.exists()) {
@@ -188,6 +190,8 @@
             thongTinQuan.whatsapp = data.admin_whatsapp || "";
             thongTinQuan.zalo = data.admin_zalo || "";
             thongTinQuan.email = data.admin_email || "";
+
+            document.getElementById('core-about-card').innerHTML = data.bai_gioi_thieu_chinh || defaultBaiGioiThieu;
 
             if(data.loi_gioi_thieu && data.loi_gioi_thieu.trim() !== "") {
                 const msgBox = document.getElementById('dynamic-message');
@@ -214,6 +218,8 @@
             if(data.link_tiktok) socialsHTML += `<a href="${data.link_tiktok}" target="_blank" class="social-btn bg-tiktok">🎵 TikTok</a>`;
             if(data.link_yt_channel) socialsHTML += `<a href="${data.link_yt_channel}" target="_blank" class="social-btn bg-yt">▶️ YouTube</a>`;
             document.getElementById('social-links').innerHTML = socialsHTML;
+        } else {
+            document.getElementById('core-about-card').innerHTML = defaultBaiGioiThieu;
         }
     }
 
@@ -221,7 +227,7 @@
         const bar = document.getElementById('auth-status');
         if (user) {
             current_user = user;
-            bar.innerHTML = `Chào con, <b>${user.email}</b> | <span onclick="window.logout()" style="text-decoration:underline; cursor:pointer;">Thoát</span>`;
+            bar.innerHTML = `Xin chào, <b>${user.email}</b> | <span onclick="window.logout()" style="text-decoration:underline; cursor:pointer;">Đăng xuất</span>`;
         } else {
             current_user = null;
             bar.innerHTML = `<span onclick="document.getElementById('login-modal').style.display='block'" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập để đặt hàng</span>`;
@@ -231,7 +237,7 @@
     window.xuLyAuth = async () => {
         const email = document.getElementById('email').value;
         const pass = document.getElementById('pass').value;
-        if(!email || !pass) return alert("Con bận điền đủ thông tin nghen!");
+        if(!email || !pass) return alert("Vui lòng điền đầy đủ thông tin đăng nhập!");
         try {
             await signInWithEmailAndPassword(auth, email, pass);
             document.getElementById('login-modal').style.display='none';
@@ -248,7 +254,7 @@
         const snap = await getDocs(collection(db, "Menus"));
         const list = document.getElementById('menu-list');
         list.innerHTML = "";
-        if(snap.empty) { list.innerHTML = "<p style='text-align:center; grid-column: 1 / -1;'>Bếp chưa dọn món ráo trọi!</p>"; return; }
+        if(snap.empty) { list.innerHTML = "<p style='text-align:center; grid-column: 1 / -1;'>Thực đơn hiện tại đang trống.</p>"; return; }
         
         snap.forEach(doc => {
             const m = doc.data();
@@ -277,8 +283,8 @@
     }
 
     window.moBangGiaoHang = () => {
-        if(!current_user) { Swal.fire("Con bận đăng nhập nghen!"); document.getElementById('login-modal').style.display='block'; return; }
-        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng đang trống ráo trọi!");
+        if(!current_user) { Swal.fire("Vui lòng đăng nhập để tiếp tục!"); document.getElementById('login-modal').style.display='block'; return; }
+        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng của bạn đang trống.");
         
         document.getElementById('checkout-modal').style.display = 'block';
     };
@@ -291,14 +297,14 @@
         const note = document.getElementById('ship-note').value;
         const btnSubmit = document.getElementById('btn-submit-order');
 
-        if(!phone || !address) return alert("Con điền đủ số điện thoại và địa chỉ đặng quán biết đường giao nghen!");
+        if(!phone || !address) return alert("Vui lòng nhập đầy đủ số điện thoại và địa chỉ giao hàng!");
 
         try {
-            btnSubmit.innerText = "⌛ Đang chốt đơn ráo trọi...";
+            btnSubmit.innerText = "Đang xử lý đơn hàng...";
             btnSubmit.disabled = true;
 
             let total = 0;
-            let tinNhanOrder = `🙏 Dạ chào Phở Bụt, con đặt món giao tới nghen:\n\n`;
+            let tinNhanOrder = `Chào Phở Bụt, tôi muốn đặt hàng:\n\n`;
 
             for(let key in cart) { 
                 let thanhTien = cart[key].sl * cart[key].gia;
@@ -306,7 +312,6 @@
                 tinNhanOrder += `- ${cart[key].sl} x ${key} (${thanhTien.toLocaleString()}đ)\n`;
             }
 
-            // 1. Lưu đơn vô kho Firebase
             await addDoc(collection(db, "Orders"), { 
                 khach_hang: current_user.email,
                 dien_thoai: phone,
@@ -320,36 +325,31 @@
                 trang_thai: "Đang chờ" 
             });
 
-            // Gom góp nội dung thư
-            let thongTinGiao = `\n💰 Tổng cộng: ${total.toLocaleString()}đ\n`;
-            thongTinGiao += `📍 Giao tới: ${address}\n`;
-            thongTinGiao += `📞 SĐT: ${phone}\n`;
-            if(note) thongTinGiao += `📝 Lời dặn: ${note}\n`;
+            let thongTinGiao = `\nTổng cộng: ${total.toLocaleString()}đ\n`;
+            thongTinGiao += `Giao tới: ${address}\n`;
+            thongTinGiao += `Số điện thoại: ${phone}\n`;
+            if(note) thongTinGiao += `Ghi chú: ${note}\n`;
 
-            let thuChoQuan = `Có đơn hàng mới ráo trọi nghen Bếp ơi!\n\n${tinNhanOrder}${thongTinGiao}`;
-            let thuChoKhach = `Mô Phật, Phở Bụt cảm ơn duyên lành của con nghen. Bếp đã nhận đơn hàng và đang chuẩn bị ráo trọi rồi.\n\nChi tiết đơn hàng của con:\n\n${tinNhanOrder}${thongTinGiao}`;
+            let thuChoQuan = `Có đơn hàng mới!\n\n${tinNhanOrder}${thongTinGiao}`;
+            let thuChoKhach = `Cảm ơn bạn đã đặt hàng tại Phở Bụt. Chúng tôi đã nhận được đơn hàng và đang tiến hành chuẩn bị.\n\nChi tiết đơn hàng của bạn:\n\n${tinNhanOrder}${thongTinGiao}`;
 
-            // 2. Tự động gửi Email qua trạm bưu điện EmailJS
             const emailjsServiceID = "service_j8kubcd";
             const emailjsTemplateID = "template_3ee7url";
 
-            // Gửi cho Quán (nếu Admin có nhập email vô kho)
             if(thongTinQuan.email) {
                 emailjs.send(emailjsServiceID, emailjsTemplateID, {
                     to_email: thongTinQuan.email,
-                    subject: `[ĐƠN MỚI] Khách: ${phone} - ${current_user.email}`,
+                    subject: `[ĐƠN MỚI] Khách hàng: ${phone} - ${current_user.email}`,
                     message: thuChoQuan
                 });
             }
 
-            // Gửi biên lai cho Khách
             emailjs.send(emailjsServiceID, emailjsTemplateID, {
                 to_email: current_user.email,
-                subject: `Phở Bụt đã nhận đơn hàng của bạn 🙏`,
+                subject: `Phở Bụt đã nhận được đơn hàng của bạn`,
                 message: thuChoKhach
             });
 
-            // 3. Mở WhatsApp hoặc Zalo đặng nhắn thẳng cho quán
             let tinNhanWhatsappZalo = tinNhanOrder + thongTinGiao;
             if (thongTinQuan.whatsapp) {
                 window.open(`https://wa.me/${thongTinQuan.whatsapp}?text=${encodeURIComponent(tinNhanWhatsappZalo)}`, '_blank');
@@ -357,14 +357,14 @@
                 window.open(`https://zalo.me/${thongTinQuan.zalo}`, '_blank');
             }
             
-            Swal.fire("🙏 Đã chốt đơn!", "Đơn hàng đã được ghi nhận và gửi email. Bếp đang chuẩn bị nghen con.", "success");
+            Swal.fire("Đã đặt hàng thành công!", "Đơn hàng của bạn đã được ghi nhận. Chúng tôi sẽ chuẩn bị ngay.", "success");
             cart = {}; updateCartUI();
             document.getElementById('checkout-modal').style.display = 'none';
 
         } catch (e) { 
-            alert("Lỗi gửi đơn: " + e.message); 
+            alert("Lỗi khi gửi đơn hàng: " + e.message); 
         } finally {
-            btnSubmit.innerText = "🚀 Chốt Đơn & Gửi Bếp";
+            btnSubmit.innerText = "Xác Nhận Đặt Hàng";
             btnSubmit.disabled = false;
         }
     };
