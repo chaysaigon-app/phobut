@@ -20,14 +20,17 @@
         .dynamic-section { background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 20px; }
         @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 40px; } }
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
-        
-        /* CSS cho mấy cái nút mạng xã hội */
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
         .social-btn { padding: 8px 15px; border-radius: 25px; color: white; text-decoration: none; font-weight: bold; font-size: 0.9em; display: inline-flex; align-items: center; }
         .bg-fb { background: #1877F2; } .bg-zalo { background: #0068ff; } .bg-wa { background: #25D366; }
-        
         .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; }
         .core-about-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: justify; margin-bottom: 20px; }
+        
+        /* CSS cho khung Video YouTube */
+        #youtube-container { max-width: 800px; margin: 20px auto; display: none; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
         .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; }
         .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
@@ -48,7 +51,7 @@
 <div class="header">
     <div id="google_translate_element" style="position:absolute; top:15px; right:15px;"></div>
     <img id="brand-logo" class="logo-img">
-    <h1 id="brand-h1">Hệ Thống</h1>
+    <h1 id="brand-h1">Loading...</h1>
     <p id="brand-slogan">Ẩm Thực Tỉnh Thức</p>
 </div>
 
@@ -58,9 +61,7 @@
         <div class="about-media"><img id="about-img" src=""></div>
         <div class="about-content">
             <div class="message-box" id="dynamic-message" style="display: none;"></div>
-            
             <div class="social-links" id="social-links"></div>
-            
             <div style="background:#f9fbf9; padding:15px; border-radius:10px; border:1px dashed #2e7d32;">
                 <p>📍 <b>Địa chỉ:</b> <span id="display-address">...</span></p>
                 <p>📞 <b>Hotline:</b> <span id="display-phone">...</span></p>
@@ -68,8 +69,13 @@
             </div>
         </div>
     </div>
+    
     <div class="core-about-card" id="core-about-card"></div>
-    <div id="youtube-container" style="display: none;"></div>
+
+    <div id="youtube-container">
+        <div class="video-wrapper" id="yt-player"></div>
+    </div>
+
     <div class="section-title">🍜 Thực Đơn</div>
     <div id="menu-list" class="menu-list">Đang tải món ăn...</div>
     <div style="text-align:center; padding: 40px 20px 20px; color:#ccc; font-size:0.8em;">
@@ -100,8 +106,6 @@
     const ADMIN_EMAIL = "chaysaigon@gmail.com";
     let currentUser = null, userProfile = {}, cart = {};
 
-    const defaultIntro = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo.`;
-
     async function init() {
         try {
             const snap = await getDoc(doc(db, "Settings", "info"));
@@ -110,21 +114,39 @@
                 document.getElementById('brand-h1').innerText = d.brand_name || "Cửa Hàng";
                 document.getElementById('brand-slogan').innerText = d.brand_slogan || "Ẩm Thực Tỉnh Thức";
                 document.getElementById('footer-brand').innerText = d.brand_name || "Cửa Hàng";
-                if(d.brand_logo) { document.getElementById('brand-logo').src = d.brand_logo; document.getElementById('brand-logo').style.display='block'; }
+                if(d.brand_logo) { 
+                    document.getElementById('brand-logo').src = d.brand_logo; 
+                    document.getElementById('brand-logo').style.display='block'; 
+                }
                 document.getElementById('display-address').innerText = d.store_address || "";
                 document.getElementById('display-phone').innerText = d.store_phone || "";
-                document.getElementById('core-about-card').innerHTML = d.bai_gioi_thieu_chinh || defaultIntro;
+                document.getElementById('core-about-card').innerHTML = d.bai_gioi_thieu_chinh || "";
                 if(d.hinh_dai_dien) document.getElementById('about-img').src = d.hinh_dai_dien;
                 if(d.link_map) { document.getElementById('btn-map').href = d.link_map; document.getElementById('btn-map').style.display='inline-block'; }
-                if(d.loi_gioi_thieu) { document.getElementById('dynamic-message').innerHTML = d.loi_gioi_thieu.replace(/\n/g, '<br>'); document.getElementById('dynamic-message').style.display='block'; }
+                if(d.loi_gioi_thieu) { 
+                    const mBox = document.getElementById('dynamic-message');
+                    mBox.innerHTML = d.loi_gioi_thieu.replace(/\n/g, '<br>'); 
+                    mBox.style.display='block'; 
+                }
+
+                // XỬ LÝ HIỆN VIDEO YOUTUBE (CÓ HỖ TRỢ SHORTS)
+                if(d.link_youtube) {
+                    let ytUrl = d.link_youtube.trim();
+                    let videoId = "";
+                    if(ytUrl.includes("shorts/")) videoId = ytUrl.split("shorts/")[1].split("?")[0];
+                    else if(ytUrl.includes("v=")) videoId = ytUrl.split("v=")[1].substring(0, 11);
+                    else if(ytUrl.includes("youtu.be/")) videoId = ytUrl.split("youtu.be/")[1].substring(0, 11);
+
+                    if(videoId) {
+                        document.getElementById('youtube-container').style.display = 'block';
+                        document.getElementById('yt-player').innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>`;
+                    }
+                }
                 
-                // --- ĐÃ KHÔI PHỤC NÚT MẠNG XÃ HỘI ---
                 let sHTML = '';
                 if(d.link_fb) sHTML += `<a href="${d.link_fb}" target="_blank" class="social-btn bg-fb">Facebook</a>`;
-                if(d.admin_zalo || d.store_phone) {
-                    let p = d.admin_zalo || d.store_phone;
-                    sHTML += `<a href="https://zalo.me/${p}" target="_blank" class="social-btn bg-zalo">Zalo</a>`;
-                }
+                let p = d.admin_zalo || d.store_phone;
+                if(p) sHTML += `<a href="https://zalo.me/${p}" target="_blank" class="social-btn bg-zalo">Zalo</a>`;
                 if(d.admin_whatsapp) sHTML += `<a href="https://wa.me/${d.admin_whatsapp}" target="_blank" class="social-btn bg-wa">WhatsApp</a>`;
                 document.getElementById('social-links').innerHTML = sHTML;
             }
@@ -154,7 +176,6 @@
         const isStaff = staffSnap.exists() && staffSnap.data().emails?.includes(currentUser.email);
         const isAdmin = currentUser.email === ADMIN_EMAIL;
         let adminZone = (isAdmin || isStaff) ? `<div class="admin-zone"><h3>🛠️ Quản lý</h3><a href="orders.html" class="btn-admin" style="background:#3498db">📦 Đơn Hàng & Kho</a>${isAdmin ? '<a href="admin.html" class="btn-admin" style="background:#2e7d32">⚙️ Cài Đặt Hệ Thống</a>' : ''}</div>` : "";
-
         document.getElementById('profile-container').innerHTML = `${adminZone}<h2>Tài Khoản</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button><button onclick="document.getElementById('profile-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Đóng</button>`;
         document.getElementById('profile-modal').style.display='block';
     };
@@ -162,7 +183,7 @@
     window.saveP = async () => { await setDoc(doc(db, "Users", currentUser.email), { phone: document.getElementById('pPh').value, address: document.getElementById('pAd').value }, { merge: true }); document.getElementById('profile-modal').style.display='none'; Swal.fire("Đã lưu!"); };
     window.addToCart = (n, p) => { if(cart[n]) cart[n].sl++; else cart[n] = { gia: p, sl: 1 }; updateUI(); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã thêm ' + n, showConfirmButton:false, timer:1000}); };
     function updateUI() { let c = 0, t = 0; for(let k in cart) { c += cart[k].sl; t += (cart[k].sl * cart[k].gia); } document.getElementById('cart-count').innerText = c; document.getElementById('cart-total').innerText = t.toLocaleString() + 'đ'; }
-    
+    window.qty = (k, v) => { cart[k].sl += v; if(cart[k].sl<=0) delete cart[k]; if(Object.keys(cart).length === 0) document.getElementById('cart-modal').style.display='none'; else window.moGioHang(); updateUI(); };
     window.moGioHang = () => {
         if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng trống!");
         let h = '<h2>Giỏ Hàng</h2>', t = 0;
@@ -170,14 +191,10 @@
         h += `<h3 style="text-align:right; color:#d35400;">Tổng: ${t.toLocaleString()}đ</h3><button class="btn-login" style="background:#e67e22" onclick="window.checkOut()">Tiếp Tục Đặt Hàng</button><button onclick="document.getElementById('cart-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Mua thêm</button>`;
         document.getElementById('cart-container').innerHTML = h; document.getElementById('cart-modal').style.display='block';
     };
-
-    window.qty = (k, v) => { cart[k].sl += v; if(cart[k].sl<=0) delete cart[k]; if(Object.keys(cart).length === 0) document.getElementById('cart-modal').style.display='none'; else window.moGioHang(); updateUI(); };
     window.checkOut = () => { if(!currentUser) return window.moLogin(); document.getElementById('cart-modal').style.display='none'; document.getElementById('checkout-container').innerHTML = `<h2>Giao Hàng</h2><input id="sPh" class="modal-input" placeholder="SĐT (*)" value="${userProfile.phone||''}"><textarea id="sAd" class="modal-input" rows="2" placeholder="Địa chỉ (*)">${userProfile.address||''}</textarea><button id="btn-sub" class="btn-login" style="background:#e67e22" onclick="window.confirmOrder()">Đặt Đơn Ngay</button><button onclick="document.getElementById('checkout-modal').style.display='none'; window.moGioHang();" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại</button>`; document.getElementById('checkout-modal').style.display='block'; };
-
     window.confirmOrder = async () => {
-        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value;
-        if(!ph || !ad) return Swal.fire("Thiếu tin", "Nhập đủ SĐT và Địa chỉ", "warning");
-        const btn = document.getElementById('btn-sub'); btn.disabled = true; btn.innerText = "Đang xử lý...";
+        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value; if(!ph || !ad) return Swal.fire("Thiếu tin", "Nhập đủ SĐT và Địa chỉ", "warning");
+        const btn = document.getElementById('btn-sub'); btn.disabled = true;
         try {
             const infoSnap = await getDoc(doc(db, "Settings", "info"));
             const vatRate = infoSnap.exists() ? (infoSnap.data().vat_rate || 0) : 0;
@@ -185,13 +202,12 @@
             snapMenu.forEach(d => { menuData[d.data().ten_tieng_viet] = { ton: d.data().ton_kho||0, von: d.data().gia_von||0 }; });
             let err = ""; let subTotal = 0, totalV = 0;
             for(let k in cart) { if(cart[k].sl > menuData[k].ton) err += `- ${k} (còn ${menuData[k].ton})\n`; subTotal += cart[k].sl * cart[k].gia; totalV += cart[k].sl * menuData[k].von; }
-            if(err) { btn.disabled = false; return Swal.fire("Không đủ kho", err, "error"); }
+            if(err) { btn.disabled = false; return Swal.fire("Hết món", err, "error"); }
             const vatAmount = Math.round(subTotal * (vatRate / 100));
             await addDoc(collection(db, "Orders"), { khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, gia_tam_tinh: subTotal, tien_thue: vatAmount, phan_tram_thue: vatRate, tong_tien: subTotal + vatAmount, tong_von: totalV, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" });
             Swal.fire("Thành công!", "Đã gửi đơn.", "success"); cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
         } catch (e) { alert(e.message); btn.disabled = false; }
     };
-
     window.moLogin = () => { document.getElementById('auth-form-container').innerHTML = `<h2>Đăng Nhập</h2><input id="lE" class="modal-input" placeholder="Email"><input id="lP" type="password" class="modal-input" placeholder="Mật khẩu"><button class="btn-login" onclick="window.doLogin()">Vào Cửa Hàng</button><button onclick="document.getElementById('auth-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Hủy</button>`; document.getElementById('auth-modal').style.display='block'; };
     window.doLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } catch (e) { alert("Sai thông tin!"); } };
     window.logout = () => signOut(auth);
