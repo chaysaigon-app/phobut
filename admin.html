@@ -8,6 +8,7 @@
         .admin-wrapper { max-width: 900px; margin: auto; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; }
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
+        h3 { color: #e67e22; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em; border-bottom: 1px dashed #ddd; padding-bottom: 5px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
@@ -27,21 +28,37 @@
 <div class="admin-wrapper">
 
     <div class="card">
-        <h2>🏠 Cài Đặt Thông Tin Quán</h2>
+        <h2>🏠 Cài Đặt Thông Tin & Kết Nối</h2>
+        
         <div class="form-group">
-            <label>Lời giới thiệu:</label>
-            <textarea id="loiGioiThieu" rows="5" placeholder="Con viết đôi lời chánh niệm giới thiệu quán vô đây nghen..."></textarea>
+            <label>Lời giới thiệu quán:</label>
+            <textarea id="loiGioiThieu" rows="4" placeholder="Con viết đôi lời chánh niệm giới thiệu quán vô đây nghen..."></textarea>
         </div>
         <div class="form-group">
-            <label>Link YouTube (nếu có):</label>
+            <label>Link Video YouTube (để phát video giới thiệu trên web):</label>
             <input type="text" id="linkYoutube" placeholder="Ví dụ: https://www.youtube.com/watch?v=...">
         </div>
         <div class="form-group">
-            <label>Hình đại diện (Để trống nếu giữ hình cũ):</label>
+            <label>Hình đại diện quán (Để trống nếu giữ hình cũ):</label>
             <input type="file" id="fileAnhDaiDien" accept="image/*">
             <br>
             <img id="previewDaiDien" src="" style="width: 150px; margin-top: 15px; border-radius: 10px; display: none; object-fit: cover;">
         </div>
+
+        <h3>🌐 Các kênh Mạng Xã Hội</h3>
+        <div class="form-group">
+            <label>Link trang Facebook:</label>
+            <input type="text" id="linkFb" placeholder="Ví dụ: https://facebook.com/phobut">
+        </div>
+        <div class="form-group">
+            <label>Link kênh TikTok:</label>
+            <input type="text" id="linkTiktok" placeholder="Ví dụ: https://tiktok.com/@phobut">
+        </div>
+        <div class="form-group">
+            <label>Link kênh YouTube:</label>
+            <input type="text" id="linkYtChannel" placeholder="Ví dụ: https://youtube.com/@phobut">
+        </div>
+
         <button id="btn-luu-thong-tin" class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Thay Đổi Thông Tin</button>
     </div>
 
@@ -110,6 +127,10 @@
             const data = docSnap.data();
             document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
             document.getElementById('linkYoutube').value = data.link_youtube || "";
+            document.getElementById('linkFb').value = data.link_fb || "";
+            document.getElementById('linkTiktok').value = data.link_tiktok || "";
+            document.getElementById('linkYtChannel').value = data.link_yt_channel || "";
+            
             if(data.hinh_dai_dien) {
                 current_avatar_url = data.hinh_dai_dien;
                 const img = document.getElementById('previewDaiDien');
@@ -121,7 +142,10 @@
 
     window.luuThongTin = async () => {
         const loi = document.getElementById('loiGioiThieu').value;
-        const link = document.getElementById('linkYoutube').value;
+        const linkYtVideo = document.getElementById('linkYoutube').value;
+        const linkFb = document.getElementById('linkFb').value;
+        const linkTiktok = document.getElementById('linkTiktok').value;
+        const linkYtChannel = document.getElementById('linkYtChannel').value;
         const file = document.getElementById('fileAnhDaiDien').files[0];
         const btn = document.getElementById('btn-luu-thong-tin');
         
@@ -132,11 +156,14 @@
 
             await setDoc(doc(db, "Settings", "info"), {
                 loi_gioi_thieu: loi,
-                link_youtube: link,
+                link_youtube: linkYtVideo,
+                link_fb: linkFb,
+                link_tiktok: linkTiktok,
+                link_yt_channel: linkYtChannel,
                 hinh_dai_dien: url
             }, { merge: true });
 
-            alert("Đã lưu thông tin quán ráo trọi rồi nghen!");
+            alert("Đã lưu thông tin mạng xã hội ráo trọi rồi nghen!");
             btn.innerText = "💾 Lưu Thay Đổi Thông Tin";
             loadThongTin();
         } catch(e) { 
