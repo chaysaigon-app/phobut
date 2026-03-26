@@ -10,7 +10,7 @@
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        input[type="text"], input[type="number"], textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
         button { padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-primary { background: #2e7d32; color: white; width: 100%; margin-top: 10px; }
         .btn-update { background: #e67e22; color: white; width: 100%; margin-top: 10px; display: none; }
@@ -25,6 +25,26 @@
 <body>
 
 <div class="admin-wrapper">
+
+    <div class="card">
+        <h2>🏠 Cài Đặt Thông Tin Quán</h2>
+        <div class="form-group">
+            <label>Lời giới thiệu:</label>
+            <textarea id="loiGioiThieu" rows="5" placeholder="Con viết đôi lời chánh niệm giới thiệu quán vô đây nghen..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Link YouTube (nếu có):</label>
+            <input type="text" id="linkYoutube" placeholder="Ví dụ: https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="form-group">
+            <label>Hình đại diện (Để trống nếu giữ hình cũ):</label>
+            <input type="file" id="fileAnhDaiDien" accept="image/*">
+            <br>
+            <img id="previewDaiDien" src="" style="width: 150px; margin-top: 15px; border-radius: 10px; display: none; object-fit: cover;">
+        </div>
+        <button id="btn-luu-thong-tin" class="btn-primary" onclick="window.luuThongTin()">💾 Lưu Thay Đổi Thông Tin</button>
+    </div>
+
     <div class="card">
         <h2 id="form-title">➕ Thêm/Sửa Món Ăn</h2>
         <input type="hidden" id="edit-id">
@@ -59,11 +79,12 @@
         <h2>🛒 Đơn Hàng Mới Nhất</h2>
         <div id="order-list">Đang tải đơn hàng...</div>
     </div>
+
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
     const app = initializeApp(firebaseConfig);
@@ -71,6 +92,7 @@
 
     const cloudName = "dym7dwnji", uploadPreset = "qjrpdbhs";
     let current_img_url = "";
+    let current_avatar_url = "";
 
     async function uploadToCloudinary(file) {
         const formData = new FormData();
@@ -81,6 +103,49 @@
         return data.secure_url;
     }
 
+    // --- PHẦN QUẢN LÝ THÔNG TIN QUÁN ---
+    async function loadThongTin() {
+        const docSnap = await getDoc(doc(db, "Settings", "info"));
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
+            document.getElementById('linkYoutube').value = data.link_youtube || "";
+            if(data.hinh_dai_dien) {
+                current_avatar_url = data.hinh_dai_dien;
+                const img = document.getElementById('previewDaiDien');
+                img.src = current_avatar_url;
+                img.style.display = "block";
+            }
+        }
+    }
+
+    window.luuThongTin = async () => {
+        const loi = document.getElementById('loiGioiThieu').value;
+        const link = document.getElementById('linkYoutube').value;
+        const file = document.getElementById('fileAnhDaiDien').files[0];
+        const btn = document.getElementById('btn-luu-thong-tin');
+        
+        try {
+            btn.innerText = "⌛ Đang lưu...";
+            let url = current_avatar_url;
+            if(file) { url = await uploadToCloudinary(file); }
+
+            await setDoc(doc(db, "Settings", "info"), {
+                loi_gioi_thieu: loi,
+                link_youtube: link,
+                hinh_dai_dien: url
+            }, { merge: true });
+
+            alert("Đã lưu thông tin quán ráo trọi rồi nghen!");
+            btn.innerText = "💾 Lưu Thay Đổi Thông Tin";
+            loadThongTin();
+        } catch(e) { 
+            alert("Lỗi: " + e.message); 
+            btn.innerText = "💾 Lưu Thay Đổi Thông Tin"; 
+        }
+    };
+
+    // --- PHẦN QUẢN LÝ MÓN ĂN & ĐƠN HÀNG ---
     window.luuMon = async (isUpdate) => {
         const ten = document.getElementById('tenVi').value;
         const gia = document.getElementById('gia').value;
@@ -151,6 +216,9 @@
     }
 
     window.xoaMon = async (id) => { if(confirm("Xóa thiệt nghen con?")) { await deleteDoc(doc(db, "Menus", id)); location.reload(); } };
+    
+    // Khởi chạy
+    loadThongTin();
     loadData();
 </script>
 </body>
