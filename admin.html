@@ -2,11 +2,18 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản Trị Phở Bụt - Chỉnh Sửa Thực Đơn</title>
+    <title>Quản Trị Phở Bụt - Chánh Điện</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .admin-wrapper { max-width: 900px; margin: auto; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        
+        /* Màn hình khóa cửa ngoài */
+        #admin-login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f0fdf4; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #admin-login-screen h2 { color: #2e7d32; font-size: 2em; margin-bottom: 10px; }
+        .btn-google { background: #e67e22; color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1.1em; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        /* Giao diện bên trong */
+        .admin-wrapper { max-width: 900px; margin: auto; display: none; } /* Giấu đi khi chưa đăng nhập */
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 30px; position: relative; }
         h2 { color: #2e7d32; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; }
         h3 { color: #e67e22; margin-top: 20px; margin-bottom: 10px; font-size: 1.1em; border-bottom: 1px dashed #ddd; padding-bottom: 5px; }
         .form-group { margin-bottom: 15px; }
@@ -17,6 +24,7 @@
         .btn-update { background: #e67e22; color: white; width: 100%; margin-top: 10px; display: none; }
         .btn-edit { background: #fff3e0; color: #e67e22; margin-right: 5px; }
         .btn-del { background: #ffeded; color: #d32f2f; }
+        .btn-logout { position: absolute; top: 20px; right: 25px; background: #d32f2f; color: white; border-radius: 20px; padding: 8px 15px; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
         .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
@@ -26,8 +34,15 @@
 </head>
 <body>
 
+<div id="admin-login-screen">
+    <h2>🙏 Cửa Thiền Quản Trị</h2>
+    <p>Nam mô A Di Đà Phật. Con bận dùng chìa khóa (Gmail) đặng bước vô nghen.</p>
+    <button class="btn-google" onclick="window.dangNhapGoogle()">🔑 Đăng Nhập Bằng Google</button>
+</div>
+
 <div class="admin-wrapper">
     <div class="card">
+        <button class="btn-logout" onclick="window.dangXuatAdmin()">🔒 Thoát</button>
         <h2>🏠 Cài Đặt Thông Tin & Kết Nối</h2>
         
         <h3>📞 Thông Tin Nhận Đơn Hàng (Của Quán)</h3>
@@ -119,15 +134,53 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // CHỈ CÓ EMAIL NÀY MỚI ĐƯỢC VÔ QUẢN TRỊ
+    const EMAIL_CHUYEN_TRACH = "chaysaigon@gmail.com"; 
 
     const cloudName = "dym7dwnji", uploadPreset = "qjrpdbhs";
     let current_img_url = "";
     let current_avatar_url = "";
 
+    // 1. Quản lý Đăng Nhập
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Kiểm tra rặt coi có đúng email quản trị không
+            if (user.email === EMAIL_CHUYEN_TRACH) {
+                document.getElementById('admin-login-screen').style.display = 'none';
+                document.querySelector('.admin-wrapper').style.display = 'block';
+                // Đăng nhập đúng rồi mới tải dữ liệu đặng tránh lỗi
+                loadThongTin();
+                loadData();
+            } else {
+                alert("Mô Phật! Trạm này chỉ dành riêng cho Bếp trưởng nghen con. Tài khoản Gmail này không có chìa khóa vô cửa thiền ráo trọi.");
+                signOut(auth); // Đuổi ra liền
+            }
+        } else {
+            // Chưa đăng nhập thì khóa màn hình lại
+            document.getElementById('admin-login-screen').style.display = 'flex';
+            document.querySelector('.admin-wrapper').style.display = 'none';
+        }
+    });
+
+    window.dangNhapGoogle = async () => {
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            alert("Lỗi đăng nhập: " + error.message);
+        }
+    };
+
+    window.dangXuatAdmin = () => { signOut(auth); };
+
+    // 2. Các chức năng bên trong (giữ nguyên ráo trọi)
     async function uploadToCloudinary(file) {
         const formData = new FormData();
         formData.append("file", file);
@@ -142,12 +195,10 @@
         if (docSnap.exists()) {
             const data = docSnap.data();
             
-            // Thông tin nhận đơn
             document.getElementById('adminEmail').value = data.admin_email || "";
             document.getElementById('adminZalo').value = data.admin_zalo || "";
             document.getElementById('adminWhatsapp').value = data.admin_whatsapp || "";
 
-            // Thông tin hiển thị
             document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
             document.getElementById('linkYoutube').value = data.link_youtube || "";
             document.getElementById('linkMap').value = data.link_map || "";
@@ -291,8 +342,6 @@
 
     window.xoaMon = async (id) => { if(confirm("Xóa thiệt nghen con?")) { await deleteDoc(doc(db, "Menus", id)); location.reload(); } };
     
-    loadThongTin();
-    loadData();
 </script>
 </body>
 </html>
