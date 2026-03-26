@@ -26,7 +26,6 @@
         @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 35px; } }
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
         
-        /* Khung lời nhắn từ nhà hàng */
         .message-box { background: #f0fdf4; border: 2px solid var(--main-color); border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: var(--main-color); }
         
         .social-links { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
@@ -58,11 +57,14 @@
 
         .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--main-color); box-sizing: border-box; z-index: 999; box-shadow: 0 -5px 15px rgba(0,0,0,0.08); }
         
-        /* Modals */
+        /* Modals & Lịch sử đơn */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; }
         .modal-content { background: white; margin: 5vh auto; padding: 25px; width: 90%; max-width: 460px; border-radius: 20px; max-height: 85vh; overflow-y: auto; position: relative; }
         .modal-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
         .btn-login { width: 100%; padding: 12px; background: var(--main-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        
+        .history-item { background: #f9f9f9; padding: 12px; border-radius: 10px; border-left: 4px solid var(--main-color); margin-bottom: 10px; font-size: 0.9em; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .history-item.cancel { border-left-color: #e74c3c; opacity: 0.7; }
     </style>
 </head>
 <body>
@@ -155,7 +157,6 @@
                 if(d.hinh_dai_dien) document.getElementById('about-img').src = d.hinh_dai_dien;
                 document.getElementById('core-about-card').innerHTML = d.bai_gioi_thieu_chinh || "Chào mừng quý khách!";
                 
-                // HIỆN LỜI NHẮN TỪ NHÀ HÀNG (lời ngỏ)
                 if(d.loi_gioi_thieu) { 
                     document.getElementById('dynamic-message').innerHTML = d.loi_gioi_thieu.replace(/\n/g, '<br>'); 
                     document.getElementById('dynamic-message').style.display='block'; 
@@ -209,11 +210,46 @@
         const isS = sSnap.exists() && sSnap.data().emails?.includes(currentUser.email);
         const isA = currentUser.email === ADMIN_EMAIL;
         let az = (isA || isS) ? `<div class="admin-zone" style="background:#e3f2fd; padding:15px; border-radius:8px; margin-bottom:15px; border-left:4px solid #3498db;"><h3>Quản lý</h3><a href="orders.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#3498db">📦 Đơn Hàng & Kho</a>${isA ? '<a href="admin.html" style="display:block; padding:10px; margin-top:8px; border-radius:8px; text-align:center; text-decoration:none; color:white; font-weight:bold; background:#2e7d32">⚙️ Cài Đặt</a>' : ''}</div>` : "";
-        document.getElementById('profile-container').innerHTML = `${az}<h2>Tài Khoản</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button>`;
+        
+        document.getElementById('profile-container').innerHTML = `${az}<h2>Tài Khoản</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button><div style="margin-top:25px; border-top:1px dashed #ccc; padding-top:15px;"><h3 style="color:var(--main-color); margin-bottom:15px;">📜 Lịch Sử Đơn Hàng</h3><div id="order-history-list">Đang tải lịch sử...</div><button onclick="document.getElementById('profile-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:15px; cursor:pointer;">Đóng</button></div>`;
         document.getElementById('profile-modal').style.display='block';
+
+        try {
+            const q = query(collection(db, "Orders"), where("khach_hang", "==", currentUser.email));
+            const snap = await getDocs(q);
+            let orders = [];
+            snap.forEach(d => orders.push({id: d.id, ...d.data()}));
+            
+            orders.sort((a,b) => (b.thoi_gian?.toMillis() || 0) - (a.thoi_gian?.toMillis() || 0));
+
+            let hHTML = "";
+            if(orders.length === 0) {
+                hHTML = "<p style='color:#888; font-style:italic;'>Thí chủ chưa đặt đơn nào ráo.</p>";
+            } else {
+                orders.forEach(o => {
+                    const time = o.thoi_gian ? o.thoi_gian.toDate().toLocaleString('vi-VN') : "Vừa xong";
+                    let cl = "history-item";
+                    if(o.trang_thai === 'Hủy') cl += " cancel";
+                    let mon = ""; for(let k in o.chi_tiet) mon += `${k} (x${o.chi_tiet[k].sl}), `;
+                    
+                    hHTML += `
+                    <div class="${cl}">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <b>${time}</b>
+                            <span style="color:#d35400; font-weight:bold;">${(o.tong_tien||0).toLocaleString()}đ</span>
+                        </div>
+                        <div style="color:#666; font-size:0.9em; margin-bottom:5px;">${mon}</div>
+                        <div>Trạng thái: <b>${o.trang_thai}</b></div>
+                    </div>`;
+                });
+            }
+            document.getElementById('order-history-list').innerHTML = hHTML;
+        } catch(e) {
+            document.getElementById('order-history-list').innerHTML = "<p style='color:red;'>Lỗi tải đơn hàng: " + e.message + "</p>";
+        }
     };
 
-    window.saveP = async () => { await setDoc(doc(db, "Users", currentUser.email), { phone: document.getElementById('pPh').value, address: document.getElementById('pAd').value }, { merge: true }); document.getElementById('profile-modal').style.display='none'; Swal.fire("Đã lưu!"); };
+    window.saveP = async () => { await setDoc(doc(db, "Users", currentUser.email), { phone: document.getElementById('pPh').value, address: document.getElementById('pAd').value }, { merge: true }); Swal.fire("Đã lưu!"); };
     window.addToCart = (n, p) => { if(cart[n]) cart[n].sl++; else cart[n] = { gia: p, sl: 1 }; updateUI(); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã thêm ' + n, showConfirmButton:false, timer:1000}); };
     function updateUI() { let c = 0, t = 0; for(let k in cart) { c += cart[k].sl; t += (cart[k].sl * cart[k].gia); } document.getElementById('cC').innerText = c; document.getElementById('cT').innerText = t.toLocaleString() + 'đ'; }
     window.qty = (k, v) => { cart[k].sl += v; if(cart[k].sl<=0) delete cart[k]; if(Object.keys(cart).length === 0) document.getElementById('cart-modal').style.display='none'; else window.moGioHang(); updateUI(); };
@@ -258,26 +294,25 @@
             const tax = Math.round(sub * ((dI.vat_rate||0)/100));
             const tongCong = sub + tax;
             
-            // LƯU ĐƠN VÀO FIREBASE
             await addDoc(collection(db, "Orders"), { 
                 khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, 
                 gia_tam_tinh: sub, tien_thue: tax, phan_tram_thue: dI.vat_rate||0, 
                 tong_tien: tongCong, tong_von: von, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" 
             });
             
-            // 1. GỬI EMAIL BÁO CHO CHỦ QUÁN (ADMIN)
-            await emailjs.send("service_j8kubcd", "template_3ee7url", { 
-                to_email: dI.admin_email || ADMIN_EMAIL, 
-                subject: `🚨 [ĐƠN MỚI] Khách hàng: ${ph}`, 
-                message: `Kính báo Admin,\n\nQuán vừa nhận được một đơn đặt hàng mới.\n\n👤 THÔNG TIN KHÁCH HÀNG:\n- Email: ${currentUser.email}\n- SĐT: ${ph}\n- Địa chỉ: ${ad}\n\n📦 CHI TIẾT ĐƠN HÀNG:\n${msg}\n💰 TỔNG THU (Đã gồm VAT): ${tongCong.toLocaleString()}đ\n\nThí chủ hãy vào trang Quản lý đơn hàng (orders.html) để xem nghen!` 
-            });
-
-            // 2. GỬI EMAIL XÁC NHẬN CHO KHÁCH HÀNG ĐẶT
-            await emailjs.send("service_j8kubcd", "template_3ee7url", { 
-                to_email: currentUser.email, 
-                subject: `✅ Xác nhận đặt hàng thành công tại ${tenQuan}`, 
-                message: `Kính chào quý khách,\n\nCảm ơn quý khách đã tin tưởng và đặt hàng tại ${tenQuan}.\n\n📦 CHI TIẾT ĐƠN HÀNG CỦA QUÝ KHÁCH:\n${msg}\n💰 TỔNG THANH TOÁN: ${tongCong.toLocaleString()}đ\n\nChúng tôi sẽ sớm liên hệ qua số điện thoại ${ph} để giao hàng.\n\nKính chúc quý khách thân tâm an lạc!` 
-            });
+            // GỬI 2 EMAIL CÙNG LÚC BẰNG PROMISE.ALL CHO NHANH GỌN LẸ
+            await Promise.all([
+                emailjs.send("service_j8kubcd", "template_3ee7url", { 
+                    to_email: dI.admin_email || ADMIN_EMAIL, 
+                    subject: `🚨 [ĐƠN MỚI] Khách hàng: ${ph}`, 
+                    message: `Kính báo Admin,\n\nQuán vừa nhận được một đơn đặt hàng mới.\n\n👤 THÔNG TIN KHÁCH HÀNG:\n- Email: ${currentUser.email}\n- SĐT: ${ph}\n- Địa chỉ: ${ad}\n\n📦 CHI TIẾT ĐƠN HÀNG:\n${msg}\n💰 TỔNG THU (Đã gồm VAT): ${tongCong.toLocaleString()}đ\n\nThí chủ hãy vào trang Quản lý đơn hàng (orders.html) để xem nghen!` 
+                }),
+                emailjs.send("service_j8kubcd", "template_3ee7url", { 
+                    to_email: currentUser.email, 
+                    subject: `✅ Xác nhận đặt hàng thành công tại ${tenQuan}`, 
+                    message: `Kính chào quý khách,\n\nCảm ơn quý khách đã tin tưởng và đặt hàng tại ${tenQuan}.\n\n📦 CHI TIẾT ĐƠN HÀNG CỦA QUÝ KHÁCH:\n${msg}\n💰 TỔNG THANH TOÁN: ${tongCong.toLocaleString()}đ\n\nChúng tôi sẽ sớm liên hệ qua số điện thoại ${ph} để giao hàng.\n\nKính chúc quý khách thân tâm an lạc!` 
+                })
+            ]);
             
             Swal.fire("Thành công!", "Đã gửi đơn hàng. Quý khách vui lòng kiểm tra email nghen!", "success"); 
             cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
