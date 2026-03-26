@@ -8,12 +8,21 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; line-height: 1.6; }
         .auth-bar { background: #1b5e20; color: white; padding: 10px; text-align: right; font-size: 0.85em; }
+        
+        /* Chỉnh lại Header cho ngay ngắn, không bị lỗi thiết kế */
         .header { background: #2e7d32; color: white; padding: 35px 20px 25px; text-align: center; position: relative; }
         .header h1 { margin: 0; font-size: 2.2em; letter-spacing: 1px; }
         .header p { margin: 5px 0 15px; font-style: italic; opacity: 0.9; font-size: 1.1em; }
+        .lang-switch { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85em; font-weight: bold; border: 1px solid rgba(255,255,255,0.5); }
+        
+        /* Phục hồi trọn vẹn Huy hiệu Halal & Ngũ Vị Tân */
         .dietary-badges { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
-        .badge { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-transform: uppercase; background: white; color: #2e7d32; }
-        .badge-vegan { background: #4caf50; color: white; border: none; }
+        .badge { display: flex; align-items: center; gap: 6px; padding: 6px 15px; border-radius: 25px; font-weight: bold; font-size: 0.85em; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-transform: uppercase; }
+        .badge-vegan { background: #4caf50; color: white; border: 1px solid #388e3c; }
+        .badge-halal { background: #f1c40f; color: #333; border: 1px solid #d4ac0d; }
+        .halal-icon { color: white; font-size: 1.4em; line-height: 1; }
+        .badge-allium { background: #ffffff; color: #2e7d32; border: 1px solid #2e7d32; }
+        .allium-icons { font-size: 1.2em; display: flex; gap: 3px; }
         
         .container { max-width: 1000px; margin: auto; padding: 15px; }
         .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 30px 0 20px; font-size: 1.5em; font-weight: bold; }
@@ -23,7 +32,6 @@
         @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 40px; } }
         
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
-        
         .about-content { display: flex; flex-direction: column; justify-content: flex-start; }
         
         /* Khung Thông Điệp Của Quán */
@@ -45,8 +53,9 @@
         .core-about-card ul li { position: relative; margin-bottom: 8px; }
         .core-about-card ul li::before { content: "•"; color: #e67e22; font-weight: bold; position: absolute; left: -15px; }
 
-        /* Video YouTube dời xuống dưới */
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        /* Video YouTube */
+        #youtube-container { max-width: 800px; margin: 0 auto 30px auto; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
         /* Thực đơn dàn ngang */
@@ -83,7 +92,8 @@
     <p>Ẩm Thực Chay Tinh Khiết & Tỉnh Thức</p>
     <div class="dietary-badges">
         <div class="badge badge-vegan">🌱 Thuần Chay</div>
-        <div class="badge">🧅 Không Ngũ Vị Tân</div>
+        <div class="badge badge-halal"><span class="halal-icon">حلال</span> Halal</div>
+        <div class="badge badge-allium"><span class="allium-icons">🧅🌿🧄</span> Không Ngũ Vị Tân</div>
     </div>
 </div>
 
@@ -197,11 +207,17 @@
                 btnMap.style.display = 'inline-block';
             }
             
-            // Xử lý Video YouTube (Mute để cho phép Autoplay)
-            if(data.link_youtube) {
-                const ytMatch = data.link_youtube.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=))([^"&?\/\s]{11})/i);
-                if (ytMatch && ytMatch[1]) {
-                    const ytId = ytMatch[1];
+            // Xử lý Video YouTube bằng thuật toán mới mạnh mẽ hơn
+            if(data.link_youtube && data.link_youtube.trim() !== "") {
+                let ytId = "";
+                const url = data.link_youtube;
+                if(url.includes("v=")) {
+                    ytId = url.split("v=")[1].substring(0,11);
+                } else if(url.includes("youtu.be/")) {
+                    ytId = url.split("youtu.be/")[1].substring(0,11);
+                }
+                
+                if (ytId) {
                     document.getElementById('youtube-container').style.display = 'block';
                     document.getElementById('youtube-container').innerHTML = `<div class="video-wrapper"><iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>`;
                 }
