@@ -13,14 +13,18 @@
         .auth-bar { background: #1b5e20; color: white; padding: 10px; text-align: right; font-size: 0.85em; }
         .auth-link { color: white; text-decoration: underline; cursor: pointer; margin-left: 10px; font-weight: bold; }
         .header { background: #2e7d32; color: white; padding: 35px 20px 25px; text-align: center; position: relative; }
+        
+        /* Logo & Slogan Style */
+        .logo-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 3px solid white; display: none; margin-left: auto; margin-right: auto; }
         .header h1 { margin: 0; font-size: 2.2em; letter-spacing: 1px; }
-        .lang-switch { position: absolute; top: 15px; right: 15px; z-index: 100; }
+        .header p { margin: 5px 0 15px; font-style: italic; opacity: 0.9; font-size: 1.1em; }
+        
         .container { max-width: 1000px; margin: auto; padding: 15px; }
         .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 30px 0 20px; font-size: 1.5em; font-weight: bold; }
         .dynamic-section { background: white; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; display: grid; grid-template-columns: 1fr; gap: 20px; padding: 25px; margin-bottom: 20px; }
         @media (min-width: 768px) { .dynamic-section { grid-template-columns: 1fr 1fr; gap: 40px; } }
         .about-media img { width: 100%; border-radius: 12px; object-fit: cover; aspect-ratio: 1/1; }
-        .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; position: relative; }
+        .message-box { background: #f0fdf4; border: 2px solid #4caf50; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; font-style: italic; color: #2e7d32; }
         .core-about-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; text-align: justify; }
         .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; }
@@ -31,8 +35,9 @@
         .modal-content { background: white; margin: 5% auto; padding: 25px; width: 85%; max-width: 450px; border-radius: 15px; max-height: 85vh; overflow-y: auto; }
         .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .admin-zone { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #3498db; }
+        .btn-admin { display: block; width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; text-align: center; text-decoration: none; color: white; font-weight: bold; box-sizing: border-box; }
         .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .history-card { background: #f9f9f9; border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.9em; }
     </style>
 </head>
 <body>
@@ -40,9 +45,10 @@
 <div class="auth-bar" id="auth-status">Đang tải...</div>
 
 <div class="header">
-    <div id="google_translate_element" class="lang-switch"></div>
-    <h1 id="brand-h1">🌱 Loading...</h1>
-    <p>Ẩm Thực Tinh Khiết & Tỉnh Thức</p>
+    <div id="google_translate_element" style="position:absolute; top:15px; right:15px;"></div>
+    <img id="brand-logo" class="logo-img" src="">
+    <h1 id="brand-h1">Loading...</h1>
+    <p id="brand-slogan">Ẩm Thực Tỉnh Thức</p>
 </div>
 
 <div class="container">
@@ -59,13 +65,10 @@
             </div>
         </div>
     </div>
-
     <div class="core-about-card" id="core-about-card"></div>
     <div id="youtube-container" style="display: none;"></div>
-
     <div class="section-title">🍜 Thực Đơn</div>
     <div id="menu-list" class="menu-list"></div>
-
     <div style="text-align:center; padding: 40px 20px 20px; color:#ccc; font-size:0.8em;">
         © 2026 <span id="footer-brand">...</span> | <a href="orders.html" style="color:#ccc;">Đơn Hàng</a> | <a href="admin.html" style="color:#ccc;">Quản Trị</a>
     </div>
@@ -91,8 +94,7 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    const defaultIntro = `Chào mừng bạn đến với <b>Veggie Saigon</b> – nơi tinh hoa ẩm thực Việt hội tụ cùng phong cách Fusion quốc tế trong một trải nghiệm <b>Thuần chay Tinh khiết (Pure Vegan)</b> hoàn hảo. <br><br><b>1. Tiêu chuẩn khắt khe cho Thân & Tâm:</b><br>Chúng tôi thấu hiểu và tôn trọng tuyệt đối chế độ ăn chánh niệm của bạn. Bếp nhà Veggie Saigon cam kết:<ul><li><b>100% Thuần chay:</b> Không trứng, không thành phần động vật.</li><li><b>Không Ngũ Vị Tân:</b> Hoàn toàn không hành, hẹ, tỏi, kiệu, hưng cừ.</li><li><b>Đồ uống Thuần chay:</b> Chỉ sử dụng các loại sữa hạt tự nhiên, nói không với sữa động vật và mật ong.</li></ul><b>2. Nguyên liệu tươi ngon & Sự chọn lọc tinh túy:</b><br>Chúng tôi sử dụng rau củ quả tươi mới mỗi ngày, được tuyển chọn kỹ lưỡng. Mỗi món ăn là một sự kết hợp khéo léo giữa nét truyền thống Việt Nam và tư duy ẩm thực quốc tế hóa.<br><br><b>3. Thực đơn đa dạng – Phù hợp mọi khoảnh khắc:</b><br>Dù bạn đi một mình hay dùng bữa cùng gia đình, Veggie Saigon luôn có lựa chọn hoàn hảo:<ul><li>Đầy đủ các món quốc hồn quốc túy: Bánh mì, Phở, Bún, Mì.</li><li>Đa dạng cách chế biến: Món chiên giòn tan, món xào đậm đà, món soup thanh tao.</li><li>Phục vụ từ các món khai vị nhẹ nhàng đến mâm cơm gia đình ấm cúng.</li></ul><b>4. Ăn uống Tỉnh thức & Kết nối:</b><br>Hơn cả một bữa ăn, chúng tôi mong muốn mang đến một không gian của sự Tỉnh thức. Mỗi thực khách khi đến với Veggie Saigon không chỉ để thưởng thức món ăn ngon, mà còn để nuôi dưỡng sự bình an trong tâm hồn và kết nối yêu thương với vạn vật.`;
-
+    const ADMIN_EMAIL = "chaysaigon@gmail.com";
     let currentUser = null, userProfile = {}, cart = {}, thongTinQuan = {};
 
     async function init() {
@@ -100,16 +102,68 @@
         if (snap.exists()) {
             thongTinQuan = snap.data();
             const b = thongTinQuan.brand_name || "Cửa Hàng";
-            document.title = b; document.getElementById('brand-h1').innerText = "🌱 " + b;
+            document.title = b; 
+            document.getElementById('brand-h1').innerText = "🌱 " + b;
             document.getElementById('footer-brand').innerText = b;
+            document.getElementById('brand-slogan').innerText = thongTinQuan.brand_slogan || "Ẩm Thực Tỉnh Thức";
+            if(thongTinQuan.brand_logo) { 
+                document.getElementById('brand-logo').src = thongTinQuan.brand_logo; 
+                document.getElementById('brand-logo').style.display = 'block'; 
+            }
             document.getElementById('display-address').innerText = thongTinQuan.store_address || "";
             document.getElementById('display-phone').innerText = thongTinQuan.store_phone || "";
-            document.getElementById('core-about-card').innerHTML = thongTinQuan.bai_gioi_thieu_chinh || defaultIntro;
+            document.getElementById('core-about-card').innerHTML = thongTinQuan.bai_gioi_thieu_chinh || "";
             if(thongTinQuan.hinh_dai_dien) document.getElementById('about-img').src = thongTinQuan.hinh_dai_dien;
             if(thongTinQuan.link_map) { document.getElementById('btn-map').href = thongTinQuan.link_map; document.getElementById('btn-map').style.display='inline-block'; }
             if(thongTinQuan.loi_gioi_thieu) { document.getElementById('dynamic-message').innerHTML = thongTinQuan.loi_gioi_thieu.replace(/\n/g, '<br>'); document.getElementById('dynamic-message').style.display='block'; }
-        } else { document.getElementById('core-about-card').innerHTML = defaultIntro; }
+        }
         fetchMenu();
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        const bar = document.getElementById('auth-status');
+        if (user) {
+            currentUser = user; bar.innerHTML = `Chào, <b>${user.email.split('@')[0]}</b> | <span onclick="window.moTaiKhoan()" style="cursor:pointer;text-decoration:underline;">Tài khoản</span> | <span onclick="window.logout()" style="cursor:pointer;">Thoát</span>`;
+            const uSnap = await getDoc(doc(db, "Users", user.email)); if(uSnap.exists()) userProfile = uSnap.data();
+        } else { currentUser = null; bar.innerHTML = `<span onclick="window.moLogin()" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập</span>`; }
+    });
+
+    window.moTaiKhoan = async () => {
+        const staffSnap = await getDoc(doc(db, "Settings", "staff"));
+        const isStaff = staffSnap.exists() && staffSnap.data().emails?.includes(currentUser.email);
+        const isAdmin = currentUser.email === ADMIN_EMAIL;
+        
+        let adminZone = "";
+        if(isAdmin || isStaff) {
+            adminZone = `<div class="admin-zone">
+                <h3 style="margin:0;">Khu vực quản lý</h3>
+                <a href="orders.html" class="btn-admin" style="background:#3498db">📦 Xem Đơn Hàng & Báo Cáo</a>
+                ${isAdmin ? '<a href="admin.html" class="btn-admin" style="background:#2e7d32">⚙️ Cài Đặt Hệ Thống</a>' : ''}
+            </div>`;
+        }
+
+        document.getElementById('profile-container').innerHTML = `
+            ${adminZone}
+            <h2 style="text-align:center;">Tài Khoản</h2>
+            <input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT">
+            <textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea>
+            <button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button>
+            <h3 style="margin-top:20px; border-bottom:1px solid #eee;">Lịch sử đơn</h3>
+            <div id="hist-list" style="max-height:200px; overflow-y:auto; font-size:0.85em;">Đang tải...</div>`;
+        
+        document.getElementById('profile-modal').style.display='block';
+        loadHistory();
+    };
+
+    async function loadHistory() {
+        const q = query(collection(db, "Orders"), where("khach_hang", "==", currentUser.email));
+        const snap = await getDocs(q);
+        let h = "";
+        snap.forEach(d => {
+            const o = d.data();
+            h += `<div class="history-card"><b>${o.trang_thai}</b> - ${o.tong_tien.toLocaleString()}đ<br>${Object.keys(o.chi_tiet).join(", ")}</div>`;
+        });
+        document.getElementById('hist-list').innerHTML = h || "Chưa có đơn.";
     }
 
     async function fetchMenu() {
@@ -121,56 +175,37 @@
         });
     }
 
-    onAuthStateChanged(auth, async (user) => {
-        const bar = document.getElementById('auth-status');
-        if (user) {
-            currentUser = user; bar.innerHTML = `Chào, <b>${user.email.split('@')[0]}</b> | <span onclick="window.moTaiKhoan()" style="cursor:pointer;text-decoration:underline;">Tài khoản</span> | <span onclick="window.logout()" style="cursor:pointer;">Thoát</span>`;
-            const uSnap = await getDoc(doc(db, "Users", user.email)); if(uSnap.exists()) userProfile = uSnap.data();
-        } else { currentUser = null; bar.innerHTML = `<span onclick="window.moLogin()" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập</span>`; }
-    });
-
     window.addToCart = (n, p) => { if(cart[n]) cart[n].sl++; else cart[n] = { gia: p, sl: 1 }; updateUI(); Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã thêm', showConfirmButton:false, timer:1000}); };
     function updateUI() { let c = 0, t = 0; for(let k in cart) { c += cart[k].sl; t += (cart[k].sl * cart[k].gia); } document.getElementById('cart-count').innerText = c; document.getElementById('cart-total').innerText = t.toLocaleString() + 'đ'; }
-
+    window.qty = (k, v) => { cart[k].sl += v; if(cart[k].sl<=0) delete cart[k]; window.moGioHang(); updateUI(); };
     window.moGioHang = () => {
         if(Object.keys(cart).length === 0) return Swal.fire("Trống!");
         let h = '<h2>Giỏ Hàng</h2>', t = 0;
         for(let k in cart) { t += cart[k].sl * cart[k].gia; h += `<div class="cart-item"><span>${k}</span><div><button onclick="window.qty('${k}',-1)">-</button> ${cart[k].sl} <button onclick="window.qty('${k}',1)">+</button></div></div>`; }
-        h += `<h3 style="text-align:right;">Tổng: ${t.toLocaleString()}đ</h3><button class="btn-login" style="background:#e67e22" onclick="window.checkOut()">Tiến Hành Đặt Hàng</button>`;
+        h += `<h3 style="text-align:right;">Tổng: ${t.toLocaleString()}đ</h3><button class="btn-login" style="background:#e67e22" onclick="window.checkOut()">Tiếp Tục</button>`;
         document.getElementById('cart-container').innerHTML = h; document.getElementById('cart-modal').style.display='block';
     };
-
-    window.qty = (k, v) => { cart[k].sl += v; if(cart[k].sl<=0) delete cart[k]; window.moGioHang(); updateUI(); };
-    window.checkOut = () => { if(!currentUser) return window.moLogin(); document.getElementById('cart-modal').style.display='none'; document.getElementById('checkout-container').innerHTML = `<h2>Giao Hàng</h2><input id="sPh" class="modal-input" placeholder="SĐT (*)" value="${userProfile.phone||''}"><textarea id="sAd" class="modal-input" rows="2" placeholder="Địa chỉ (*)">${userProfile.address||''}</textarea><textarea id="sNt" class="modal-input" rows="2" placeholder="Ghi chú..."></textarea><button id="btn-submit-order" class="btn-login" style="background:#e67e22" onclick="window.confirmOrder()">Xác Nhận Đặt Đơn</button>`; document.getElementById('checkout-modal').style.display='block'; };
-
+    window.checkOut = () => { if(!currentUser) return window.moLogin(); document.getElementById('cart-modal').style.display='none'; document.getElementById('checkout-container').innerHTML = `<h2>Giao Hàng</h2><input id="sPh" class="modal-input" placeholder="SĐT (*)" value="${userProfile.phone||''}"><textarea id="sAd" class="modal-input" rows="2" placeholder="Địa chỉ (*)">${userProfile.address||''}</textarea><button id="btn-submit-order" class="btn-login" style="background:#e67e22" onclick="window.confirmOrder()">Xác Nhận Đặt Đơn</button>`; document.getElementById('checkout-modal').style.display='block'; };
     window.confirmOrder = async () => {
-        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value, nt = document.getElementById('sNt').value;
+        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value;
         if(!ph || !ad) return alert("Thiếu thông tin!");
-        const btn = document.getElementById('btn-submit-order'); btn.disabled = true; btn.innerText = "Đang kiểm tra kho...";
-        try {
-            const snapMenu = await getDocs(collection(db, "Menus")); const menuData = {};
-            snapMenu.forEach(d => { menuData[d.data().ten_tieng_viet] = { ton: d.data().ton_kho||0, von: d.data().gia_von||0 }; });
-            let err = ""; let total = 0, totalV = 0;
-            for(let k in cart) { 
-                if(cart[k].sl > menuData[k].ton) err += `- ${k} (còn ${menuData[k].ton})\n`;
-                total += cart[k].sl * cart[k].gia; totalV += cart[k].sl * menuData[k].von;
-            }
-            if(err) { btn.disabled = false; btn.innerText = "Xác Nhận Đặt Đơn"; return Swal.fire("Hết món", err, "error"); }
-            await addDoc(collection(db, "Orders"), { khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, ghi_chu: nt, chi_tiet: cart, tong_tien: total, tong_von: totalV, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" });
-            await setDoc(doc(db, "Users", currentUser.email), { phone: ph, address: ad }, { merge: true });
-            Swal.fire("Thành công!", "Đơn đã gửi.", "success"); cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
-        } catch (e) { alert(e.message); btn.disabled = false; }
+        const btn = document.getElementById('btn-submit-order'); btn.disabled = true; btn.innerText = "Đang kiểm tra...";
+        const snapMenu = await getDocs(collection(db, "Menus")); const menuData = {};
+        snapMenu.forEach(d => { menuData[d.data().ten_tieng_viet] = { ton: d.data().ton_kho||0, von: d.data().gia_von||0 }; });
+        let err = ""; let total = 0, totalV = 0;
+        for(let k in cart) { if(cart[k].sl > menuData[k].ton) err += `- ${k} (còn ${menuData[k].ton})\n`; total += cart[k].sl * cart[k].gia; totalV += cart[k].sl * menuData[k].von; }
+        if(err) { btn.disabled = false; return Swal.fire("Hết món", err, "error"); }
+        await addDoc(collection(db, "Orders"), { khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, tong_tien: total, tong_von: totalV, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" });
+        await setDoc(doc(db, "Users", currentUser.email), { phone: ph, address: ad }, { merge: true });
+        Swal.fire("Thành công!", "Đơn đã gửi.", "success"); cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
     };
-
     window.moLogin = () => { document.getElementById('auth-form-container').innerHTML = `<h2>Đăng Nhập</h2><input id="lE" class="modal-input" placeholder="Email"><input id="lP" type="password" class="modal-input" placeholder="Mật khẩu"><button class="btn-login" onclick="window.doLogin()">Vào Cửa Hàng</button>`; document.getElementById('auth-modal').style.display='block'; };
     window.doLogin = async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } catch (e) { alert("Sai!"); } };
-    window.moTaiKhoan = () => { document.getElementById('profile-container').innerHTML = `<h2>Tài Khoản</h2><input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT"><textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea><button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button>`; document.getElementById('profile-modal').style.display='block'; };
     window.saveP = async () => { await setDoc(doc(db, "Users", currentUser.email), { phone: document.getElementById('pPh').value, address: document.getElementById('pAd').value }, { merge: true }); document.getElementById('profile-modal').style.display='none'; Swal.fire("Đã lưu!"); };
     window.logout = () => signOut(auth);
-
     init();
 </script>
-<script type="text/javascript"> function googleTranslateElementInit() { new google.translate.TranslateElement({ pageLanguage: 'vi', includedLanguages: 'en,zh-CN,ko,ru', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false }, 'google_translate_element'); } </script>
+<script type="text/javascript"> function googleTranslateElementInit() { new google.translate.TranslateElement({ pageLanguage: 'vi', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element'); } </script>
 <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
