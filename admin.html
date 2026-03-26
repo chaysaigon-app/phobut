@@ -31,11 +31,11 @@
         <h2>🏠 Cài Đặt Thông Tin & Kết Nối</h2>
         
         <div class="form-group">
-            <label>Lời giới thiệu quán:</label>
-            <textarea id="loiGioiThieu" rows="4" placeholder="Con viết đôi lời chánh niệm giới thiệu quán vô đây nghen..."></textarea>
+            <label>Thông điệp từ Bếp (Lời giới thiệu ngắn gọn):</label>
+            <textarea id="loiGioiThieu" rows="3" placeholder="Con viết đôi lời chánh niệm giới thiệu quán vô đây nghen..."></textarea>
         </div>
         <div class="form-group">
-            <label>Link Video YouTube (để phát video giới thiệu trên web):</label>
+            <label>Link Video YouTube (Tự động phát bên dưới bài giới thiệu dài):</label>
             <input type="text" id="linkYoutube" placeholder="Ví dụ: https://www.youtube.com/watch?v=...">
         </div>
         <div class="form-group">
@@ -45,7 +45,11 @@
             <img id="previewDaiDien" src="" style="width: 150px; margin-top: 15px; border-radius: 10px; display: none; object-fit: cover;">
         </div>
 
-        <h3>🌐 Các kênh Mạng Xã Hội</h3>
+        <h3>🌐 Các kênh Mạng Xã Hội & Bản Đồ</h3>
+        <div class="form-group">
+            <label>Link bản đồ Google Maps:</label>
+            <input type="text" id="linkMap" placeholder="Ví dụ: https://goo.gl/maps/...">
+        </div>
         <div class="form-group">
             <label>Link trang Facebook:</label>
             <input type="text" id="linkFb" placeholder="Ví dụ: https://facebook.com/phobut">
@@ -127,6 +131,7 @@
             const data = docSnap.data();
             document.getElementById('loiGioiThieu').value = data.loi_gioi_thieu || "";
             document.getElementById('linkYoutube').value = data.link_youtube || "";
+            document.getElementById('linkMap').value = data.link_map || "";
             document.getElementById('linkFb').value = data.link_fb || "";
             document.getElementById('linkTiktok').value = data.link_tiktok || "";
             document.getElementById('linkYtChannel').value = data.link_yt_channel || "";
@@ -143,6 +148,7 @@
     window.luuThongTin = async () => {
         const loi = document.getElementById('loiGioiThieu').value;
         const linkYtVideo = document.getElementById('linkYoutube').value;
+        const linkMap = document.getElementById('linkMap').value;
         const linkFb = document.getElementById('linkFb').value;
         const linkTiktok = document.getElementById('linkTiktok').value;
         const linkYtChannel = document.getElementById('linkYtChannel').value;
@@ -157,13 +163,14 @@
             await setDoc(doc(db, "Settings", "info"), {
                 loi_gioi_thieu: loi,
                 link_youtube: linkYtVideo,
+                link_map: linkMap,
                 link_fb: linkFb,
                 link_tiktok: linkTiktok,
                 link_yt_channel: linkYtChannel,
                 hinh_dai_dien: url
             }, { merge: true });
 
-            alert("Đã lưu thông tin mạng xã hội ráo trọi rồi nghen!");
+            alert("Đã lưu thông tin quán ráo trọi rồi nghen!");
             btn.innerText = "💾 Lưu Thay Đổi Thông Tin";
             loadThongTin();
         } catch(e) { 
