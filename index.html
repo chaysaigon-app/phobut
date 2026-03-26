@@ -1,52 +1,264 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cửa Hàng Trực Tuyến</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript"> (function(){ emailjs.init("67fQLu2LTz1bZmT5L"); })(); </script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; line-height: 1.6; }
+        .auth-bar { background: #1b5e20; color: white; padding: 10px; text-align: right; font-size: 0.85em; }
+        .auth-link { color: white; text-decoration: underline; cursor: pointer; margin-left: 10px; font-weight: bold; }
+        .header { background: #2e7d32; color: white; padding: 30px 20px; text-align: center; }
+        .logo-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid white; display: none; margin: 0 auto 10px; }
+        .header h1 { margin: 0; font-size: 2.2em; }
+        .header p { margin: 5px 0 0; opacity: 0.9; font-style: italic; }
+        .container { max-width: 1000px; margin: auto; padding: 15px; }
+        .section-title { color: #2e7d32; border-left: 4px solid #e67e22; padding-left: 10px; margin: 30px 0 20px; font-weight: bold; font-size: 1.5em; }
+        .core-about-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: justify; margin-bottom: 20px; }
+        .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .menu-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: center; }
+        .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .btn-add { background: #2e7d32; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; width: 90%; margin-bottom: 15px; font-weight: bold; }
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; display: flex; justify-content: space-between; border-top: 2px solid #2e7d32; box-sizing: border-box; z-index: 1000; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; width: 85%; max-width: 450px; border-radius: 15px; max-height: 85vh; overflow-y: auto; position: relative;}
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .admin-zone { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #3498db; text-align: left; }
+        .btn-admin { display: block; width: 100%; padding: 10px; margin-top: 8px; border-radius: 8px; text-align: center; text-decoration: none; color: white; font-weight: bold; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+<div class="auth-bar" id="auth-status">Đang tải...</div>
+
+<div class="header">
+    <img id="brand-logo" class="logo-img">
+    <h1 id="brand-h1">Hệ Thống</h1>
+    <p id="brand-slogan">Ẩm Thực Tỉnh Thức</p>
+</div>
+
+<div class="container">
+    <div class="section-title">🌿 Về Chúng Tôi</div>
+    <div class="core-about-card" id="core-about-card"></div>
+    <div class="section-title">🍜 Thực Đơn</div>
+    <div id="menu-list" class="menu-list">Đang tải món ăn...</div>
+    <div style="text-align:center; padding: 40px 20px; color:#ccc; font-size:0.8em;">
+        © 2026 <span id="footer-brand">Cửa hàng</span> | <a href="orders.html" style="color:#ccc;">Xử Lý Đơn</a> | <a href="admin.html" style="color:#ccc;">Cài Đặt</a>
+    </div>
+</div>
+
+<div class="cart-bar">
+    <div>🛒 <b><span id="cart-count">0</span> món</b> <br><span id="cart-total" style="color:#d35400; font-weight:bold;">0đ</span></div>
+    <button onclick="window.moGioHang()" style="background:#e67e22; color:white; border:none; padding:10px 20px; border-radius:25px; font-weight:bold; cursor:pointer;">Giỏ Hàng</button>
+</div>
+
+<div id="auth-modal" class="modal"><div class="modal-content" id="auth-form-container"></div></div>
+<div id="profile-modal" class="modal"><div class="modal-content" id="profile-container"></div></div>
+<div id="cart-modal" class="modal"><div class="modal-content" id="cart-container"></div></div>
+<div id="checkout-modal" class="modal"><div class="modal-content" id="checkout-container"></div></div>
+
 <script type="module">
-    // ... (Giữ nguyên các hàm khởi tạo)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, serverTimestamp, getDoc, doc, setDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const ADMIN_EMAIL = "chaysaigon@gmail.com";
+    let currentUser = null, userProfile = {}, cart = {};
+
+    // 1. TẢI DỮ LIỆU CÀI ĐẶT
+    async function init() {
+        try {
+            const snap = await getDoc(doc(db, "Settings", "info"));
+            if (snap.exists()) {
+                const d = snap.data();
+                document.getElementById('brand-h1').innerText = d.brand_name || "Cửa Hàng";
+                document.getElementById('brand-slogan').innerText = d.brand_slogan || "Ẩm Thực Tỉnh Thức";
+                document.getElementById('footer-brand').innerText = d.brand_name || "Cửa Hàng";
+                if(d.brand_logo) { 
+                    document.getElementById('brand-logo').src = d.brand_logo; 
+                    document.getElementById('brand-logo').style.display='block'; 
+                }
+                document.getElementById('core-about-card').innerHTML = d.bai_gioi_thieu_chinh || "Chào mừng quý khách đã đến với cửa hàng của chúng tôi!";
+            }
+            fetchMenu();
+        } catch (e) { console.error("Lỗi init: ", e); }
+    }
+
+    // 2. TẢI THỰC ĐƠN
+    async function fetchMenu() {
+        try {
+            const snap = await getDocs(collection(db, "Menus"));
+            const list = document.getElementById('menu-list'); 
+            list.innerHTML = "";
+            snap.forEach(d => {
+                const m = d.data(); const out = (m.ton_kho <= 0);
+                list.innerHTML += `
+                    <div class="menu-card" style="opacity:${out?0.6:1}">
+                        <img src="${m.hinh_anh || 'https://via.placeholder.com/200'}">
+                        <div style="padding:10px;">
+                            <h3 style="margin:5px 0;">${m.ten_tieng_viet}</h3>
+                            <p style="font-weight:bold; color:#d35400; margin:5px 0;">${m.gia_tien.toLocaleString()}đ</p>
+                            <button class="btn-add" ${out?'disabled style="background:#ccc"':''} onclick="window.addToCart('${m.ten_tieng_viet}', ${m.gia_tien})">
+                                ${out?'Hết món':'Thêm vào giỏ'}
+                            </button>
+                        </div>
+                    </div>`;
+            });
+        } catch (e) { console.error("Lỗi thực đơn: ", e); }
+    }
+
+    // 3. XÁC THỰC NGƯỜI DÙNG
+    onAuthStateChanged(auth, async (user) => {
+        const bar = document.getElementById('auth-status');
+        if (user) {
+            currentUser = user; 
+            bar.innerHTML = `Chào, <b>${user.email.split('@')[0]}</b> | <span onclick="window.moTaiKhoan()" style="cursor:pointer;text-decoration:underline;">Tài khoản</span> | <span onclick="window.logout()" style="cursor:pointer;">Thoát</span>`;
+            const uSnap = await getDoc(doc(db, "Users", user.email)); if(uSnap.exists()) userProfile = uSnap.data();
+        } else { 
+            currentUser = null; 
+            bar.innerHTML = `<span onclick="window.moLogin()" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập</span>`; 
+        }
+    });
+
+    // 4. QUẢN LÝ TÀI KHOẢN & PHÂN QUYỀN
+    window.moTaiKhoan = async () => {
+        const staffSnap = await getDoc(doc(db, "Settings", "staff"));
+        const isStaff = staffSnap.exists() && staffSnap.data().emails?.includes(currentUser.email);
+        const isAdmin = currentUser.email === ADMIN_EMAIL;
+        
+        let adminZone = (isAdmin || isStaff) ? `
+            <div class="admin-zone">
+                <h3 style="margin:0;">🛠️ Quản lý</h3>
+                <a href="orders.html" class="btn-admin" style="background:#3498db">📦 Đơn Hàng & Kho</a>
+                ${isAdmin ? '<a href="admin.html" class="btn-admin" style="background:#2e7d32">⚙️ Cài Đặt Hệ Thống</a>' : ''}
+            </div>` : "";
+
+        document.getElementById('profile-container').innerHTML = `
+            ${adminZone}
+            <h2 style="text-align:center;">Tài Khoản</h2>
+            <input id="pPh" class="modal-input" value="${userProfile.phone||''}" placeholder="SĐT">
+            <textarea id="pAd" class="modal-input" rows="2" placeholder="Địa chỉ">${userProfile.address||''}</textarea>
+            <button class="btn-login" onclick="window.saveP()">Lưu Thông Tin</button>
+            <button onclick="document.getElementById('profile-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Đóng</button>`;
+        document.getElementById('profile-modal').style.display='block';
+    };
+
+    window.saveP = async () => {
+        await setDoc(doc(db, "Users", currentUser.email), { phone: document.getElementById('pPh').value, address: document.getElementById('pAd').value }, { merge: true });
+        document.getElementById('profile-modal').style.display='none';
+        Swal.fire("Đã lưu!");
+    };
+
+    // 5. GIỎ HÀNG & ĐẶT ĐƠN
+    window.addToCart = (n, p) => { 
+        if(cart[n]) cart[n].sl++; else cart[n] = { gia: p, sl: 1 }; 
+        updateUI(); 
+        Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã thêm ' + n, showConfirmButton:false, timer:1000}); 
+    };
+
+    function updateUI() { 
+        let c = 0, t = 0; 
+        for(let k in cart) { c += cart[k].sl; t += (cart[k].sl * cart[k].gia); } 
+        document.getElementById('cart-count').innerText = c; 
+        document.getElementById('cart-total').innerText = t.toLocaleString() + 'đ'; 
+    }
+
+    window.moGioHang = () => {
+        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng trống!");
+        let h = '<h2>Giỏ Hàng</h2>', t = 0;
+        for(let k in cart) { 
+            t += cart[k].sl * cart[k].gia; 
+            h += `<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                    <span>${k}</span>
+                    <div><button onclick="window.qty('${k}',-1)">-</button> <b>${cart[k].sl}</b> <button onclick="window.qty('${k}',1)">+</button></div>
+                  </div>`; 
+        }
+        h += `<h3 style="text-align:right; color:#d35400;">Tổng: ${t.toLocaleString()}đ</h3>
+              <button class="btn-login" style="background:#e67e22" onclick="window.checkOut()">Tiếp Tục Đặt Hàng</button>
+              <button onclick="document.getElementById('cart-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Mua thêm</button>`;
+        document.getElementById('cart-container').innerHTML = h; 
+        document.getElementById('cart-modal').style.display='block';
+    };
+
+    window.qty = (k, v) => { 
+        cart[k].sl += v; 
+        if(cart[k].sl<=0) delete cart[k]; 
+        if(Object.keys(cart).length === 0) document.getElementById('cart-modal').style.display='none';
+        else window.moGioHang(); 
+        updateUI(); 
+    };
+
+    window.checkOut = () => { 
+        if(!currentUser) return window.moLogin(); 
+        document.getElementById('cart-modal').style.display='none'; 
+        document.getElementById('checkout-container').innerHTML = `
+            <h2>Xác Nhận Nhận Hàng</h2>
+            <input id="sPh" class="modal-input" placeholder="Số điện thoại (*)" value="${userProfile.phone||''}">
+            <textarea id="sAd" class="modal-input" rows="2" placeholder="Địa chỉ giao hàng (*)">${userProfile.address||''}</textarea>
+            <button id="btn-sub" class="btn-login" style="background:#e67e22" onclick="window.confirmOrder()">Đặt Đơn Ngay</button>
+            <button onclick="document.getElementById('checkout-modal').style.display='none'; window.moGioHang();" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Quay lại</button>`; 
+        document.getElementById('checkout-modal').style.display='block'; 
+    };
 
     window.confirmOrder = async () => {
-        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value; 
-        if(!ph || !ad) return alert("Vui lòng điền đủ thông tin!");
+        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value;
+        if(!ph || !ad) return Swal.fire("Thiếu tin", "Vui lòng nhập SĐT và Địa chỉ", "warning");
         
-        const btn = document.getElementById('btn-sub'); btn.disabled = true; btn.innerText = "Đang kiểm tra...";
-
+        const btn = document.getElementById('btn-sub'); btn.disabled = true; btn.innerText = "Đang xử lý...";
+        
         try {
-            // Lấy thông tin giá & VAT hiện tại từ hệ thống
             const infoSnap = await getDoc(doc(db, "Settings", "info"));
             const vatRate = infoSnap.exists() ? (infoSnap.data().vat_rate || 0) : 0;
-            
             const snapMenu = await getDocs(collection(db, "Menus")); 
             const menuData = {};
             snapMenu.forEach(d => { menuData[d.data().ten_tieng_viet] = { ton: d.data().ton_kho||0, von: d.data().gia_von||0 }; });
             
             let err = ""; let subTotal = 0, totalV = 0;
             for(let k in cart) { 
-                if(cart[k].sl > menuData[k].ton) err += `- ${k} (còn ${menuData[k].ton})\n`;
-                subTotal += cart[k].sl * cart[k].gia; 
-                totalV += cart[k].sl * menuData[k].von; 
+                if(cart[k].sl > menuData[k].ton) err += `- ${k} (còn ${menuData[k].ton} phần)\n`;
+                subTotal += cart[k].sl * cart[k].gia; totalV += cart[k].sl * menuData[k].von;
             }
-            
-            if(err) { btn.disabled = false; btn.innerText="Đặt Đơn"; return Swal.fire("Hết món", err, "error"); }
+            if(err) { btn.disabled = false; btn.innerText = "Đặt Đơn"; return Swal.fire("Không đủ kho", err, "error"); }
 
-            // TÍNH TOÁN VAT
             const vatAmount = Math.round(subTotal * (vatRate / 100));
-            const finalTotal = subTotal + vatAmount;
-
             await addDoc(collection(db, "Orders"), { 
-                khach_hang: currentUser.email, 
-                dien_thoai: ph, 
-                dia_chi: ad, 
-                chi_tiet: cart, 
-                gia_tam_tinh: subTotal,
-                tien_thue: vatAmount,
-                phan_tram_thue: vatRate,
-                tong_tien: finalTotal, 
-                tong_von: totalV, 
-                thoi_gian: serverTimestamp(), 
-                trang_thai: "Chờ xác nhận" 
+                khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, 
+                gia_tam_tinh: subTotal, tien_thue: vatAmount, phan_tram_thue: vatRate,
+                tong_tien: subTotal + vatAmount, tong_von: totalV, 
+                thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" 
             });
-
-            Swal.fire("Thành công!", "Đơn hàng đã được ghi nhận.", "success"); 
+            
+            Swal.fire("Thành công!", "Đơn hàng của bạn đã được gửi tới bếp.", "success");
             cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
-        } catch (e) { alert(e.message); btn.disabled = false; }
+        } catch (e) { alert("Lỗi đặt đơn: " + e.message); btn.disabled = false; }
     };
 
-    // ... (Giữ nguyên các hàm còn lại)
+    // 6. LOGIN FORM
+    window.moLogin = () => { 
+        document.getElementById('auth-form-container').innerHTML = `
+            <h2>Đăng Nhập</h2>
+            <input id="lE" class="modal-input" placeholder="Email">
+            <input id="lP" type="password" class="modal-input" placeholder="Mật khẩu">
+            <button class="btn-login" onclick="window.doLogin()">Vào Cửa Hàng</button>
+            <button onclick="document.getElementById('auth-modal').style.display='none'" style="width:100%; border:none; background:none; color:#999; margin-top:10px; cursor:pointer;">Hủy</button>`; 
+        document.getElementById('auth-modal').style.display='block'; 
+    };
+    window.doLogin = async () => { 
+        try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } 
+        catch (e) { alert("Sai email hoặc mật khẩu!"); } 
+    };
+    window.logout = () => signOut(auth);
+
+    init();
 </script>
+</body>
+</html>
