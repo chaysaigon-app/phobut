@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Thu Ngân Tại Quầy - Phở Bụt</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --main-color: #2e7d32; --dark-color: #1b5e20; --bg-color: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; height: 100vh; display: flex; overflow: hidden; }
+        
+        /* Layout chia 2 cột */
+        .left-panel { width: 65%; height: 100%; padding: 20px; overflow-y: auto; box-sizing: border-box; }
+        .right-panel { width: 35%; height: 100%; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; }
+
+        /* Khung Menu */
+        .header-pos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-pos h2 { margin: 0; color: var(--main-color); }
+        .btn-nav { background: #3498db; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9em; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .pos-item { background: white; border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; border: 2px solid transparent; text-align: center; }
+        .pos-item:hover { transform: translateY(-3px); border-color: var(--main-color); }
+        .pos-item img { width: 100%; height: 120px; object-fit: cover; }
+        .pos-item-info { padding: 10px; }
+        .pos-item-name { font-weight: bold; font-size: 0.95em; margin-bottom: 5px; height: 45px; overflow: hidden; }
+        .pos-item-price { color: #d35400; font-weight: bold; }
+
+        /* Khung Giỏ Hàng (Hóa đơn) */
+        .cart-header { padding: 20px; background: var(--main-color); color: white; text-align: center; }
+        .cart-header h3 { margin: 0; font-size: 1.3em; }
+        
+        .cart-body { flex: 1; overflow-y: auto; padding: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #eee; }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-weight: bold; font-size: 0.95em; }
+        .cart-item-calc { color: #7f8c8d; font-size: 0.85em; }
+        .cart-controls { display: flex; align-items: center; gap: 8px; }
+        .btn-qty { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; }
+        
+        .cart-footer { padding: 20px; background: #f9fbf9; border-top: 2px solid #eee; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95em; }
+        .summary-row.total { font-size: 1.3em; font-weight: bold; color: #d35400; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px; }
+        
+        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-pos { padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 1em; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-print { background: #7f8c8d; }
+        .btn-checkout { background: var(--main-color); grid-column: span 2; font-size: 1.2em; }
+        
+        .customer-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; margin-bottom: 15px; font-family: inherit; }
+
+        /* Phần in ấn (Chỉ hiện khi in bill) */
+        .print-receipt { display: none; width: 300px; margin: 0 auto; font-family: monospace; color: #000; }
+        @media print {
+            body { background: white; overflow: visible; display: block; }
+            .left-panel, .right-panel { display: none !important; }
+            .print-receipt { display: block; }
+            .print-receipt h2 { text-align: center; margin: 0; font-size: 1.5em; }
+            .print-receipt p { text-align: center; margin: 5px 0; font-size: 0.9em; }
+            .print-receipt table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            .print-receipt th, .print-receipt td { border-bottom: 1px dashed #000; padding: 5px 0; font-size: 0.9em; }
+            .print-receipt th { text-align: left; }
+            .print-receipt td:nth-child(2), .print-receipt th:nth-child(2) { text-align: center; }
+            .print-receipt td:nth-child(3), .print-receipt th:nth-child(3) { text-align: right; }
+            .print-total { text-align: right; font-weight: bold; font-size: 1.1em; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="left-panel no-print">
+    <div class="header-pos">
+        <h2>🍜 Menu Thu Ngân Tại Quầy</h2>
+        <div>
+            <a href="orders.html" class="btn-nav">📦 Kho & Đơn</a>
+            <button onclick="window.logout()" style="background:#e74c3c; color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer; margin-left:10px;">Đăng Xuất</button>
+        </div>
+    </div>
+    <div class="menu-grid" id="pos-menu">Đang tải thực đơn...</div>
+</div>
+
+<div class="right-panel no-print">
+    <div class="cart-header">
+        <h3>🧾 Bàn / Đơn Tại Quán</h3>
+    </div>
+    <div style="padding: 15px 15px 0;">
+        <input type="text" id="cusName" class="customer-input" placeholder="Tên khách hoặc Số bàn (Không bắt buộc)">
+    </div>
+    <div class="cart-body" id="pos-cart">
+        <p style="text-align:center; color:#999; margin-top:50px; font-style:italic;">Chưa có món nào được chọn đặng tính tiền.</p>
+    </div>
+    <div class="cart-footer">
+        <div class="summary-row"><span>Tạm tính:</span><span id="pos-sub">0đ</span></div>
+        <div class="summary-row"><span>Thuế VAT (<span id="pos-vat-rate">0</span>%):</span><span id="pos-vat">0đ</span></div>
+        <div class="summary-row total"><span>TỔNG CỘNG:</span><span id="pos-total">0đ</span></div>
+        
+        <div class="action-buttons">
+            <button class="btn-pos" style="background: #e74c3c;" onclick="window.huyDon()">Xóa Đơn</button>
+            <button class="btn-pos btn-print" onclick="window.inTamTinh()">🖨️ In Tạm Tính</button>
+            <button class="btn-pos btn-checkout" onclick="window.thanhToan()">✅ THU TIỀN & LƯU SỔ</button>
+        </div>
+    </div>
+</div>
+
+<div class="print-receipt" id="receipt-area">
+    <h2 id="r-brand">Phở Bụt</h2>
+    <p id="r-addr">Địa chỉ quán</p>
+    <p id="r-phone">Hotline</p>
+    <p style="border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+        Bàn/Khách: <b id="r-cus">...</b><br>
+        TG: <span id="r-time">...</span>
+    </p>
+    <table>
+        <thead><tr><th>Món</th><th>SL</th><th>T.Tiền</th></tr></thead>
+        <tbody id="r-items"></tbody>
+    </table>
+    <div class="print-total">
+        Cộng tiền: <span id="r-sub">0</span><br>
+        VAT (<span id="r-vat-rt">0</span>%): <span id="r-vat">0</span><br>
+        <span style="font-size: 1.2em;">TỔNG: <span id="r-tot">0</span></span>
+    </div>
+    <p style="text-align:center; margin-top: 20px; font-style: italic;">Xin cảm tạ và hẹn gặp lại!<br>Nam Mô A Di Đà Phật.</p>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, writeBatch, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const ADMIN_EMAIL = "chaysaigon@gmail.com";
+
+    let menuData = {};
+    let posCart = {};
+    let thongTinQuan = { vat_rate: 0 };
+    let currentUserEmail = "";
+
+    onAuthStateChanged(auth, async (u) => {
+        if (u) {
+            const sSnap = await getDoc(doc(db, "Settings", "staff"));
+            const isS = sSnap.exists() && sSnap.data().emails?.includes(u.email);
+            if (u.email === ADMIN_EMAIL || isS) {
+                currentUserEmail = u.email;
+                await loadSettings();
+                loadMenu();
+            } else {
+                alert("Tài khoản không được cấp phép thu ngân!");
+                signOut(auth);
+                window.location.href = "index.html";
+            }
+        } else {
+            alert("Vui lòng đăng nhập qua trang Admin trước nghen con!");
+            window.location.href = "admin.html";
+        }
+    });
+
+    window.logout = () => signOut(auth);
+
+    async function loadSettings() {
+        const snap = await getDoc(doc(db, "Settings", "info"));
+        if(snap.exists()) {
+            thongTinQuan = snap.data();
+            document.documentElement.style.setProperty('--main-color', thongTinQuan.main_color || "#2e7d32");
+            document.getElementById('pos-vat-rate').innerText = thongTinQuan.vat_rate || 0;
+            document.getElementById('r-brand').innerText = thongTinQuan.brand_name || "Phở Bụt";
+            document.getElementById('r-addr').innerText = thongTinQuan.store_address || "";
+            document.getElementById('r-phone').innerText = thongTinQuan.store_phone || "";
+            document.getElementById('r-vat-rt').innerText = thongTinQuan.vat_rate || 0;
+        }
+    }
+
+    async function loadMenu() {
+        const snap = await getDocs(collection(db, "Menus"));
+        const grid = document.getElementById('pos-menu');
+        grid.innerHTML = "";
+        
+        snap.forEach(d => {
+            const m = d.data();
+            menuData[m.ten_tieng_viet] = { gia: m.gia_tien, von: m.gia_von || 0, hinh: m.hinh_anh, ton: m.ton_kho || 0 };
+            
+            const out = (m.ton_kho <= 0);
+            grid.innerHTML += `
+                <div class="pos-item" style="opacity:${out ? 0.5 : 1}" onclick="${out ? '' : `window.add('${m.ten_tieng_viet}')`}">
+                    <img src="${m.hinh_anh || 'https://via.placeholder.com/150'}" alt="${m.ten_tieng_viet}">
+                    <div class="pos-item-info">
+                        <div class="pos-item-name">${m.ten_tieng_viet}</div>
+                        <div class="pos-item-price">${m.gia_tien.toLocaleString()}đ ${out ? '<br><small style="color:red">(Hết)</small>' : ''}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    window.add = (ten) => {
+        if(posCart[ten]) posCart[ten].sl++;
+        else posCart[ten] = { sl: 1, gia: menuData[ten].gia, von: menuData[ten].von };
+        renderCart();
+    };
+
+    window.qty = (ten, delta) => {
+        if(posCart[ten]) {
+            posCart[ten].sl += delta;
+            if(posCart[ten].sl <= 0) delete posCart[ten];
+            renderCart();
+        }
+    };
+
+    window.huyDon = () => {
+        if(Object.keys(posCart).length === 0) return;
+        if(confirm("Xóa ráo trọi các món đang chọn nghen con?")) {
+            posCart = {};
+            document.getElementById('cusName').value = "";
+            renderCart();
+        }
+    };
+
+    function renderCart() {
+        const cartDiv = document.getElementById('pos-cart');
+        const rItems = document.getElementById('r-items');
+        
+        if(Object.keys(posCart).length === 0) {
+            cartDiv.innerHTML = `<p style="text-align:center; color:#999; margin-top:50px; font-style:italic;">Chưa có món nào được chọn đặng tính tiền.</p>`;
+            document.getElementById('pos-sub').innerText = "0đ";
+            document.getElementById('pos-vat').innerText = "0đ";
+            document.getElementById('pos-total').innerText = "0đ";
+            return;
+        }
+
+        let html = "", printHtml = "";
+        let subTotal = 0, totalVon = 0;
+
+        for(let k in posCart) {
+            const item = posCart[k];
+            const thanhtien = item.sl * item.gia;
+            subTotal += thanhtien;
+            totalVon += item.sl * item.von;
+
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${k}</div>
+                        <div class="cart-item-calc">${item.gia.toLocaleString()}đ x ${item.sl}</div>
+                    </div>
+                    <div class="cart-controls">
+                        <button class="btn-qty" onclick="window.qty('${k}', -1)">-</button>
+                        <span style="font-weight:bold; width: 20px; text-align:center;">${item.sl}</span>
+                        <button class="btn-qty" onclick="window.qty('${k}', 1)">+</button>
+                    </div>
+                    <div style="font-weight:bold; width: 80px; text-align:right;">${thanhtien.toLocaleString()}đ</div>
+                </div>
+            `;
+            
+            printHtml += `<tr><td>${k}</td><td>${item.sl}</td><td>${thanhtien.toLocaleString()}</td></tr>`;
+        }
+
+        const vatRate = thongTinQuan.vat_rate || 0;
+        const vatAmt = Math.round(subTotal * (vatRate / 100));
+        const finalTotal = subTotal + vatAmt;
+
+        cartDiv.innerHTML = html;
+        rItems.innerHTML = printHtml;
+
+        document.getElementById('pos-sub').innerText = subTotal.toLocaleString() + "đ";
+        document.getElementById('pos-vat').innerText = vatAmt.toLocaleString() + "đ";
+        document.getElementById('pos-total').innerText = finalTotal.toLocaleString() + "đ";
+        
+        // Cập nhật số liệu để in
+        document.getElementById('r-sub').innerText = subTotal.toLocaleString();
+        document.getElementById('r-vat').innerText = vatAmt.toLocaleString();
+        document.getElementById('r-tot').innerText = finalTotal.toLocaleString();
+    }
+
+    window.inTamTinh = () => {
+        if(Object.keys(posCart).length === 0) return Swal.fire("Phiền não chi, giỏ hàng đang trống mà con!");
+        document.getElementById('r-cus').innerText = document.getElementById('cusName').value || "Khách vãng lai";
+        document.getElementById('r-time').innerText = new Date().toLocaleString('vi-VN');
+        window.print();
+    };
+
+    window.thanhToan = async () => {
+        if(Object.keys(posCart).length === 0) return Swal.fire("Chọn món đặng thu tiền nghen con!");
+        
+        const cus = document.getElementById('cusName').value || "Khách tại quán";
+        const btn = document.querySelector('.btn-checkout');
+        btn.disabled = true; btn.innerText = "Đang lưu sổ...";
+
+        try {
+            let sub = 0, von = 0;
+            for(let k in posCart) {
+                sub += posCart[k].sl * posCart[k].gia;
+                von += posCart[k].sl * posCart[k].von;
+            }
+            const vatAmt = Math.round(sub * ((thongTinQuan.vat_rate || 0) / 100));
+            const tong = sub + vatAmt;
+
+            // 1. Lưu đơn vô sổ, trạng thái là "Đã hoàn thành" luôn vì thu tiền trực tiếp
+            await addDoc(collection(db, "Orders"), {
+                khach_hang: cus,
+                dien_thoai: "Thanh toán tại quầy",
+                dia_chi: "Dùng tại quán",
+                chi_tiet: posCart,
+                gia_tam_tinh: sub,
+                tien_thue: vatAmt,
+                phan_tram_thue: thongTinQuan.vat_rate || 0,
+                tong_tien: tong,
+                tong_von: von,
+                thoi_gian: serverTimestamp(),
+                trang_thai: "Đã hoàn thành" // Thu xong coi như xong
+            });
+
+            // 2. Trừ tồn kho ráo trọi
+            const batch = writeBatch(db);
+            for (let k in posCart) {
+                const q = query(collection(db, "Menus"), where("ten_tieng_viet", "==", k));
+                const mS = await getDocs(q);
+                mS.forEach(m => batch.update(doc(db, "Menus", m.id), { ton_kho: Math.max(0, (m.data().ton_kho || 0) - posCart[k].sl) }));
+            }
+            await batch.commit();
+
+            // 3. Hỏi xem có muốn in biên lai không
+            Swal.fire({
+                title: 'Thu tiền thành công!',
+                text: 'Con có muốn in biên lai cho khách không?',
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--main-color)',
+                cancelButtonColor: '#7f8c8d',
+                confirmButtonText: '🖨️ In Biên Lai',
+                cancelButtonText: 'Đóng'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.inTamTinh();
+                }
+                posCart = {};
+                document.getElementById('cusName').value = "";
+                renderCart();
+                loadMenu(); // Tải lại đặng cập nhật số tồn kho
+                btn.disabled = false; btn.innerText = "✅ THU TIỀN & LƯU SỔ";
+            });
+
+        } catch(e) {
+            alert("Lỗi lưu sổ: " + e.message);
+            btn.disabled = false; btn.innerText = "✅ THU TIỀN & LƯU SỔ";
+        }
+    };
+</script>
+</body>
+</html>
