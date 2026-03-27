@@ -310,41 +310,44 @@
     };
 
     window.confirmOrder = async () => {
-        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value; 
+        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value;
         if(!ph || !ad) return Swal.fire("Thiếu thông tin", "Vui lòng nhập SĐT và Địa chỉ để chúng tôi giao hàng.", "warning");
         const btn = document.getElementById('btn-sub'); btn.disabled = true; btn.innerText = "Đang xử lý...";
-        
+
         try {
-            const iSnap = await getDoc(doc(db, "Settings", "info")); 
+            const iSnap = await getDoc(doc(db, "Settings", "info"));
             const dI = iSnap.exists() ? iSnap.data() : {};
-            
+
             const snapM = await getDocs(collection(db, "Menus")); const mD = {};
             snapM.forEach(d => { mD[d.data().ten_tieng_viet] = { ton: d.data().ton_kho||0, von: d.data().gia_von||0 }; });
-            
-            let sub = 0, von = 0;
-            for(let k in cart) { 
+
+            let tongCong = 0, von = 0; // tongCong là Tổng tiền khách trả (giá công bố đã có VAT)
+            for(let k in cart) {
                 if(cart[k].sl > mD[k].ton) {
                     btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN HÀNG";
-                    return Swal.fire("Sản phẩm tạm hết", `Xin lỗi, món ${k} không đủ số lượng trong kho.`, "error"); 
-                } 
-                sub += cart[k].sl*cart[k].gia; von += cart[k].sl*mD[k].von; 
+                    return Swal.fire("Sản phẩm tạm hết", `Xin lỗi, món ${k} không đủ số lượng trong kho.`, "error");
+                }
+                tongCong += cart[k].sl * cart[k].gia; 
+                von += cart[k].sl * mD[k].von;
             }
-            
-            const tax = Math.round(sub * ((dI.vat_rate||0)/100));
-            const tongCong = sub + tax;
-            
-            await addDoc(collection(db, "Orders"), { 
-                khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart, 
-                gia_tam_tinh: sub, tien_thue: tax, phan_tram_thue: dI.vat_rate||0, 
-                tong_tien: tongCong, tong_von: von, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận" 
+
+            const vatRate = dI.vat_rate || 0;
+            // Bóc tách ngược VAT từ Tổng tiền
+            const sub = Math.round(tongCong / (1 + (vatRate / 100))); // Giá gốc (Doanh thu thuần)
+            const tax = tongCong - sub; // Tiền thuế VAT
+
+            await addDoc(collection(db, "Orders"), {
+                khach_hang: currentUser.email, dien_thoai: ph, dia_chi: ad, chi_tiet: cart,
+                gia_tam_tinh: sub, tien_thue: tax, phan_tram_thue: vatRate,
+                tong_tien: tongCong, tong_von: von, thoi_gian: serverTimestamp(), trang_thai: "Chờ xác nhận"
             });
-            
-            Swal.fire("Đặt hàng thành công!", "Quý khách vui lòng theo dõi tình trạng đơn hàng trong phần Tài Khoản.", "success"); 
+
+            Swal.fire("Đặt hàng thành công!", "Quý khách vui lòng theo dõi tình trạng đơn hàng trong phần Tài Khoản.", "success");
             cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
             window.moTaiKhoan();
-        } catch (e) { 
-            alert("Đã xảy ra lỗi: " + e.message); 
-            btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN HÀNG"; 
+        } catch (e) {
+            alert("Đã xảy ra lỗi: " + e.message);
+            btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN HÀNG";
         }
     };
 
