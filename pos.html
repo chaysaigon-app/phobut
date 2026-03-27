@@ -90,7 +90,7 @@
         <p style="text-align:center; color:#999; margin-top:50px; font-style:italic;">Chưa có món nào được chọn đặng tính tiền.</p>
     </div>
     <div class="cart-footer">
-        <div class="summary-row"><span>Tạm tính:</span><span id="pos-sub">0đ</span></div>
+        <div class="summary-row"><span>Tạm tính (chưa thuế):</span><span id="pos-sub">0đ</span></div>
         <div class="summary-row"><span>Thuế VAT (<span id="pos-vat-rate">0</span>%):</span><span id="pos-vat">0đ</span></div>
         <div class="summary-row total"><span>TỔNG CỘNG:</span><span id="pos-total">0đ</span></div>
         
@@ -230,12 +230,12 @@
         }
 
         let html = "", printHtml = "";
-        let subTotal = 0, totalVon = 0;
+        let finalTotal = 0, totalVon = 0; // finalTotal là Tổng tiền niêm yết (đã gồm VAT)
 
         for(let k in posCart) {
             const item = posCart[k];
-            const thanhtien = item.sl * item.gia;
-            subTotal += thanhtien;
+            const thanhtien = item.sl * item.gia; 
+            finalTotal += thanhtien;
             totalVon += item.sl * item.von;
 
             html += `
@@ -253,12 +253,13 @@
                 </div>
             `;
             
-            printHtml += `<tr><td>${k}</td><td>${item.sl}</td><td>${thanhtien.toLocaleString()}</td></tr>`;
+            printHtml += `<tr><td>${k}</td><td style="text-align:center;">${item.sl}</td><td style="text-align:right;">${thanhtien.toLocaleString()}</td></tr>`;
         }
 
         const vatRate = thongTinQuan.vat_rate || 0;
-        const vatAmt = Math.round(subTotal * (vatRate / 100));
-        const finalTotal = subTotal + vatAmt;
+        // Bóc tách ngược VAT từ Tổng tiền
+        const subTotal = Math.round(finalTotal / (1 + (vatRate / 100))); // Giá gốc
+        const vatAmt = finalTotal - subTotal; // Tiền thuế
 
         cartDiv.innerHTML = html;
         rItems.innerHTML = printHtml;
@@ -267,7 +268,7 @@
         document.getElementById('pos-vat').innerText = vatAmt.toLocaleString() + "đ";
         document.getElementById('pos-total').innerText = finalTotal.toLocaleString() + "đ";
         
-        // Cập nhật số liệu để in
+        // Cập nhật số liệu để in bill
         document.getElementById('r-sub').innerText = subTotal.toLocaleString();
         document.getElementById('r-vat').innerText = vatAmt.toLocaleString();
         document.getElementById('r-tot').innerText = finalTotal.toLocaleString();
@@ -288,27 +289,30 @@
         btn.disabled = true; btn.innerText = "Đang lưu sổ...";
 
         try {
-            let sub = 0, von = 0;
+            let tong = 0, von = 0;
             for(let k in posCart) {
-                sub += posCart[k].sl * posCart[k].gia;
+                tong += posCart[k].sl * posCart[k].gia;
                 von += posCart[k].sl * posCart[k].von;
             }
-            const vatAmt = Math.round(sub * ((thongTinQuan.vat_rate || 0) / 100));
-            const tong = sub + vatAmt;
+            const vatRate = thongTinQuan.vat_rate || 0;
+            
+            // Tính toán ngược lại
+            const sub = Math.round(tong / (1 + (vatRate / 100)));
+            const vatAmt = tong - sub;
 
-            // 1. Lưu đơn vô sổ, trạng thái là "Đã hoàn thành" luôn vì thu tiền trực tiếp
+            // 1. Lưu đơn vô sổ
             await addDoc(collection(db, "Orders"), {
                 khach_hang: cus,
                 dien_thoai: "Thanh toán tại quầy",
                 dia_chi: "Dùng tại quán",
                 chi_tiet: posCart,
-                gia_tam_tinh: sub,
+                gia_tam_tinh: sub, // Giá chưa thuế
                 tien_thue: vatAmt,
-                phan_tram_thue: thongTinQuan.vat_rate || 0,
-                tong_tien: tong,
+                phan_tram_thue: vatRate,
+                tong_tien: tong,   // Tổng tiền khách trả (giá niêm yết)
                 tong_von: von,
                 thoi_gian: serverTimestamp(),
-                trang_thai: "Đã hoàn thành" // Thu xong coi như xong
+                trang_thai: "Đã hoàn thành" 
             });
 
             // 2. Trừ tồn kho ráo trọi
@@ -337,7 +341,7 @@
                 posCart = {};
                 document.getElementById('cusName').value = "";
                 renderCart();
-                loadMenu(); // Tải lại đặng cập nhật số tồn kho
+                loadMenu(); 
                 btn.disabled = false; btn.innerText = "✅ THU TIỀN & LƯU SỔ";
             });
 
