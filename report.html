@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Báo Cáo Thuế & Doanh Thu - Hệ Thống Admin</title>
+    <style>
+        :root { --main-color: #2e7d32; --dark-color: #1b5e20; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; color: #333; margin: 0; }
+        
+        .container { max-width: 1000px; margin: auto; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        .header-title { color: var(--main-color); border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-top: 0; text-align: center; font-size: 1.8em; text-transform: uppercase; }
+        .store-info { text-align: center; margin-bottom: 30px; font-style: italic; color: #555; }
+
+        /* Vùng lọc dữ liệu */
+        .filter-section { background: #f9fbf9; padding: 20px; border-radius: 10px; border: 1px dashed var(--main-color); margin-bottom: 25px; display: flex; gap: 15px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .filter-section input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit; }
+        .btn-action { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-filter { background: var(--main-color); }
+        .btn-print { background: #e67e22; font-size: 1.1em; }
+        
+        /* Bảng tổng kết */
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+        .summary-box { background: white; padding: 15px; border-radius: 8px; border: 1px solid #eee; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .summary-box h4 { margin: 0 0 10px 0; font-size: 0.9em; color: #7f8c8d; text-transform: uppercase; }
+        .summary-box p { margin: 0; font-size: 1.4em; font-weight: bold; }
+        
+        /* Bảng chi tiết */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: right; }
+        th { background: #f0fdf4; color: var(--dark-color); text-align: center; }
+        td:nth-child(1), td:nth-child(2) { text-align: center; }
+        
+        .nav-link { display: inline-block; margin-bottom: 20px; color: #3498db; text-decoration: none; font-weight: bold; }
+        .nav-link:hover { text-decoration: underline; }
+
+        /* Định dạng rặt cho việc In Ấn */
+        @media print {
+            body { background: white; padding: 0; }
+            .no-print { display: none !important; }
+            .card { box-shadow: none; border: none; padding: 0; }
+            table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            th, td { border: 1px solid #000; color: #000; padding: 8px; font-size: 12pt; }
+            .header-title { color: #000; border-bottom: 2px solid #000; }
+            .summary-box { border: 1px solid #000; }
+            .summary-box p { color: #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="admin.html" class="nav-link no-print">⬅ Trở về Cài Đặt</a>
+    <a href="orders.html" class="nav-link no-print" style="margin-left: 15px;">⬅ Trở về Đơn Hàng</a>
+
+    <div class="card" id="print-area">
+        <h2 class="header-title">BÁO CÁO THUẾ & DOANH THU</h2>
+        <div class="store-info" id="store-name-display">Hệ Thống Phở Bụt - Đang tải dữ liệu...</div>
+
+        <div class="filter-section no-print">
+            <label><b>Từ ngày:</b></label>
+            <input type="date" id="dateFrom">
+            <label><b>Đến ngày:</b></label>
+            <input type="date" id="dateTo">
+            <button class="btn-action btn-filter" onclick="window.renderReport()">Lọc Báo Cáo</button>
+            <button class="btn-action btn-print" onclick="window.print()">🖨️ Kê Khai & In Ấn</button>
+        </div>
+
+        <div class="summary-grid">
+            <div class="summary-box">
+                <h4>Tổng Tiền Giao Dịch</h4>
+                <p id="sum-tong" style="color: #2980b9;">0đ</p>
+            </div>
+            <div class="summary-box">
+                <h4>VAT Thu Hộ (Phải Nộp)</h4>
+                <p id="sum-thue" style="color: #d35400;">0đ</p>
+            </div>
+            <div class="summary-box">
+                <h4>Doanh Thu Thuần</h4>
+                <p id="sum-doanhthu" style="color: #8e44ad;">0đ</p>
+            </div>
+            <div class="summary-box">
+                <h4>Lợi Nhuận Gộp</h4>
+                <p id="sum-loinhuan" style="color: #27ae60;">0đ</p>
+            </div>
+        </div>
+
+        <h3 style="border-left: 4px solid var(--main-color); padding-left: 10px;">Bảng Kê Chi Tiết Giao Dịch</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Ngày Giờ</th>
+                    <th>Mã Đơn</th>
+                    <th>Doanh Thu Thuần</th>
+                    <th>Tiền Thuế VAT</th>
+                    <th>Tổng Thanh Toán</th>
+                    <th>Tiền Vốn</th>
+                </tr>
+            </thead>
+            <tbody id="report-tbody">
+                <tr><td colspan="7" style="text-align:center;">Đang tải dữ liệu chứng từ...</td></tr>
+            </tbody>
+        </table>
+        
+        <div style="text-align: right; margin-top: 30px; font-style: italic; display: none;" id="print-signature" class="print-only">
+            <p>Ngày ...... tháng ...... năm .........</p>
+            <p style="margin-right: 40px; font-weight: bold;">Người Lập Báo Cáo</p>
+            <br><br><br>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        #print-signature { display: block !important; }
+    }
+</style>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy, getDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const ADMIN_EMAIL = "chaysaigon@gmail.com";
+    
+    let allCompletedOrders = [];
+
+    // Kiểm tra quyền (phải là Admin hoặc Nhân viên)
+    onAuthStateChanged(auth, async (u) => {
+        if (u) {
+            const sSnap = await getDoc(doc(db, "Settings", "staff"));
+            const isS = sSnap.exists() && sSnap.data().emails?.includes(u.email);
+            if (u.email === ADMIN_EMAIL || isS) {
+                loadStoreInfo();
+                loadData();
+            } else {
+                alert("Bạn không đủ quyền hạn xem sổ sách!");
+                window.location.href = "index.html";
+            }
+        } else {
+            alert("Vui lòng đăng nhập qua trang Admin trước!");
+            window.location.href = "admin.html";
+        }
+    });
+
+    async function loadStoreInfo() {
+        const snap = await getDoc(doc(db, "Settings", "info"));
+        if(snap.exists()) {
+            const d = snap.data();
+            document.getElementById('store-name-display').innerText = `Cửa hàng: ${d.brand_name || "Phở Bụt"} | Địa chỉ: ${d.store_address || "Chưa cập nhật"} | MST: Đang chờ bổ sung`;
+            if(d.main_color) document.documentElement.style.setProperty('--main-color', d.main_color);
+        }
+    }
+
+    async function loadData() {
+        try {
+            // Lấy tất cả đơn hàng đã sắp xếp theo thời gian
+            const q = query(collection(db, "Orders"), orderBy("thoi_gian", "desc"));
+            const snap = await getDocs(q);
+            
+            allCompletedOrders = [];
+            snap.forEach(d => {
+                const o = d.data();
+                // Chỉ lấy đơn "Đã hoàn thành" vô sổ sách
+                if (o.trang_thai === "Đã hoàn thành" && o.thoi_gian) {
+                    allCompletedOrders.push({ id: d.id, ...o });
+                }
+            });
+            
+            // Lần đầu tải trang sẽ hiển thị báo cáo của tháng hiện tại
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            
+            document.getElementById('dateFrom').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('dateTo').value = now.toISOString().split('T')[0];
+            
+            window.renderReport();
+        } catch(e) {
+            alert("Lỗi truy xuất sổ sách: " + e.message);
+        }
+    }
+
+    window.renderReport = () => {
+        const tbody = document.getElementById('report-tbody');
+        tbody.innerHTML = "";
+        
+        let dFrom = document.getElementById('dateFrom').value;
+        let dTo = document.getElementById('dateTo').value;
+        
+        const tFrom = dFrom ? new Date(dFrom).getTime() : 0;
+        const tTo = dTo ? new Date(dTo).setHours(23,59,59,999) : Infinity;
+
+        let totalGiaoDich = 0, totalThue = 0, totalDoanhThu = 0, totalVon = 0;
+        let stt = 1;
+
+        allCompletedOrders.forEach(o => {
+            const timeMs = o.thoi_gian.toMillis();
+            if (timeMs >= tFrom && timeMs <= tTo) {
+                const tongThanhToan = o.tong_tien || 0;
+                const doanhThuThuan = o.gia_tam_tinh || 0; // Giá chưa thuế
+                const thue = o.tien_thue || 0;
+                const von = o.tong_von || 0;
+
+                totalGiaoDich += tongThanhToan;
+                totalThue += thue;
+                totalDoanhThu += doanhThuThuan;
+                totalVon += von;
+
+                const timeStr = o.thoi_gian.toDate().toLocaleString('vi-VN');
+                const shortId = o.id.substring(0, 8).toUpperCase();
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${stt++}</td>
+                        <td>${timeStr}</td>
+                        <td>${shortId}</td>
+                        <td>${doanhThuThuan.toLocaleString()}đ</td>
+                        <td style="color:#d35400;">${thue.toLocaleString()}đ</td>
+                        <td style="font-weight:bold;">${tongThanhToan.toLocaleString()}đ</td>
+                        <td style="color:#7f8c8d;">${von.toLocaleString()}đ</td>
+                    </tr>
+                `;
+            }
+        });
+
+        if(stt === 1) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; font-style:italic;">Không phát sinh giao dịch nào trong khoảng thời gian này.</td></tr>`;
+        }
+
+        // Cập nhật ô tổng kết phía trên
+        document.getElementById('sum-tong').innerText = totalGiaoDich.toLocaleString() + "đ";
+        document.getElementById('sum-thue').innerText = totalThue.toLocaleString() + "đ";
+        document.getElementById('sum-doanhthu').innerText = totalDoanhThu.toLocaleString() + "đ";
+        
+        const loiNhuan = totalDoanhThu - totalVon; // Tiền lời là doanh thu thuần trừ vốn
+        document.getElementById('sum-loinhuan').innerText = loiNhuan.toLocaleString() + "đ";
+    };
+</script>
+</body>
+</html>
