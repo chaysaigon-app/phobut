@@ -146,7 +146,7 @@
                     </div>
                     <ul class="item-list">${itms}</ul>
                     <div style="text-align:right; font-size:0.9em;">
-                        Tạm tính: ${(o.gia_tam_tinh || 0).toLocaleString()}đ | Thuế (${o.phan_tram_thue || 0}%): ${(o.tien_thue || 0).toLocaleString()}đ<br>
+                        Doanh thu thuần (chưa thuế): ${(o.gia_tam_tinh || 0).toLocaleString()}đ | Thuế VAT (${o.phan_tram_thue || 0}%): ${(o.tien_thue || 0).toLocaleString()}đ<br>
                         <b style="font-size:1.2em; color:#d35400;">TỔNG THANH TOÁN: ${(o.tong_tien || 0).toLocaleString()}đ</b>
                     </div>
                     <div class="btn-group no-print">
