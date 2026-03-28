@@ -1,638 +1,355 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#1a3a2a">
-<title>POS - Phở Bụt</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<style>
-:root {
-  --green: #1a6b3a;
-  --green-dark: #0f4524;
-  --green-light: #e6f4ec;
-  --orange: #e07020;
-  --red: #d03030;
-  --gray-bg: #f2f4f3;
-  --gray-card: #ffffff;
-  --gray-border: #e0e4e2;
-  --text: #1c2320;
-  --text-muted: #6b7875;
-  --radius: 14px;
-  --font: 'Be Vietnam Pro', sans-serif;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: var(--font); background: var(--gray-bg); color: var(--text); height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Thu Ngân Tại Quầy - Phở Bụt</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --main-color: #2e7d32; --dark-color: #1b5e20; --bg-color: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; height: 100vh; display: flex; overflow: hidden; }
+        
+        /* Layout chia 2 cột */
+        .left-panel { width: 65%; height: 100%; padding: 20px; overflow-y: auto; box-sizing: border-box; }
+        .right-panel { width: 35%; height: 100%; background: white; box-shadow: -2px 0 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; }
 
-/* ===== LOGIN SCREEN ===== */
-#login-screen {
-  position: fixed; inset: 0; z-index: 999;
-  background: linear-gradient(160deg, #0f4524 0%, #1a6b3a 60%, #2d9b58 100%);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
-  padding: 40px 24px;
-}
-.login-logo { text-align: center; }
-.login-logo h1 { font-size: 2.4rem; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
-.login-logo p { color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-top: 6px; }
-.login-card {
-  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 20px; padding: 28px 24px; width: 100%; max-width: 380px;
-}
-.login-card h2 { color: #fff; font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; text-align: center; }
-.login-input {
-  width: 100%; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 10px; padding: 14px 16px; color: #fff; font-family: var(--font); font-size: 1rem;
-  margin-bottom: 12px; outline: none;
-}
-.login-input::placeholder { color: rgba(255,255,255,0.55); }
-.login-input:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.2); }
-.btn-login-google {
-  width: 100%; padding: 14px; border-radius: 10px; border: none; cursor: pointer;
-  background: #fff; color: #1a3a2a; font-family: var(--font); font-size: 1rem; font-weight: 600;
-  display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 4px;
-}
-.btn-login-email {
-  width: 100%; padding: 14px; border-radius: 10px; border: none; cursor: pointer;
-  background: var(--orange); color: #fff; font-family: var(--font); font-size: 1rem; font-weight: 600;
-  margin-bottom: 12px;
-}
+        /* Khung Menu */
+        .header-pos { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header-pos h2 { margin: 0; color: var(--main-color); }
+        .btn-nav { background: #3498db; color: white; padding: 10px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 0.9em; }
 
-/* ===== TOP BAR ===== */
-#topbar {
-  background: var(--green-dark); color: #fff; padding: 12px 16px;
-  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-}
-.topbar-title { font-size: 1rem; font-weight: 700; }
-.topbar-right { display: flex; align-items: center; gap: 10px; }
-.topbar-user { font-size: 0.8rem; color: rgba(255,255,255,0.7); max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.btn-icon { background: rgba(255,255,255,0.12); border: none; border-radius: 8px; padding: 7px 10px; cursor: pointer; font-size: 1rem; color: #fff; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .pos-item { background: white; border-radius: 12px; overflow: hidden; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: 0.2s; border: 2px solid transparent; text-align: center; }
+        .pos-item:hover { transform: translateY(-3px); border-color: var(--main-color); }
+        .pos-item img { width: 100%; height: 120px; object-fit: cover; }
+        .pos-item-info { padding: 10px; }
+        .pos-item-name { font-weight: bold; font-size: 0.95em; margin-bottom: 5px; height: 45px; overflow: hidden; }
+        .pos-item-price { color: #d35400; font-weight: bold; }
 
-/* ===== TABS ===== */
-#tabs {
-  display: flex; background: #fff; border-bottom: 1px solid var(--gray-border); flex-shrink: 0; overflow-x: auto;
-}
-#tabs::-webkit-scrollbar { display: none; }
-.tab-btn {
-  flex-shrink: 0; padding: 10px 18px; border: none; background: none; cursor: pointer;
-  font-family: var(--font); font-size: 0.82rem; font-weight: 600; color: var(--text-muted);
-  border-bottom: 2.5px solid transparent; white-space: nowrap;
-}
-.tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+        /* Khung Giỏ Hàng (Hóa đơn) */
+        .cart-header { padding: 20px; background: var(--main-color); color: white; text-align: center; }
+        .cart-header h3 { margin: 0; font-size: 1.3em; }
+        
+        .cart-body { flex: 1; overflow-y: auto; padding: 15px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #eee; }
+        .cart-item-info { flex: 1; }
+        .cart-item-name { font-weight: bold; font-size: 0.95em; }
+        .cart-item-calc { color: #7f8c8d; font-size: 0.85em; }
+        .cart-controls { display: flex; align-items: center; gap: 8px; }
+        .btn-qty { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; }
+        
+        .cart-footer { padding: 20px; background: #f9fbf9; border-top: 2px solid #eee; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95em; }
+        .summary-row.total { font-size: 1.3em; font-weight: bold; color: #d35400; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px; }
+        
+        .action-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-pos { padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 1em; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-print { background: #7f8c8d; }
+        .btn-checkout { background: var(--main-color); grid-column: span 2; font-size: 1.2em; }
+        
+        .customer-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; margin-bottom: 15px; font-family: inherit; }
 
-/* ===== MAIN LAYOUT ===== */
-#main { flex: 1; display: flex; overflow: hidden; }
-
-/* LEFT PANEL */
-#left-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-#search-bar { padding: 10px 12px; background: #fff; border-bottom: 1px solid var(--gray-border); }
-#search-input {
-  width: 100%; padding: 10px 14px; border: 1px solid var(--gray-border); border-radius: 10px;
-  font-family: var(--font); font-size: 0.92rem; background: var(--gray-bg); outline: none;
-}
-#search-input:focus { border-color: var(--green); background: #fff; }
-#menu-grid {
-  flex: 1; overflow-y: auto; padding: 10px; display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px;
-}
-.menu-item {
-  background: #fff; border-radius: var(--radius); overflow: hidden; cursor: pointer;
-  border: 2px solid transparent; transition: border 0.15s, transform 0.12s; position: relative;
-}
-.menu-item:active { transform: scale(0.97); }
-.menu-item.out-of-stock { opacity: 0.45; pointer-events: none; }
-.menu-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
-.menu-item-body { padding: 7px 8px 8px; }
-.menu-item-name { font-size: 0.8rem; font-weight: 600; line-height: 1.3; height: 2.6em; overflow: hidden; }
-.menu-item-price { font-size: 0.82rem; color: var(--orange); font-weight: 700; margin-top: 3px; }
-.menu-item-badge {
-  position: absolute; top: 6px; right: 6px; background: var(--orange); color: #fff;
-  border-radius: 50%; width: 22px; height: 22px; font-size: 0.72rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-}
-
-/* RIGHT PANEL (BILL) */
-#right-panel {
-  width: 300px; flex-shrink: 0; display: flex; flex-direction: column;
-  background: #fff; border-left: 1px solid var(--gray-border);
-}
-@media (max-width: 600px) {
-  #right-panel { display: none; }
-  #right-panel.show-mobile { display: flex; position: fixed; inset: 0; z-index: 100; width: 100%; }
-}
-.bill-header {
-  padding: 12px 14px; background: var(--green); color: #fff;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.bill-header h3 { font-size: 0.95rem; font-weight: 700; }
-.bill-table-label { font-size: 0.75rem; opacity: 0.85; }
-#bill-items { flex: 1; overflow-y: auto; padding: 8px 12px; }
-.empty-bill { text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0; font-style: italic; }
-.bill-item {
-  display: flex; align-items: center; gap: 8px; padding: 8px 0;
-  border-bottom: 1px dashed var(--gray-border);
-}
-.bill-item-name { flex: 1; font-size: 0.85rem; font-weight: 600; line-height: 1.3; }
-.bill-qty-ctrl { display: flex; align-items: center; gap: 5px; }
-.btn-qty {
-  width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--gray-border);
-  background: var(--gray-bg); cursor: pointer; font-size: 0.9rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-}
-.bill-qty-num { font-size: 0.85rem; font-weight: 700; min-width: 18px; text-align: center; }
-.bill-item-total { font-size: 0.82rem; font-weight: 700; color: var(--orange); min-width: 65px; text-align: right; }
-
-.bill-footer { padding: 12px 14px; border-top: 1px solid var(--gray-border); }
-.bill-row { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 6px; }
-.bill-row.total { font-size: 1.05rem; font-weight: 700; color: var(--green-dark); border-top: 1px solid var(--gray-border); padding-top: 8px; margin-top: 6px; }
-
-/* DISCOUNT ROW */
-.discount-row { display: flex; gap: 6px; margin-bottom: 8px; }
-.discount-input {
-  flex: 1; padding: 8px 10px; border: 1px solid var(--gray-border); border-radius: 8px;
-  font-family: var(--font); font-size: 0.85rem; outline: none;
-}
-.discount-input:focus { border-color: var(--green); }
-.btn-discount { padding: 8px 12px; background: var(--green-light); color: var(--green); border: none; border-radius: 8px; font-family: var(--font); font-weight: 600; font-size: 0.82rem; cursor: pointer; white-space: nowrap; }
-
-.bill-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-.btn-bill { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 0.88rem; }
-.btn-clear { background: #fbe8e8; color: var(--red); }
-.btn-print-temp { background: #f0f0f0; color: var(--text); }
-.btn-checkout { grid-column: span 2; background: var(--green); color: #fff; font-size: 0.95rem; padding: 14px; border-radius: 12px; }
-
-/* TABLE MANAGER */
-#table-manager { padding: 14px; overflow-y: auto; flex: 1; }
-.table-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
-.table-card {
-  border-radius: 12px; padding: 14px 8px; text-align: center; cursor: pointer;
-  border: 2px solid var(--gray-border); background: #fff; transition: 0.15s;
-}
-.table-card:active { transform: scale(0.95); }
-.table-card.active { border-color: var(--green); background: var(--green-light); }
-.table-card.has-order { border-color: var(--orange); background: #fff9f0; }
-.table-card .t-icon { font-size: 1.5rem; }
-.table-card .t-name { font-size: 0.78rem; font-weight: 700; margin-top: 5px; }
-.table-card .t-count { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-.table-card.has-order .t-count { color: var(--orange); font-weight: 600; }
-.table-add-btn {
-  border-radius: 12px; padding: 14px 8px; text-align: center; cursor: pointer;
-  border: 2px dashed var(--gray-border); background: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-}
-.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.section-header h3 { font-size: 1rem; font-weight: 700; }
-.btn-sm { padding: 7px 14px; background: var(--green-light); color: var(--green); border: none; border-radius: 8px; font-family: var(--font); font-weight: 600; font-size: 0.82rem; cursor: pointer; }
-
-/* FLOATING BILL BUTTON (mobile) */
-#float-bill-btn {
-  display: none; position: fixed; bottom: 20px; right: 16px; z-index: 50;
-  background: var(--green); color: #fff; border: none; border-radius: 50px; padding: 14px 20px;
-  font-family: var(--font); font-weight: 700; font-size: 0.9rem; cursor: pointer;
-  box-shadow: 0 4px 18px rgba(26,107,58,0.4);
-}
-@media (max-width: 600px) { #float-bill-btn { display: flex; align-items: center; gap: 8px; } }
-
-/* PRINT RECEIPT */
-#print-receipt { display: none; }
-@media print {
-  body > *:not(#print-receipt) { display: none !important; }
-  #print-receipt {
-    display: block; font-family: 'Courier New', monospace; font-size: 12pt;
-    width: 72mm; margin: 0 auto; color: #000;
-  }
-  #print-receipt h2 { text-align: center; font-size: 14pt; margin-bottom: 4px; }
-  #print-receipt p { text-align: center; font-size: 10pt; margin: 2px 0; }
-  .pr-divider { border-top: 1px dashed #000; margin: 8px 0; }
-  .pr-row { display: flex; justify-content: space-between; font-size: 10pt; margin: 3px 0; }
-  .pr-total { font-size: 13pt; font-weight: bold; }
-}
-</style>
+        /* Phần in ấn (Chỉ hiện khi in bill) */
+        .print-receipt { display: none; width: 300px; margin: 0 auto; font-family: monospace; color: #000; }
+        @media print {
+            body { background: white; overflow: visible; display: block; }
+            .left-panel, .right-panel { display: none !important; }
+            .print-receipt { display: block; }
+            .print-receipt h2 { text-align: center; margin: 0; font-size: 1.5em; }
+            .print-receipt p { text-align: center; margin: 5px 0; font-size: 0.9em; }
+            .print-receipt table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            .print-receipt th, .print-receipt td { border-bottom: 1px dashed #000; padding: 5px 0; font-size: 0.9em; }
+            .print-receipt th { text-align: left; }
+            .print-receipt td:nth-child(2), .print-receipt th:nth-child(2) { text-align: center; }
+            .print-receipt td:nth-child(3), .print-receipt th:nth-child(3) { text-align: right; }
+            .print-total { text-align: right; font-weight: bold; font-size: 1.1em; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen">
-  <div class="login-logo">
-    <h1>🍜 Phở Bụt</h1>
-    <p>Hệ Thống Thu Ngân</p>
-  </div>
-  <div class="login-card">
-    <h2>Đăng nhập</h2>
-    <input id="le" type="email" class="login-input" placeholder="Email">
-    <input id="lp" type="password" class="login-input" placeholder="Mật khẩu">
-    <button class="btn-login-email" onclick="doLogin()">Đăng Nhập</button>
-    <button class="btn-login-google" onclick="loginGoogle()">
-      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
-      Đăng nhập Google
-    </button>
-  </div>
-</div>
-
-<!-- TOP BAR -->
-<div id="topbar">
-  <div class="topbar-title" id="tb-title">🍜 Thu Ngân</div>
-  <div class="topbar-right">
-    <span class="topbar-user" id="tb-user"></span>
-    <button class="btn-icon" onclick="window.location.href='orders.html'" title="Đơn hàng">📦</button>
-    <button class="btn-icon" onclick="doLogout()">⏏</button>
-  </div>
-</div>
-
-<!-- TABS -->
-<div id="tabs">
-  <button class="tab-btn active" onclick="switchTab('pos')">🍽️ Gọi món</button>
-  <button class="tab-btn" onclick="switchTab('tables')">🪑 Bàn</button>
-  <button class="tab-btn" onclick="switchTab('orders-tab')">📋 Đơn hôm nay</button>
-</div>
-
-<!-- MAIN -->
-<div id="main">
-
-  <!-- POS TAB -->
-  <div id="tab-pos" style="display:flex;flex:1;overflow:hidden;width:100%">
-    <div id="left-panel">
-      <div id="search-bar">
-        <input type="search" id="search-input" placeholder="🔍  Tìm món ăn..." oninput="filterMenu()">
-      </div>
-      <div id="menu-grid">
-        <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Đang tải thực đơn...</div>
-      </div>
-    </div>
-    <div id="right-panel">
-      <div class="bill-header">
+<div class="left-panel no-print">
+    <div class="header-pos">
+        <h2>🍜 Menu Thu Ngân Tại Quầy</h2>
         <div>
-          <h3 id="bill-title">🧾 Hóa đơn</h3>
-          <div class="bill-table-label" id="bill-table-label">— Chọn bàn ở tab Bàn —</div>
+            <a href="orders.html" class="btn-nav">📦 Kho & Đơn</a>
+            <button onclick="window.logout()" style="background:#e74c3c; color:white; border:none; padding:10px 15px; border-radius:8px; font-weight:bold; cursor:pointer; margin-left:10px;">Đăng Xuất</button>
         </div>
-        <button class="btn-icon" style="background:rgba(255,255,255,0.2)" onclick="closeMobileBill()">✕</button>
-      </div>
-      <div id="bill-items">
-        <div class="empty-bill">Chưa có món nào được chọn</div>
-      </div>
-      <div class="bill-footer">
-        <div class="discount-row">
-          <input id="discount-input" type="text" class="discount-input" placeholder="Giảm giá: VD 10% hoặc 20000">
-          <button class="btn-discount" onclick="applyDiscount()">Áp dụng</button>
-        </div>
-        <div class="bill-row"><span>Tạm tính:</span><span id="b-sub">0đ</span></div>
-        <div class="bill-row" id="b-vat-row"><span>VAT (<span id="b-vat-r">0</span>%):</span><span id="b-vat">0đ</span></div>
-        <div class="bill-row" id="b-disc-row" style="display:none;color:var(--green)"><span>Giảm giá:</span><span id="b-disc">0đ</span></div>
-        <div class="bill-row total"><span>TỔNG CỘNG:</span><span id="b-total">0đ</span></div>
-        <div class="bill-actions">
-          <button class="btn-bill btn-clear" onclick="clearBill()">🗑 Xóa đơn</button>
-          <button class="btn-bill btn-print-temp" onclick="printBill(false)">🖨 In tạm</button>
-          <button class="btn-bill btn-checkout" onclick="checkout()">✅ THU TIỀN & LƯU SỔ</button>
-        </div>
-      </div>
     </div>
-  </div>
-
-  <!-- TABLES TAB -->
-  <div id="tab-tables" style="display:none;flex:1;overflow:hidden;width:100%">
-    <div id="table-manager">
-      <div class="section-header">
-        <h3>🪑 Quản lý bàn</h3>
-        <button class="btn-sm" onclick="addTable()">+ Thêm bàn</button>
-      </div>
-      <div class="table-grid" id="table-grid"></div>
-    </div>
-  </div>
-
-  <!-- ORDERS TAB -->
-  <div id="tab-orders-tab" style="display:none;flex:1;overflow-y:auto;padding:14px;width:100%">
-    <div class="section-header">
-      <h3>📋 Đơn hôm nay</h3>
-      <button class="btn-sm" onclick="loadTodayOrders()">↻ Tải lại</button>
-    </div>
-    <div id="today-orders"></div>
-  </div>
-
+    <div class="menu-grid" id="pos-menu">Đang tải thực đơn...</div>
 </div>
 
-<!-- FLOAT BILL BUTTON -->
-<button id="float-bill-btn" onclick="openMobileBill()">
-  🧾 Xem đơn&nbsp;<span id="float-count" style="background:rgba(255,255,255,0.25);border-radius:50px;padding:2px 8px">0</span>
-</button>
+<div class="right-panel no-print">
+    <div class="cart-header">
+        <h3>🧾 Bàn / Đơn Tại Quán</h3>
+    </div>
+    <div style="padding: 15px 15px 0;">
+        <input type="text" id="cusName" class="customer-input" placeholder="Tên khách hoặc Số bàn (Không bắt buộc)">
+    </div>
+    <div class="cart-body" id="pos-cart">
+        <p style="text-align:center; color:#999; margin-top:50px; font-style:italic;">Chưa có món nào được chọn đặng tính tiền.</p>
+    </div>
+    <div class="cart-footer">
+        <div class="summary-row"><span>Tạm tính (chưa thuế):</span><span id="pos-sub">0đ</span></div>
+        <div class="summary-row"><span>Thuế VAT (<span id="pos-vat-rate">0</span>%):</span><span id="pos-vat">0đ</span></div>
+        <div class="summary-row total"><span>TỔNG CỘNG:</span><span id="pos-total">0đ</span></div>
+        
+        <div class="action-buttons">
+            <button class="btn-pos" style="background: #e74c3c;" onclick="window.huyDon()">Xóa Đơn</button>
+            <button class="btn-pos btn-print" onclick="window.inTamTinh()">🖨️ In Tạm Tính</button>
+            <button class="btn-pos btn-checkout" onclick="window.thanhToan()">✅ THU TIỀN & LƯU SỔ</button>
+        </div>
+    </div>
+</div>
 
-<!-- PRINT RECEIPT -->
-<div id="print-receipt">
-  <h2 id="pr-brand">Phở Bụt</h2>
-  <p id="pr-addr"></p>
-  <p id="pr-phone"></p>
-  <div class="pr-divider"></div>
-  <p>Bàn/Khách: <b id="pr-table"></b></p>
-  <p>Thời gian: <span id="pr-time"></span></p>
-  <div class="pr-divider"></div>
-  <div id="pr-items"></div>
-  <div class="pr-divider"></div>
-  <div class="pr-row"><span>Tạm tính:</span><span id="pr-sub"></span></div>
-  <div class="pr-row"><span id="pr-vat-label">VAT:</span><span id="pr-vat"></span></div>
-  <div class="pr-row" id="pr-disc-row"><span>Giảm giá:</span><span id="pr-disc"></span></div>
-  <div class="pr-divider"></div>
-  <div class="pr-row pr-total"><span>TỔNG:</span><span id="pr-total"></span></div>
-  <div class="pr-divider"></div>
-  <p style="text-align:center;margin-top:10px;font-style:italic">Xin cảm ơn quý khách!<br>Nam Mô A Di Đà Phật. 🙏</p>
+<div class="print-receipt" id="receipt-area">
+    <h2 id="r-brand">Phở Bụt</h2>
+    <p id="r-addr">Địa chỉ quán</p>
+    <p id="r-phone">Hotline</p>
+    <p style="border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+        Bàn/Khách: <b id="r-cus">...</b><br>
+        TG: <span id="r-time">...</span>
+    </p>
+    <table>
+        <thead><tr><th>Món</th><th>SL</th><th>T.Tiền</th></tr></thead>
+        <tbody id="r-items"></tbody>
+    </table>
+    <div class="print-total">
+        Cộng tiền: <span id="r-sub">0</span><br>
+        VAT (<span id="r-vat-rt">0</span>%): <span id="r-vat">0</span><br>
+        <span style="font-size: 1.2em;">TỔNG: <span id="r-tot">0</span></span>
+    </div>
+    <p style="text-align:center; margin-top: 20px; font-style: italic;">Xin cảm tạ và hẹn gặp lại!<br>Nam Mô A Di Đà Phật.</p>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, writeBatch, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, addDoc, serverTimestamp, writeBatch, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcF4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const ADMIN_EMAIL = "chaysaigon@gmail.com";
+    const firebaseConfig = { apiKey: "AIzaSyA0zujbTZbHe_7gAe_y9QkrcR4qXKC6Abo", authDomain: "phobut-95574.firebaseapp.com", projectId: "phobut-95574" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const ADMIN_EMAIL = "chaysaigon@gmail.com";
 
-let menuData = {};
-let allMenuItems = [];
-let posCart = {};
-let thongTinQuan = { vat_rate: 0 };
-let currentUser = null;
-let activeTable = null;
-let tables = JSON.parse(localStorage.getItem('pos_tables') || '[]');
-let tableOrders = JSON.parse(localStorage.getItem('pos_table_orders') || '{}');
-let discountValue = 0;
-let discountIsPercent = false;
+    let menuData = {};
+    let posCart = {};
+    let thongTinQuan = { vat_rate: 0 };
+    let currentUserEmail = "";
 
-onAuthStateChanged(auth, async u => {
-  if (u) {
-    const sSnap = await getDoc(doc(db, "Settings", "staff"));
-    const isS = sSnap.exists() && sSnap.data().emails?.includes(u.email);
-    if (u.email === ADMIN_EMAIL || isS) {
-      currentUser = u;
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('tb-user').textContent = u.email.split('@')[0];
-      await loadSettings();
-      await loadMenu();
-      renderTables();
-    } else {
-      alert("Tài khoản không được cấp phép!");
-      signOut(auth);
-    }
-  } else {
-    document.getElementById('login-screen').style.display = 'flex';
-  }
-});
-
-window.doLogin = async () => {
-  const e = document.getElementById('le').value;
-  const p = document.getElementById('lp').value;
-  if (!e || !p) return;
-  try { await signInWithEmailAndPassword(auth, e, p); }
-  catch { Swal.fire({icon:'error',title:'Sai thông tin!',timer:1500,showConfirmButton:false}); }
-};
-window.loginGoogle = async () => {
-  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
-  catch(err) { alert(err.message); }
-};
-window.doLogout = () => signOut(auth);
-
-async function loadSettings() {
-  const snap = await getDoc(doc(db, "Settings", "info"));
-  if (snap.exists()) {
-    thongTinQuan = snap.data();
-    document.getElementById('tb-title').textContent = '🍜 ' + (thongTinQuan.brand_name || 'Thu Ngân');
-    document.getElementById('b-vat-r').textContent = thongTinQuan.vat_rate || 0;
-    document.getElementById('pr-brand').textContent = thongTinQuan.brand_name || 'Phở Bụt';
-    document.getElementById('pr-addr').textContent = thongTinQuan.store_address || '';
-    document.getElementById('pr-phone').textContent = thongTinQuan.store_phone || '';
-    if (thongTinQuan.main_color) document.documentElement.style.setProperty('--green', thongTinQuan.main_color);
-  }
-}
-
-async function loadMenu() {
-  const snap = await getDocs(collection(db, "Menus"));
-  menuData = {}; allMenuItems = [];
-  snap.forEach(d => {
-    const m = d.data();
-    menuData[m.ten_tieng_viet] = { gia: m.gia_tien, von: m.gia_von || 0, ton: m.ton_kho || 0 };
-    allMenuItems.push({ ...m, id: d.id });
-  });
-  renderMenu(allMenuItems);
-}
-
-function renderMenu(items) {
-  const grid = document.getElementById('menu-grid');
-  if (!items.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Không tìm thấy món</div>'; return; }
-  grid.innerHTML = items.map(m => {
-    const out = m.ton_kho <= 0;
-    const inCart = posCart[m.ten_tieng_viet]?.sl || 0;
-    return `<div class="menu-item${out?' out-of-stock':''}" onclick="addItem('${m.ten_tieng_viet}')">
-      <img src="${m.hinh_anh||'https://via.placeholder.com/200/e6f4ec/1a6b3a?text=+'}" loading="lazy">
-      ${inCart > 0 ? `<div class="menu-item-badge">${inCart}</div>` : ''}
-      <div class="menu-item-body">
-        <div class="menu-item-name">${m.ten_tieng_viet}</div>
-        <div class="menu-item-price">${m.gia_tien.toLocaleString()}đ${out?' <small style="color:var(--red)">(Hết)</small>':''}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-window.filterMenu = () => {
-  const q = document.getElementById('search-input').value.toLowerCase().trim();
-  renderMenu(q ? allMenuItems.filter(m => m.ten_tieng_viet.toLowerCase().includes(q)) : allMenuItems);
-};
-
-window.addItem = ten => {
-  if (!menuData[ten] || menuData[ten].ton <= 0) return;
-  if (posCart[ten]) posCart[ten].sl++;
-  else posCart[ten] = { sl: 1, gia: menuData[ten].gia, von: menuData[ten].von };
-  renderBill(); filterMenu();
-};
-
-window.qtyChange = (ten, delta) => {
-  if (!posCart[ten]) return;
-  posCart[ten].sl += delta;
-  if (posCart[ten].sl <= 0) delete posCart[ten];
-  renderBill(); filterMenu();
-};
-
-window.applyDiscount = () => {
-  const raw = document.getElementById('discount-input').value.trim();
-  if (!raw) { discountValue = 0; renderBill(); return; }
-  if (raw.endsWith('%')) { discountIsPercent = true; discountValue = parseFloat(raw) || 0; }
-  else { discountIsPercent = false; discountValue = parseInt(raw.replace(/\D/g,'')) || 0; }
-  renderBill();
-  Swal.fire({toast:true,position:'top-end',icon:'success',title:'Đã áp dụng giảm giá!',showConfirmButton:false,timer:1200});
-};
-
-function calcTotals() {
-  let sub = 0, von = 0;
-  for (let k in posCart) { sub += posCart[k].sl * posCart[k].gia; von += posCart[k].sl * posCart[k].von; }
-  const vatRate = thongTinQuan.vat_rate || 0;
-  const vat = Math.round(sub * vatRate / 100);
-  let disc = discountIsPercent ? Math.round((sub + vat) * discountValue / 100) : discountValue;
-  disc = Math.min(disc, sub + vat);
-  return { sub, vat, disc, total: sub + vat - disc, von, vatRate };
-}
-
-function renderBill() {
-  const keys = Object.keys(posCart);
-  const container = document.getElementById('bill-items');
-  if (!keys.length) {
-    container.innerHTML = '<div class="empty-bill">Chưa có món nào được chọn</div>';
-  } else {
-    container.innerHTML = keys.map(k => `<div class="bill-item">
-      <div class="bill-item-name">${k}</div>
-      <div class="bill-qty-ctrl">
-        <button class="btn-qty" onclick="qtyChange('${k}',-1)">−</button>
-        <span class="bill-qty-num">${posCart[k].sl}</span>
-        <button class="btn-qty" onclick="qtyChange('${k}',1)">+</button>
-      </div>
-      <div class="bill-item-total">${(posCart[k].sl*posCart[k].gia).toLocaleString()}đ</div>
-    </div>`).join('');
-  }
-  const { sub, vat, disc, total, vatRate } = calcTotals();
-  document.getElementById('b-sub').textContent = sub.toLocaleString()+'đ';
-  document.getElementById('b-vat-r').textContent = vatRate;
-  document.getElementById('b-vat').textContent = vat.toLocaleString()+'đ';
-  document.getElementById('b-total').textContent = total.toLocaleString()+'đ';
-  const discRow = document.getElementById('b-disc-row');
-  if (disc > 0) { discRow.style.display='flex'; document.getElementById('b-disc').textContent='-'+disc.toLocaleString()+'đ'; }
-  else { discRow.style.display='none'; }
-  document.getElementById('float-count').textContent = keys.reduce((a,k)=>a+posCart[k].sl,0);
-  if (activeTable) saveTableOrder();
-}
-
-window.clearBill = () => {
-  if (!Object.keys(posCart).length) return;
-  Swal.fire({title:'Xóa đơn?',icon:'warning',showCancelButton:true,confirmButtonText:'Xóa',cancelButtonText:'Thôi',confirmButtonColor:'#d03030'})
-    .then(r => { if(r.isConfirmed) { posCart={}; discountValue=0; document.getElementById('discount-input').value=''; renderBill(); filterMenu(); if(activeTable) saveTableOrder(); }});
-};
-
-window.checkout = async () => {
-  if (!Object.keys(posCart).length) return Swal.fire('Chọn món trước nghen!');
-  const cus = activeTable?.name || 'Khách tại quán';
-  const btn = document.querySelector('.btn-checkout');
-  btn.disabled = true; btn.textContent = 'Đang lưu...';
-  try {
-    const { sub, vat, disc, total, von, vatRate } = calcTotals();
-    await addDoc(collection(db, "Orders"), {
-      khach_hang: cus, dien_thoai: "Tại quầy", dia_chi: "Dùng tại quán",
-      chi_tiet: posCart, gia_tam_tinh: sub, tien_thue: vat, phan_tram_thue: vatRate,
-      giam_gia: disc, tong_tien: total, tong_von: von,
-      thoi_gian: serverTimestamp(), trang_thai: "Đã hoàn thành"
+    onAuthStateChanged(auth, async (u) => {
+        if (u) {
+            const sSnap = await getDoc(doc(db, "Settings", "staff"));
+            const isS = sSnap.exists() && sSnap.data().emails?.includes(u.email);
+            if (u.email === ADMIN_EMAIL || isS) {
+                currentUserEmail = u.email;
+                await loadSettings();
+                loadMenu();
+            } else {
+                alert("Tài khoản không được cấp phép thu ngân!");
+                signOut(auth);
+                window.location.href = "index.html";
+            }
+        } else {
+            alert("Vui lòng đăng nhập qua trang Admin trước nghen con!");
+            window.location.href = "admin.html";
+        }
     });
-    const batch = writeBatch(db);
-    for (let k in posCart) {
-      const q = query(collection(db,"Menus"),where("ten_tieng_viet","==",k));
-      const s = await getDocs(q);
-      s.forEach(m => batch.update(doc(db,"Menus",m.id),{ton_kho:Math.max(0,(m.data().ton_kho||0)-posCart[k].sl)}));
+
+    window.logout = () => signOut(auth);
+
+    async function loadSettings() {
+        const snap = await getDoc(doc(db, "Settings", "info"));
+        if(snap.exists()) {
+            thongTinQuan = snap.data();
+            document.documentElement.style.setProperty('--main-color', thongTinQuan.main_color || "#2e7d32");
+            document.getElementById('pos-vat-rate').innerText = thongTinQuan.vat_rate || 0;
+            document.getElementById('r-brand').innerText = thongTinQuan.brand_name || "Phở Bụt";
+            document.getElementById('r-addr').innerText = thongTinQuan.store_address || "";
+            document.getElementById('r-phone').innerText = thongTinQuan.store_phone || "";
+            document.getElementById('r-vat-rt').innerText = thongTinQuan.vat_rate || 0;
+        }
     }
-    await batch.commit();
-    Swal.fire({title:'Thu tiền thành công! 🎉',text:'In biên lai cho khách?',icon:'success',showCancelButton:true,confirmButtonText:'🖨 In biên lai',cancelButtonText:'Đóng',confirmButtonColor:'#1a6b3a'})
-      .then(r => { if(r.isConfirmed) printBill(true); });
-    if (activeTable) { tableOrders[activeTable.id] = null; saveTableOrders(); }
-    posCart = {}; discountValue = 0; document.getElementById('discount-input').value = '';
-    renderBill(); filterMenu(); loadMenu();
-  } catch(e) { alert('Lỗi: '+e.message); }
-  btn.disabled = false; btn.textContent = '✅ THU TIỀN & LƯU SỔ';
-};
 
-window.printBill = (isReceipt) => {
-  if (!Object.keys(posCart).length && !isReceipt) return Swal.fire('Giỏ hàng trống!');
-  const { sub, vat, disc, total, vatRate } = calcTotals();
-  document.getElementById('pr-table').textContent = activeTable?.name || 'Khách vãng lai';
-  document.getElementById('pr-time').textContent = new Date().toLocaleString('vi-VN');
-  document.getElementById('pr-vat-label').textContent = `VAT (${vatRate}%):`;
-  document.getElementById('pr-items').innerHTML = Object.entries(posCart).map(([k,v])=>`<div class="pr-row"><span>${k} x${v.sl}</span><span>${(v.sl*v.gia).toLocaleString()}đ</span></div>`).join('');
-  document.getElementById('pr-sub').textContent = sub.toLocaleString()+'đ';
-  document.getElementById('pr-vat').textContent = vat.toLocaleString()+'đ';
-  const pr = document.getElementById('pr-disc-row');
-  if (disc>0) { pr.style.display='flex'; document.getElementById('pr-disc').textContent='-'+disc.toLocaleString()+'đ'; } else { pr.style.display='none'; }
-  document.getElementById('pr-total').textContent = total.toLocaleString()+'đ';
-  window.print();
-};
+    async function loadMenu() {
+        const snap = await getDocs(collection(db, "Menus"));
+        const grid = document.getElementById('pos-menu');
+        grid.innerHTML = "";
+        
+        snap.forEach(d => {
+            const m = d.data();
+            menuData[m.ten_tieng_viet] = { gia: m.gia_tien, von: m.gia_von || 0, hinh: m.hinh_anh, ton: m.ton_kho || 0 };
+            
+            const out = (m.ton_kho <= 0);
+            grid.innerHTML += `
+                <div class="pos-item" style="opacity:${out ? 0.5 : 1}" onclick="${out ? '' : `window.add('${m.ten_tieng_viet}')`}">
+                    <img src="${m.hinh_anh || 'https://via.placeholder.com/150'}" alt="${m.ten_tieng_viet}">
+                    <div class="pos-item-info">
+                        <div class="pos-item-name">${m.ten_tieng_viet}</div>
+                        <div class="pos-item-price">${m.gia_tien.toLocaleString()}đ ${out ? '<br><small style="color:red">(Hết)</small>' : ''}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
 
-function saveTableOrders() { localStorage.setItem('pos_table_orders', JSON.stringify(tableOrders)); }
-function saveTables() { localStorage.setItem('pos_tables', JSON.stringify(tables)); }
-function saveTableOrder() {
-  if (!activeTable) return;
-  tableOrders[activeTable.id] = { cart: {...posCart}, discount: discountValue, discPercent: discountIsPercent };
-  saveTableOrders();
-}
+    window.add = (ten) => {
+        if(posCart[ten]) posCart[ten].sl++;
+        else posCart[ten] = { sl: 1, gia: menuData[ten].gia, von: menuData[ten].von };
+        renderCart();
+    };
 
-window.selectTable = id => {
-  if (activeTable) saveTableOrder();
-  activeTable = tables.find(t => t.id === id);
-  if (!activeTable) return;
-  const saved = tableOrders[id];
-  if (saved) { posCart = saved.cart || {}; discountValue = saved.discount || 0; discountIsPercent = saved.discPercent || false; document.getElementById('discount-input').value = discountIsPercent ? discountValue+'%' : (discountValue||''); }
-  else { posCart = {}; discountValue = 0; document.getElementById('discount-input').value = ''; }
-  document.getElementById('bill-title').textContent = '🧾 ' + activeTable.name;
-  document.getElementById('bill-table-label').textContent = activeTable.name;
-  renderBill(); renderTables(); filterMenu();
-  switchTab('pos');
-};
+    window.qty = (ten, delta) => {
+        if(posCart[ten]) {
+            posCart[ten].sl += delta;
+            if(posCart[ten].sl <= 0) delete posCart[ten];
+            renderCart();
+        }
+    };
 
-function renderTables() {
-  const grid = document.getElementById('table-grid');
-  let html = tables.map(t => {
-    const order = tableOrders[t.id];
-    const count = order ? Object.values(order.cart||{}).reduce((a,v)=>a+v.sl,0) : 0;
-    const isActive = activeTable?.id === t.id;
-    return `<div class="table-card${isActive?' active':''}${count>0?' has-order':''}" onclick="selectTable('${t.id}')">
-      <div class="t-icon">🪑</div>
-      <div class="t-name">${t.name}</div>
-      <div class="t-count">${count>0?count+' món':'Trống'}</div>
-    </div>`;
-  }).join('');
-  html += `<button class="table-add-btn" onclick="addTable()"><span style="font-size:1.4rem">＋</span><span style="font-size:0.75rem;color:var(--text-muted)">Thêm bàn</span></button>`;
-  grid.innerHTML = html;
-}
+    window.huyDon = () => {
+        if(Object.keys(posCart).length === 0) return;
+        if(confirm("Xóa ráo trọi các món đang chọn nghen con?")) {
+            posCart = {};
+            document.getElementById('cusName').value = "";
+            renderCart();
+        }
+    };
 
-window.addTable = async () => {
-  const { value: name } = await Swal.fire({title:'Tên bàn mới',input:'text',inputPlaceholder:'VD: Bàn 1, Bàn VIP...',confirmButtonText:'Thêm',confirmButtonColor:'#1a6b3a'});
-  if (name) { tables.push({id:'table_'+Date.now(),name}); saveTables(); renderTables(); }
-};
+    function renderCart() {
+        const cartDiv = document.getElementById('pos-cart');
+        const rItems = document.getElementById('r-items');
+        
+        if(Object.keys(posCart).length === 0) {
+            cartDiv.innerHTML = `<p style="text-align:center; color:#999; margin-top:50px; font-style:italic;">Chưa có món nào được chọn đặng tính tiền.</p>`;
+            document.getElementById('pos-sub').innerText = "0đ";
+            document.getElementById('pos-vat').innerText = "0đ";
+            document.getElementById('pos-total').innerText = "0đ";
+            return;
+        }
 
-window.loadTodayOrders = async () => {
-  const div = document.getElementById('today-orders');
-  div.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-muted)">Đang tải...</div>';
-  try {
-    const today = new Date(); today.setHours(0,0,0,0);
-    const snap = await getDocs(query(collection(db,"Orders"),orderBy("thoi_gian","desc")));
-    let html = '', count = 0;
-    snap.forEach(d => {
-      const o = d.data();
-      if (!o.thoi_gian || o.thoi_gian.toDate() < today) return;
-      count++;
-      const time = o.thoi_gian.toDate().toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
-      const items = Object.entries(o.chi_tiet||{}).map(([k,v])=>`${k} x${v.sl}`).join(', ');
-      html += `<div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;border-left:4px solid ${o.trang_thai==='Đã hoàn thành'?'#1a6b3a':'#e07020'}">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-          <span style="font-weight:700;font-size:0.9rem">${o.khach_hang}</span>
-          <span style="font-size:0.8rem;color:var(--text-muted)">${time}</span>
-        </div>
-        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px">${items}</div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="font-weight:700;color:var(--orange)">${(o.tong_tien||0).toLocaleString()}đ</span>
-          <span style="font-size:0.75rem;padding:3px 10px;border-radius:20px;font-weight:600;background:${o.trang_thai==='Đã hoàn thành'?'#e6f4ec':'#fff9f0'};color:${o.trang_thai==='Đã hoàn thành'?'#1a6b3a':'#e07020'}">${o.trang_thai}</span>
-        </div>
-      </div>`;
-    });
-    div.innerHTML = count ? html : '<div style="text-align:center;padding:40px;color:var(--text-muted);font-style:italic">Chưa có đơn nào hôm nay</div>';
-  } catch(e) { div.innerHTML = '<div style="color:red;padding:20px">Lỗi: '+e.message+'</div>'; }
-};
+        let html = "", printHtml = "";
+        let finalTotal = 0, totalVon = 0; // finalTotal là Tổng tiền niêm yết (đã gồm VAT)
 
-window.switchTab = tab => {
-  ['pos','tables','orders-tab'].forEach(t => document.getElementById('tab-'+t).style.display = t===tab?'flex':'none');
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active',i==['pos','tables','orders-tab'].indexOf(tab)));
-  if (tab==='orders-tab') loadTodayOrders();
-  if (tab==='tables') renderTables();
-};
+        for(let k in posCart) {
+            const item = posCart[k];
+            const thanhtien = item.sl * item.gia; 
+            finalTotal += thanhtien;
+            totalVon += item.sl * item.von;
 
-window.openMobileBill = () => document.getElementById('right-panel').classList.add('show-mobile');
-window.closeMobileBill = () => document.getElementById('right-panel').classList.remove('show-mobile');
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${k}</div>
+                        <div class="cart-item-calc">${item.gia.toLocaleString()}đ x ${item.sl}</div>
+                    </div>
+                    <div class="cart-controls">
+                        <button class="btn-qty" onclick="window.qty('${k}', -1)">-</button>
+                        <span style="font-weight:bold; width: 20px; text-align:center;">${item.sl}</span>
+                        <button class="btn-qty" onclick="window.qty('${k}', 1)">+</button>
+                    </div>
+                    <div style="font-weight:bold; width: 80px; text-align:right;">${thanhtien.toLocaleString()}đ</div>
+                </div>
+            `;
+            
+            printHtml += `<tr><td>${k}</td><td style="text-align:center;">${item.sl}</td><td style="text-align:right;">${thanhtien.toLocaleString()}</td></tr>`;
+        }
 
-if (!tables.length) {
-  tables = [{id:'t1',name:'Bàn 1'},{id:'t2',name:'Bàn 2'},{id:'t3',name:'Bàn 3'},{id:'t4',name:'Bàn 4'}];
-  saveTables();
-}
+        const vatRate = thongTinQuan.vat_rate || 0;
+        // Bóc tách ngược VAT từ Tổng tiền
+        const subTotal = Math.round(finalTotal / (1 + (vatRate / 100))); // Giá gốc
+        const vatAmt = finalTotal - subTotal; // Tiền thuế
+
+        cartDiv.innerHTML = html;
+        rItems.innerHTML = printHtml;
+
+        document.getElementById('pos-sub').innerText = subTotal.toLocaleString() + "đ";
+        document.getElementById('pos-vat').innerText = vatAmt.toLocaleString() + "đ";
+        document.getElementById('pos-total').innerText = finalTotal.toLocaleString() + "đ";
+        
+        // Cập nhật số liệu để in bill
+        document.getElementById('r-sub').innerText = subTotal.toLocaleString();
+        document.getElementById('r-vat').innerText = vatAmt.toLocaleString();
+        document.getElementById('r-tot').innerText = finalTotal.toLocaleString();
+    }
+
+    window.inTamTinh = () => {
+        if(Object.keys(posCart).length === 0) return Swal.fire("Phiền não chi, giỏ hàng đang trống mà con!");
+        document.getElementById('r-cus').innerText = document.getElementById('cusName').value || "Khách vãng lai";
+        document.getElementById('r-time').innerText = new Date().toLocaleString('vi-VN');
+        window.print();
+    };
+
+    window.thanhToan = async () => {
+        if(Object.keys(posCart).length === 0) return Swal.fire("Chọn món đặng thu tiền nghen con!");
+        
+        const cus = document.getElementById('cusName').value || "Khách tại quán";
+        const btn = document.querySelector('.btn-checkout');
+        btn.disabled = true; btn.innerText = "Đang lưu sổ...";
+
+        try {
+            let tong = 0, von = 0;
+            for(let k in posCart) {
+                tong += posCart[k].sl * posCart[k].gia;
+                von += posCart[k].sl * posCart[k].von;
+            }
+            const vatRate = thongTinQuan.vat_rate || 0;
+            
+            // Tính toán ngược lại
+            const sub = Math.round(tong / (1 + (vatRate / 100)));
+            const vatAmt = tong - sub;
+
+            // 1. Lưu đơn vô sổ
+            await addDoc(collection(db, "Orders"), {
+                khach_hang: cus,
+                dien_thoai: "Thanh toán tại quầy",
+                dia_chi: "Dùng tại quán",
+                chi_tiet: posCart,
+                gia_tam_tinh: sub, // Giá chưa thuế
+                tien_thue: vatAmt,
+                phan_tram_thue: vatRate,
+                tong_tien: tong,   // Tổng tiền khách trả (giá niêm yết)
+                tong_von: von,
+                thoi_gian: serverTimestamp(),
+                trang_thai: "Đã hoàn thành" 
+            });
+
+            // 2. Trừ tồn kho ráo trọi
+            const batch = writeBatch(db);
+            for (let k in posCart) {
+                const q = query(collection(db, "Menus"), where("ten_tieng_viet", "==", k));
+                const mS = await getDocs(q);
+                mS.forEach(m => batch.update(doc(db, "Menus", m.id), { ton_kho: Math.max(0, (m.data().ton_kho || 0) - posCart[k].sl) }));
+            }
+            await batch.commit();
+
+            // 3. Hỏi xem có muốn in biên lai không
+            Swal.fire({
+                title: 'Thu tiền thành công!',
+                text: 'Con có muốn in biên lai cho khách không?',
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--main-color)',
+                cancelButtonColor: '#7f8c8d',
+                confirmButtonText: '🖨️ In Biên Lai',
+                cancelButtonText: 'Đóng'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.inTamTinh();
+                }
+                posCart = {};
+                document.getElementById('cusName').value = "";
+                renderCart();
+                loadMenu(); 
+                btn.disabled = false; btn.innerText = "✅ THU TIỀN & LƯU SỔ";
+            });
+
+        } catch(e) {
+            alert("Lỗi lưu sổ: " + e.message);
+            btn.disabled = false; btn.innerText = "✅ THU TIỀN & LƯU SỔ";
+        }
+    };
 </script>
 </body>
 </html>
