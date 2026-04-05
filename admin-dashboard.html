@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Admin Dashboard — Vegans Da Nang</title>
+<title>Admin — Vegans Da Nang</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
-/* CSS giữ nguyên bản gốc của bạn */
 :root{
   --bg:#07090e;--s1:#0c1018;--s2:#131924;--s3:#1a2232;--s4:#1f2a3c;
   --brd:#283450;--brd2:#1a2232;
@@ -21,13 +20,15 @@
   --pur:#b06fff;--pur-d:rgba(176,111,255,.12);
   --txt:#dde4f5;--txt2:#7a8eb0;--txt3:#3d4f70;
   --font:'Be Vietnam Pro',sans-serif;--mono:'JetBrains Mono',monospace;
-  --r:10px;--r2:16px;--sh:0 8px 32px rgba(0,0,0,.5);--sw:224px;
+  --r:10px;--r2:16px;--sh:0 8px 32px rgba(0,0,0,.5);--sw:220px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14px;height:100vh;display:flex;overflow:hidden}
 button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
-input,select,textarea{font-family:var(--font);color:var(--txt)}
+input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
 ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:4px}
+
+/* AUTH */
 #auth{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;padding:24px}
 .ac{width:100%;max-width:360px;background:var(--s1);border:1px solid var(--brd);border-radius:20px;padding:44px 36px}
 .al{text-align:center;margin-bottom:24px}.al-ico{font-size:40px;margin-bottom:8px}
@@ -37,14 +38,16 @@ input,select,textarea{font-family:var(--font);color:var(--txt)}
 .afl label{display:block;font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
 .afl input{width:100%;background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:11px 14px;color:var(--txt);font-size:14px;outline:none;transition:border-color .2s}
 .afl input:focus{border-color:var(--acc)}
-.ap{width:100%;background:var(--acc);color:#fff;border-radius:var(--r);padding:12px;font-weight:800;font-size:15px;transition:all .2s;letter-spacing:.3px}
+.ap{width:100%;background:var(--acc);color:#fff;border-radius:var(--r);padding:12px;font-weight:800;font-size:15px}
 .ap:hover{background:var(--acc2)}
 #ae{color:var(--red);font-size:12px;text-align:center;min-height:16px;margin-top:8px}
+
+/* SIDEBAR */
 #sb{width:var(--sw);background:var(--s1);border-right:1px solid var(--brd);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
-.sb-br{padding:15px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
-.sb-ico{font-size:20px}.sb-txt{font-weight:900;font-size:15px;letter-spacing:-0.5px}.sb-txt span{color:var(--acc)}
+.sb-br{padding:14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
+.sb-ico{font-size:20px}.sb-txt{font-weight:900;font-size:14px}
 #br-sel{padding:8px;border-bottom:1px solid var(--brd);flex-shrink:0}
-#br-sel select{width:100%;background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:7px 10px;color:var(--txt);font-size:12px;outline:none;cursor:pointer}
+#br-sel select{width:100%;background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:7px 10px;color:var(--txt);font-size:12px;outline:none}
 .sbn{flex:1;overflow-y:auto;padding:6px}
 .ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt2);font-weight:500;font-size:13px;transition:all .15s;margin-bottom:2px;width:100%;text-align:left}
 .ni:hover{background:var(--s3);color:var(--txt)}.ni.on{background:var(--acc-d);color:var(--acc)}
@@ -54,53 +57,46 @@ input,select,textarea{font-family:var(--font);color:var(--txt)}
 .su{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:var(--s3)}
 .sav{width:30px;height:30px;border-radius:50%;background:var(--acc-d);border:2px solid var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:var(--acc);flex-shrink:0}
 .sui{flex:1;overflow:hidden}.sue{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sur{font-size:10px;color:var(--txt3)}
-.lout{margin-top:8px;width:100%;background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:8px;padding:7px;font-size:12px;font-family:var(--font);transition:all .15s}
+.lout{margin-top:8px;width:100%;background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:8px;padding:7px;font-size:12px;transition:all .15s}
 .lout:hover{border-color:var(--red);color:var(--red)}
+
+/* MAIN */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 #pg-hdr{padding:14px 24px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:10px}
 #pg-ttl{font-size:19px;font-weight:800;letter-spacing:-0.5px;flex-shrink:0}
 #pg-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.hdr-export-btn{display:flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--brd);color:var(--txt2);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;transition:all .15s}
-.hdr-export-btn:hover{border-color:var(--acc);color:var(--acc)}
-.hdr-export-btn.pdf{border-color:var(--red);color:var(--red);background:var(--red-d)}
-.hdr-export-btn.email{border-color:var(--grn);color:var(--grn);background:var(--grn-d)}
-.bs-acc{background:var(--acc);border:1px solid var(--acc);color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;font-family:var(--font)}
+.hdr-btn{display:flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--brd);color:var(--txt2);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;transition:all .15s}
+.hdr-btn:hover{border-color:var(--acc);color:var(--acc)}
+.bs-acc{background:var(--acc);border:1px solid var(--acc);color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700}
 .bs-acc:hover{background:var(--acc2)}
 #pg-c{flex:1;overflow-y:auto;padding:20px 24px}
-.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px;margin-bottom:20px}
+
+/* CARDS */
+.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
 .kc{background:var(--s2);border:1px solid var(--brd);border-radius:var(--r2);padding:16px;position:relative;overflow:hidden}
 .kc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.kc.or::before{background:var(--acc)}.kc.gr::before{background:var(--grn)}.kc.bl::before{background:var(--blu)}.kc.pu::before{background:var(--pur)}
+.kc.or::before{background:var(--acc)}.kc.gr::before{background:var(--grn)}.kc.bl::before{background:var(--blu)}.kc.pu::before{background:var(--pur)}.kc.re::before{background:var(--red)}
 .kl{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .kv{font-family:var(--mono);font-size:20px;font-weight:700;margin-bottom:4px}
 .ks{font-size:11px;color:var(--txt3)}.ki{position:absolute;right:12px;top:12px;font-size:22px;opacity:.18}
-.cr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
-.cc{background:var(--s2);border:1px solid var(--brd);border-radius:var(--r2);padding:16px}
-.ct{font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
-.bc{display:flex;flex-direction:column;gap:6px}
-.bi{display:flex;align-items:center;gap:8px}
-.blab{width:108px;color:var(--txt2);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btr{flex:1;height:17px;background:var(--s4);border-radius:4px;overflow:hidden}
-.bf{height:100%;border-radius:4px;transition:width .65s cubic-bezier(.4,0,.2,1)}
-.bval{width:68px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--txt2)}
-.dw{display:flex;align-items:center;gap:14px}
-.dl{display:flex;flex-direction:column;gap:7px}
-.dli{display:flex;align-items:center;gap:6px;font-size:11px}
-.dld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.stl{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--txt)}
-.stl::after{content:'';flex:1;height:1px;background:var(--brd)}
-.df{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+
+/* TABLES */
+.cvd{background:var(--s2);border:1px solid var(--brd);border-radius:var(--r2);padding:16px;margin-bottom:14px}
+.df{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
 .df label{font-size:12px;color:var(--txt2);font-weight:600}
-.df input{background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 10px;color:var(--txt);font-size:12px;outline:none;transition:border-color .2s}
-.df input:focus{border-color:var(--acc)}
-.df-btn{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font)}
+.df input,.df select{background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 10px;color:var(--txt);font-size:12px;outline:none}
+.df input:focus,.df select:focus{border-color:var(--acc)}
+.df-btn{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700}
 .dt{width:100%;border-collapse:collapse;font-size:13px}
 .dt th{text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--brd)}
-.dt td{padding:10px 12px;border-bottom:1px solid var(--brd2)}
+.dt td{padding:10px 12px;border-bottom:1px solid var(--brd2);vertical-align:middle}
 .dt tr:hover td{background:var(--s3)}.dt tr:last-child td{border-bottom:none}
 .bdg{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
-.badm{background:var(--acc-d);color:var(--acc)}.bcsh{background:var(--blu-d);color:var(--blu)}
 .bact{background:var(--grn-d);color:var(--grn)}.bins{background:var(--red-d);color:var(--red)}
+.bpnd{background:var(--ylw-d);color:var(--ylw)}.badm{background:var(--acc-d);color:var(--acc)}
+.bhid{background:var(--txt3);color:var(--bg);opacity:.7}
+
+/* FORMS */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .ff{display:flex;flex-direction:column;gap:5px}.ff.full{grid-column:1/-1}
 .ff label{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px}
@@ -108,17 +104,13 @@ input,select,textarea{font-family:var(--font);color:var(--txt)}
 .ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--acc)}
 .ff textarea{resize:vertical;min-height:70px}
 .fa{display:flex;gap:8px;margin-top:16px}
-.fcn{background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:var(--r);padding:8px 18px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600}
-.fsv{background:var(--acc);border:none;color:#fff;border-radius:var(--r);padding:8px 22px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700}
+.fcn{background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:var(--r);padding:8px 18px;font-size:13px;font-weight:600}
+.fsv{background:var(--acc);border:none;color:#fff;border-radius:var(--r);padding:8px 22px;font-size:13px;font-weight:700}
 .fsv:hover{background:var(--acc2)}
-.iua{border:2px dashed var(--brd);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative}
-.iua:hover{border-color:var(--acc)}
-.iua img{max-height:90px;max-width:100%;border-radius:6px;margin-bottom:8px}
-.iua p{font-size:12px;color:var(--txt3)}
-.iua input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upb{height:3px;background:var(--s4);border-radius:2px;margin-top:6px;overflow:hidden}
-.upbf{height:100%;background:var(--acc);width:0;transition:width .3s}
-.compress-info{font-size:10px;color:var(--grn);margin-top:4px;min-height:14px}
+.fsv.green{background:var(--grn);color:#000}
+.fsv.red{background:var(--red)}
+
+/* TOGGLE */
 .tog-wrap{display:flex;align-items:center;gap:8px}
 .tog{position:relative;width:40px;height:22px;flex-shrink:0}
 .tog input{opacity:0;width:0;height:0;position:absolute}
@@ -127,21 +119,24 @@ input,select,textarea{font-family:var(--font);color:var(--txt)}
 .tog input:checked + .tog-sl{background:var(--grn);border-color:var(--grn)}
 .tog input:checked + .tog-sl::before{transform:translateX(18px);background:#fff}
 .tog-lbl{font-size:12px;color:var(--txt2);font-weight:600}
-.cvd{background:var(--s2);border:1px solid var(--brd);border-radius:var(--r2);padding:18px;margin-bottom:14px}
+
+/* IMAGE UPLOAD */
+.iua{border:2px dashed var(--brd);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative}
+.iua:hover{border-color:var(--acc)}
+.iua img{max-height:90px;max-width:100%;border-radius:6px;margin:0 auto 8px}
+.iua p{font-size:12px;color:var(--txt3)}
+.iua input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upb{height:3px;background:var(--s4);border-radius:2px;margin-top:6px;overflow:hidden}
+.upbf{height:100%;background:var(--acc);width:0;transition:width .3s}
+
+/* MODAL */
 #mo{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
 #mo.open{display:flex}
-.mod{background:var(--s1);border:1px solid var(--brd);border-radius:var(--r2);padding:24px;width:540px;max-width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.mod{background:var(--s1);border:1px solid var(--brd);border-radius:var(--r2);padding:24px;width:580px;max-width:100%;max-height:90vh;overflow-y:auto;position:relative}
 .mod h3{font-size:16px;font-weight:800;margin-bottom:18px}
 .mclose{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--txt2);font-size:19px;cursor:pointer}
-#email-mo{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:600;display:none;align-items:center;justify-content:center;padding:16px}
-#email-mo.open{display:flex}
-.email-card{background:var(--s1);border:1px solid var(--grn);border-radius:var(--r2);padding:24px;width:400px;max-width:100%}
-.email-card h3{font-size:16px;font-weight:800;margin-bottom:4px;color:var(--grn)}
-.email-card p{font-size:12px;color:var(--txt2);margin-bottom:16px}
-.email-inp{width:100%;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:11px 14px;color:var(--txt);font-size:14px;outline:none;transition:border-color .2s;margin-bottom:12px}
-.email-inp:focus{border-color:var(--grn)}
-.email-send{width:100%;background:var(--grn);color:#000;border-radius:var(--r);padding:12px;font-weight:800;font-size:14px;margin-bottom:8px}
-.email-cancel{width:100%;background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:var(--r);padding:10px;font-size:13px;font-weight:600;font-family:var(--font)}
+
+/* TOAST */
 #toast{position:fixed;bottom:20px;right:20px;background:var(--s1);border:1px solid var(--brd);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(60px);opacity:0;transition:all .28s;box-shadow:var(--sh)}
 #toast.show{transform:translateY(0);opacity:1}
 #toast.ok{border-color:var(--grn);color:var(--grn)}#toast.err{border-color:var(--red);color:var(--red)}#toast.inf{border-color:var(--blu);color:var(--blu)}
@@ -154,9 +149,13 @@ input,select,textarea{font-family:var(--font);color:var(--txt)}
 
 <div id="auth">
   <div class="ac">
-    <div class="al"><div class="al-ico" id="auth-ico">🌿</div><h1 id="auth-title">Admin</h1><p>Bảng điều khiển quản trị hệ thống</p></div>
+    <div class="al">
+      <div class="al-ico" id="auth-ico">🌿</div>
+      <h1 id="auth-title">Admin</h1>
+      <p>Bảng điều khiển quản trị hệ thống</p>
+    </div>
     <div class="afl"><label>Email</label><input id="ai-em" type="email" placeholder="admin@email.com"/></div>
-    <div class="afl"><label>Mật khẩu</label><input id="ai-pw" type="password" placeholder="••••••••"/></div>
+    <div class="afl"><label>Mật khẩu</label><input id="ai-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <button class="ap" onclick="doLogin()">Đăng nhập</button>
     <div id="ae"></div>
   </div>
@@ -164,18 +163,19 @@ input,select,textarea{font-family:var(--font);color:var(--txt)}
 
 <div id="sb">
   <div class="sb-br"><div class="sb-ico" id="sb-ico">🌿</div><div class="sb-txt" id="sb-name">Admin</div></div>
-  <div id="br-sel"><select id="brs" onchange="onBrCh()"><option>Chọn chi nhánh...</option></select></div>
+  <div id="br-sel"><select id="brs" onchange="onBrCh()"><option>Đang tải...</option></select></div>
   <nav class="sbn">
     <div class="ns">Tổng quan</div>
     <button class="ni on" onclick="goP('dashboard')"><span class="ico">📊</span>Dashboard</button>
     <button class="ni" onclick="goP('orders')"><span class="ico">📋</span>Đơn hàng</button>
-    <div class="ns">Quản lý đối tác</div>
+    <div class="ns">Quản lý Quán</div>
     <button class="ni" onclick="goP('menu')"><span class="ico">🍽️</span>Thực đơn & Kho</button>
     <button class="ni" onclick="goP('staff')"><span class="ico">👥</span>Nhân viên</button>
     <button class="ni" onclick="goP('vouchers')"><span class="ico">🎟️</span>Voucher</button>
-    <button class="ni" onclick="goP('settings')"><span class="ico">⚙️</span>Cài đặt</button>
-    <div class="ns" id="sa-s" style="display:none">Hệ thống (HQ)</div>
-    <button class="ni" id="n-br" style="display:none" onclick="goP('branches')"><span class="ico">🏢</span>Quản lý Chi nhánh</button>
+    <button class="ni" onclick="goP('settings')"><span class="ico">⚙️</span>Cài đặt Quán</button>
+    <div class="ns" id="sa-section" style="display:none">Hệ thống HQ</div>
+    <button class="ni" id="n-branches" style="display:none" onclick="goP('branches')"><span class="ico">🏢</span>Quản lý Đối tác</button>
+    <button class="ni" id="n-requests" style="display:none" onclick="goP('requests')"><span class="ico">📥</span>Yêu cầu đăng ký</button>
   </nav>
   <div class="sb-bot">
     <div class="su"><div class="sav" id="sav">?</div><div class="sui"><div class="sue" id="sue"></div><div class="sur" id="sur"></div></div></div>
@@ -191,16 +191,6 @@ input,select,textarea{font-family:var(--font);color:var(--txt)}
 <div id="mo" onclick="closeMo(event)">
   <div class="mod" id="mod-box"><button class="mclose" onclick="closeMo2()">✕</button><div id="mod-c"></div></div>
 </div>
-
-<div id="email-mo" onclick="closeEmailMo(event)">
-  <div class="email-card">
-    <h3>📧 Gửi Báo Cáo PDF</h3>
-    <p id="email-mo-desc">Nhập email để nhận báo cáo dạng PDF</p>
-    <input class="email-inp" id="report-email" type="email" placeholder="email@domain.com"/>
-    <button class="email-send" onclick="confirmSendReport()">📤 Gửi Báo Cáo</button>
-    <button class="email-cancel" onclick="closeEmailMoDirect()">Huỷ</button>
-  </div>
-</div>
 <div id="toast"></div>
 
 <script type="module">
@@ -211,36 +201,39 @@ import {
 } from './config.js';
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { getFirestore, collection, doc, getDocs, getDoc, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, limit, where } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDocs, getDoc, addDoc, setDoc,
+         updateDoc, deleteDoc, query, orderBy, serverTimestamp, limit, where, onSnapshot }
+  from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
 const fbApp = initializeApp(FIREBASE_CONFIG);
 const auth  = getAuth(fbApp);
 const db    = getFirestore(fbApp);
 
-document.getElementById('auth-ico').textContent   = APP_LOGO_EMOJI;
-document.getElementById('auth-title').textContent  = APP_NAME + ' Admin';
-document.getElementById('sb-ico').textContent     = APP_LOGO_EMOJI;
-document.getElementById('sb-name').innerHTML      = APP_LOGO_EMOJI + ' <span>' + APP_NAME + '</span>';
+document.getElementById('auth-ico').textContent  = APP_LOGO_EMOJI;
+document.getElementById('auth-title').textContent = APP_NAME + ' Admin';
+document.getElementById('sb-ico').textContent    = APP_LOGO_EMOJI;
+document.getElementById('sb-name').textContent   = APP_NAME;
 document.title = APP_NAME + ' — Admin';
 
-// -- IMAGE COMPRESSION (Giữ nguyên) --
-function compressImage(file, maxWidth = 800, quality = 0.82, outputType = 'image/webp') {
-  return new Promise((resolve, reject) => {
+// ── IMAGE COMPRESS / UPLOAD ──
+function compressImage(file, maxWidth=800, quality=0.82) {
+  return new Promise((res, rej) => {
     const reader = new FileReader();
-    reader.onerror = () => reject(new Error('Không đọc được file ảnh'));
+    reader.onerror = () => rej(new Error('Không đọc được file'));
     reader.onload  = ev => {
       const img = new Image();
-      img.onerror = () => reject(new Error('File không phải ảnh hợp lệ'));
+      img.onerror = () => rej(new Error('Không phải ảnh hợp lệ'));
       img.onload  = () => {
-        let { width, height } = img;
-        if (width > maxWidth) { height = Math.round(height * maxWidth / width); width = maxWidth; }
+        let {width, height} = img;
+        if (width > maxWidth) { height = Math.round(height*maxWidth/width); width = maxWidth; }
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(blob => { if (!blob) reject(new Error('toBlob failed')); else resolve(blob); }, outputType, quality);
+        ctx.fillStyle = '#fff'; ctx.fillRect(0,0,width,height);
+        ctx.drawImage(img,0,0,width,height);
+        canvas.toBlob(blob => blob ? res(blob) : rej(new Error('toBlob failed')), 'image/webp', quality);
       };
       img.src = ev.target.result;
     };
@@ -248,45 +241,35 @@ function compressImage(file, maxWidth = 800, quality = 0.82, outputType = 'image
   });
 }
 
-async function uploadToCloudinary(file, onProgress) {
-  onProgress(10);
+async function uploadToCloudinary(file, onProg) {
+  onProg(10);
   let blob;
-  try {
-    blob = await compressImage(file);
-    const oKB = Math.round(file.size / 1024), cKB = Math.round(blob.size / 1024);
-    const inf = document.getElementById('compress-info');
-    if (inf) inf.textContent = `✓ Nén: ${oKB}KB → ${cKB}KB`;
-  } catch(err) { console.warn('Compress fallback:', err); blob = file; }
-  onProgress(30);
+  try { blob = await compressImage(file); } catch { blob = file; }
+  onProg(40);
   const fd = new FormData();
-  fd.append('file', blob, file.name.replace(/\.[^.]+$/, '.webp'));
+  fd.append('file', blob, 'img.webp');
   fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
-  fd.append('folder', 'menu_items');
-  onProgress(60);
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
-  onProgress(90);
-  if (!res.ok) throw new Error(`Cloudinary HTTP ${res.status}`);
+  fd.append('folder', 'vegans_dn');
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body:fd });
+  onProg(90);
+  if (!res.ok) throw new Error(`Cloudinary error ${res.status}`);
   const data = await res.json();
-  onProgress(100);
+  onProg(100);
   return data.secure_url;
 }
 
-// -- STATE --
+// ── STATE ──
 let me = null, myRole = null, isSA = false;
 let curBrId = null, curBrName = '';
 let allBranches = [];
 let curPage = 'dashboard';
-let allOrders = [];
+let _mImgUrl = '', _brImgUrl = '';
 
-// -- AUTH & NAVIGATION --
-const getBranchIds = () => curBrId === 'all' ? allBranches.map(b => b.id) : [curBrId];
-
+// ── AUTH ──
 window.doLogin = async () => {
-  const em = document.getElementById('ai-em').value.trim();
-  const pw = document.getElementById('ai-pw').value;
   document.getElementById('ae').textContent = '';
-  try { await signInWithEmailAndPassword(auth, em, pw); }
-  catch(err) { document.getElementById('ae').textContent = 'Email/mật khẩu sai.'; }
+  try { await signInWithEmailAndPassword(auth, document.getElementById('ai-em').value.trim(), document.getElementById('ai-pw').value); }
+  catch { document.getElementById('ae').textContent = 'Email/mật khẩu sai.'; }
 };
 window.doLogout = () => signOut(auth);
 
@@ -294,87 +277,108 @@ onAuthStateChanged(auth, async user => {
   if (!user) { document.getElementById('auth').style.display = 'flex'; return; }
   me = user; isSA = user.email === SUPER_ADMIN_EMAIL;
   document.getElementById('auth').style.display = 'none';
-  document.getElementById('sav').textContent    = user.email[0].toUpperCase();
-  document.getElementById('sue').textContent    = user.email;
-  document.getElementById('sa-s').style.display = isSA ? '' : 'none';
-  document.getElementById('n-br').style.display = isSA ? '' : 'none';
+  document.getElementById('sav').textContent = user.email[0].toUpperCase();
+  document.getElementById('sue').textContent = user.email;
+  document.getElementById('sa-section').style.display  = isSA ? '' : 'none';
+  document.getElementById('n-branches').style.display  = isSA ? '' : 'none';
+  document.getElementById('n-requests').style.display  = isSA ? '' : 'none';
   await loadBranches(user);
 });
 
 async function loadBranches(user) {
-  try {
-    const snap = await getDocs(collection(db, 'Branches'));
-    allBranches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const sel = document.getElementById('brs');
-    sel.innerHTML = '';
-    if (isSA) {
-      myRole = 'admin';
-      sel.innerHTML = '<option value="all">🌐 Tất cả chi nhánh (HQ)</option>' +
-        allBranches.map(b => `<option value="${b.id}">${b.info?.name || b.id}</option>`).join('');
-    } else {
-      const myB = [];
-      for (const b of allBranches) {
-        const sd = await getDoc(doc(db, 'Branches', b.id, 'Staff', user.email));
-        if (sd.exists()) myB.push({ ...b, role: sd.data().role });
-      }
-      if (!myB.length) { showT('Không có quyền vào hệ thống', 'err'); signOut(auth); return; }
-      sel.innerHTML = myB.map(b => `<option value="${b.id}" data-role="${b.role}">${b.info?.name || b.id}</option>`).join('');
-      myRole = myB[0].role;
+  const snap = await getDocs(collection(db,'Branches'));
+  allBranches = snap.docs.map(d => ({id:d.id,...d.data()}));
+  const sel = document.getElementById('brs');
+  sel.innerHTML = '';
+
+  if (isSA) {
+    myRole = 'superadmin';
+    sel.innerHTML = '<option value="all">🌐 Tất cả (HQ)</option>' +
+      allBranches.map(b => `<option value="${b.id}">${b.info?.name||b.id}</option>`).join('');
+  } else {
+    const myBranches = [];
+    for (const b of allBranches) {
+      const sd = await getDoc(doc(db,'Branches',b.id,'Staff',user.email));
+      if (sd.exists()) myBranches.push({...b, role: sd.data().role});
     }
-    if (sel.options.length) { sel.selectedIndex = 0; onBrCh(); }
-  } catch(e) { showT('Lỗi: ' + e.message, 'err'); }
+    if (!myBranches.length) { showT('Không có quyền truy cập','err'); signOut(auth); return; }
+    sel.innerHTML = myBranches.map(b => `<option value="${b.id}" data-role="${b.role}">${b.info?.name||b.id}</option>`).join('');
+    myRole = myBranches[0].role;
+  }
+  if (sel.options.length) { sel.selectedIndex = 0; onBrCh(); }
 }
 
 window.onBrCh = () => {
   const sel = document.getElementById('brs');
   const opt = sel.options[sel.selectedIndex];
-  curBrId = opt.value; curBrName = curBrId === 'all' ? 'Tất cả chi nhánh' : opt.text;
+  curBrId   = opt.value;
+  curBrName = curBrId === 'all' ? 'Tất cả chi nhánh' : opt.text;
   if (!isSA && opt.dataset.role) myRole = opt.dataset.role;
-  document.getElementById('sur').textContent = isSA ? 'Super Admin' : (myRole === 'admin' ? 'Partner Admin' : 'Staff');
-  if (curBrId) goP(curPage);
+  document.getElementById('sur').textContent = isSA ? '⭐ Super Admin' : (myRole === 'admin' ? 'Partner Admin' : 'Cashier');
+  goP(curPage);
 };
 
-const PTITLES = { dashboard: '📊 Dashboard', orders: '📋 Đơn hàng', menu: '🍽️ Thực đơn & Kho', staff: '👥 Nhân viên', vouchers: '🎟️ Voucher', branches: '🏢 Quản lý Đối tác', settings: '⚙️ Cài đặt' };
+const PTITLES = {
+  dashboard:'📊 Dashboard', orders:'📋 Đơn hàng',
+  menu:'🍽️ Thực đơn & Kho', staff:'👥 Nhân viên',
+  vouchers:'🎟️ Voucher', settings:'⚙️ Cài đặt Quán',
+  branches:'🏢 Quản lý Đối tác', requests:'📥 Yêu cầu đăng ký'
+};
+
 window.goP = async p => {
   curPage = p;
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
   document.getElementById('pg-ttl').textContent = PTITLES[p] || p;
   document.getElementById('pg-acts').innerHTML  = '';
   document.getElementById('pg-c').innerHTML = '<div class="ldr"><div class="spin"></div><span>Đang tải...</span></div>';
-  
-  if (!curBrId && p !== 'branches') { document.getElementById('pg-c').innerHTML = '<div class="ldr">Chọn chi nhánh</div>'; return; }
+  if (!curBrId && !['branches','requests'].includes(p)) {
+    document.getElementById('pg-c').innerHTML = '<div class="ldr">Chọn chi nhánh</div>'; return;
+  }
   try {
-    if      (p === 'dashboard') await rDash();
-    else if (p === 'orders')    await rOrders();
-    else if (p === 'menu')      await rMenu();
-    else if (p === 'staff')     await rStaff();
-    else if (p === 'vouchers')  await rVouchers();
-    else if (p === 'branches')  await rBranches();
-    else if (p === 'settings')  await rSettings();
-  } catch(e) { document.getElementById('pg-c').innerHTML = `<div class="ldr" style="color:var(--red)">Lỗi: ${e.message}</div>`; }
+    if      (p==='dashboard') await rDash();
+    else if (p==='orders')    await rOrders();
+    else if (p==='menu')      await rMenu();
+    else if (p==='staff')     await rStaff();
+    else if (p==='vouchers')  await rVouchers();
+    else if (p==='settings')  await rSettings();
+    else if (p==='branches')  await rBranches();
+    else if (p==='requests')  await rRequests();
+  } catch(e) {
+    document.getElementById('pg-c').innerHTML = `<div class="ldr" style="color:var(--red)">Lỗi: ${e.message}</div>`;
+  }
 };
 
-// -- DASHBOARD (Giữ nguyên) --
+// ════════════════════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════════════════════
 async function rDash() {
-  const today = new Date(); today.setHours(0,0,0,0);
-  const from  = new Date(today); from.setDate(today.getDate() - 30);
-  const brIds = getBranchIds(); 
-  allOrders = [];
+  const brIds = curBrId === 'all' ? allBranches.map(b=>b.id) : [curBrId];
+  let orders = [], revenue = 0, pendingCount = 0;
   for (const bId of brIds) {
-    const oSnap = await getDocs(query(collection(db, 'Branches', bId, 'Orders'), orderBy('createdAt','desc'), limit(500)));
-    oSnap.docs.forEach(d => allOrders.push({ id:d.id, branchId:bId, ...d.data() }));
+    const snap = await getDocs(query(collection(db,'Branches',bId,'Orders'), orderBy('createdAt','desc'), limit(200)));
+    snap.docs.forEach(d => {
+      const o = {id:d.id,...d.data()};
+      orders.push(o);
+      if (['completed','paid','delivered'].includes(o.status)) revenue += o.total||0;
+      if (o.status === 'pending') pendingCount++;
+    });
   }
-  const done = allOrders.filter(o => ['completed','paid','delivered'].includes(o.status));
-  const totR = done.reduce((s,o) => s+(o.total||0), 0);
+  const approvedCount = allBranches.filter(b => b.isPartnerApproved && !b.hidden).length;
+  const pendingBranches = allBranches.filter(b => !b.isPartnerApproved).length;
+
   document.getElementById('pg-c').innerHTML = `
-    <div class="kg">
-      <div class="kc or"><div class="ki">💰</div><div class="kl">Doanh thu</div><div class="kv" style="color:var(--acc)">${fmt(totR)}</div></div>
-      <div class="kc pu"><div class="ki">🧾</div><div class="kl">Tổng đơn hoàn thành</div><div class="kv" style="color:var(--pur)">${done.length}</div></div>
-    </div>
-  `;
+  <div class="kg">
+    <div class="kc or"><div class="ki">💰</div><div class="kl">Doanh thu</div><div class="kv" style="color:var(--acc)">${fmt(revenue)}</div><div class="ks">Đơn hoàn thành</div></div>
+    <div class="kc gr"><div class="ki">📋</div><div class="kl">Đơn chờ xử lý</div><div class="kv" style="color:var(--grn)">${pendingCount}</div><div class="ks">Đang chờ xác nhận</div></div>
+    <div class="kc bl"><div class="ki">🏪</div><div class="kl">Quán đang hoạt động</div><div class="kv" style="color:var(--blu)">${approvedCount}</div><div class="ks">Đã phân quyền</div></div>
+    <div class="kc re"><div class="ki">🕐</div><div class="kl">Chờ phân quyền</div><div class="kv" style="color:var(--red)">${pendingBranches}</div><div class="ks" style="cursor:pointer;color:var(--blu);text-decoration:underline" onclick="goP('requests')">Xem ngay →</div></div>
+    <div class="kc pu"><div class="ki">🧾</div><div class="kl">Tổng đơn hàng</div><div class="kv" style="color:var(--pur)">${orders.length}</div></div>
+  </div>`;
 }
 
-// ── 1. CẬP NHẬT RORDERS: Đọc tất cả nếu là HQ, không cho sửa ──
+// ════════════════════════════════════════════════════════
+//  ORDERS — SA: read only / Partner: có thể cập nhật
+// ════════════════════════════════════════════════════════
 async function rOrders() {
   const SL = {pending:'Chờ XN',paid:'Đã TT',preparing:'Chuẩn bị',delivering:'Giao hàng',delivered:'Đã giao',completed:'Hoàn thành',cancelled:'Đã hủy'};
   const SC = {pending:'var(--ylw)',paid:'var(--grn)',preparing:'var(--blu)',delivering:'var(--pur)',delivered:'#c8a7ff',completed:'#4dffa6',cancelled:'var(--red)'};
@@ -382,122 +386,115 @@ async function rOrders() {
 
   let orders = [];
   if (curBrId === 'all') {
-    // HQ: Quét tất cả các chi nhánh
-    for(const b of allBranches) {
-      if(b.isPartnerApproved) {
-        const snap = await getDocs(query(collection(db,'Branches',b.id,'Orders'), orderBy('createdAt','desc'), limit(50)));
-        snap.docs.forEach(d => orders.push({ id:d.id, branchName: b.info?.name, branchId: b.id, ...d.data() }));
-      }
+    for (const b of allBranches.filter(b=>b.isPartnerApproved)) {
+      const snap = await getDocs(query(collection(db,'Branches',b.id,'Orders'), orderBy('createdAt','desc'), limit(50)));
+      snap.docs.forEach(d => orders.push({id:d.id, branchName:b.info?.name, branchId:b.id, ...d.data()}));
     }
-    // Sắp xếp tổng hợp theo thời gian mới nhất
     orders.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
   } else {
     const snap = await getDocs(query(collection(db,'Branches',curBrId,'Orders'), orderBy('createdAt','desc'), limit(100)));
-    orders = snap.docs.map(d => ({ id:d.id, branchName: curBrName, branchId: curBrId, ...d.data() }));
+    orders = snap.docs.map(d => ({id:d.id, branchName:curBrName, branchId:curBrId, ...d.data()}));
   }
+
+  const readOnly = curBrId === 'all'; // SA xem tổng → chỉ đọc
 
   const rows = orders.map(o => {
     const ts = o.createdAt?.toDate?.(); const s = o.status || 'pending';
-    const opts = SF.map(st => `<option value="${st}" ${st===s?'selected':''}>${SL[st]}</option>`).join('');
-    const chIco = {dinein:'🪑',takeaway:'🥡',weborder:'🌐',apporder:'📱'}[o.orderType] || '';
-    
-    // Nếu HQ xem (curBrId == 'all'), chỉ hiện Text, không hiện thẻ Select
-    const statusHtml = curBrId === 'all' 
+    const ch = {dinein:'🪑',takeaway:'🥡',weborder:'🌐',apporder:'📱'}[o.orderType] || '';
+    const statusCell = readOnly
       ? `<span class="bdg" style="background:${SC[s]}18;color:${SC[s]}">${SL[s]||s}</span>`
-      : `<select style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px;color:var(--txt);font-size:11px;font-family:var(--font)" onchange="updSt('${o.branchId}', '${o.id}', this.value)">${opts}</select>`;
+      : `<select style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px;color:var(--txt);font-size:11px" onchange="updSt('${o.branchId}','${o.id}',this.value)">${SF.map(st=>`<option value="${st}" ${st===s?'selected':''}>${SL[st]}</option>`).join('')}</select>`;
+
+    const customerCell = o.customer ? `<div style="font-size:11px;color:var(--blu)">${o.customer.name||''} ${o.customer.phone||''}</div>` : '';
 
     return `<tr>
       <td><span style="font-family:var(--mono);font-size:11px">#${o.id.slice(-6).toUpperCase()}</span></td>
-      ${curBrId === 'all' ? `<td><strong style="color:var(--blu)">${o.branchName||'—'}</strong></td>` : ''}
-      <td style="font-size:12px">${ts?ts.toLocaleString('vi-VN'):'—'}</td>
-      <td>${chIco} ${o.orderType||'—'}</td>
+      ${readOnly ? `<td><strong style="color:var(--blu)">${o.branchName||'—'}</strong></td>` : ''}
+      <td style="font-size:11px">${ts?ts.toLocaleString('vi-VN'):'—'}<br>${customerCell}</td>
+      <td>${ch} ${o.orderType||'—'}</td>
       <td style="font-family:var(--mono);font-weight:700;color:var(--acc)">${fmt(o.total)}</td>
-      <td>${statusHtml}</td>
+      <td>${statusCell}</td>
     </tr>`;
   }).join('');
 
   document.getElementById('pg-c').innerHTML = `
+  ${readOnly ? `<div style="background:var(--blu-d);border:1px solid var(--blu);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--blu)">
+    ℹ️ Chế độ HQ — Chỉ đọc. Super Admin không thể chỉnh sửa đơn hàng của đối tác.
+  </div>` : ''}
   <div class="cvd" style="overflow-x:auto">
-    <table class="dt"><thead><tr><th>Mã đơn</th>${curBrId === 'all' ? '<th>Chi nhánh</th>' : ''}<th>Thời gian</th><th>Kênh</th><th>Tổng</th><th>Cập nhật trạng thái</th></tr></thead>
-    <tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:24px">Chưa có đơn</td></tr>'}</tbody></table>
+    <table class="dt"><thead><tr>
+      <th>Mã đơn</th>${readOnly ? '<th>Chi nhánh</th>' : ''}
+      <th>Thời gian / Khách</th><th>Kênh</th><th>Tổng</th><th>Trạng thái</th>
+    </tr></thead>
+    <tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--txt3)">Chưa có đơn hàng</td></tr>'}</tbody></table>
   </div>`;
 }
-
 window.updSt = async (bId, id, s) => {
-  if (curBrId === 'all') return; // Double check
-  try { await updateDoc(doc(db,'Branches',bId,'Orders',id), {status:s, updatedAt:serverTimestamp()}); showT('Đã cập nhật','ok'); } 
-  catch(e) { showT('Lỗi: '+e.message,'err'); }
+  if (curBrId === 'all') { showT('HQ không thể cập nhật đơn hàng','err'); return; }
+  await updateDoc(doc(db,'Branches',bId,'Orders',id), {status:s, updatedAt:serverTimestamp()});
+  showT('Đã cập nhật','ok');
 };
 
-// ── 2. CẬP NHẬT RMENU: Partner CRUD độc lập ──
+// ════════════════════════════════════════════════════════
+//  MENU
+// ════════════════════════════════════════════════════════
 async function rMenu() {
   if (curBrId === 'all') {
-    document.getElementById('pg-c').innerHTML = `
-    <div class="cvd" style="text-align:center;padding:40px;color:var(--txt2)">
-      <div style="font-size:36px;margin-bottom:12px">🍽️</div>
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px">Vui lòng chọn một nhà hàng cụ thể</div>
-      <div style="font-size:13px">Hệ thống SaaS: Mỗi đối tác (nhà hàng) quản lý một thực đơn hoàn toàn độc lập. HQ không can thiệp.</div>
-    </div>`;
-    return;
+    document.getElementById('pg-c').innerHTML = `<div class="cvd" style="text-align:center;padding:40px;color:var(--txt2)">
+      <div style="font-size:32px;margin-bottom:12px">🍽️</div>
+      <div style="font-size:15px;font-weight:700">Chọn một nhà hàng cụ thể để quản lý thực đơn</div></div>`; return;
   }
-
-  document.getElementById('pg-acts').innerHTML = `<button class="bs-acc" onclick="openAddMenuItem()">+ Thêm món ăn</button>`;
-  const snap = await getDocs(collection(db, 'Branches', curBrId, 'Menu'));
-  const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  document.getElementById('pg-acts').innerHTML = `<button class="bs-acc" onclick="openAddMenuItem()">+ Thêm món</button>`;
+  const snap  = await getDocs(collection(db,'Branches',curBrId,'Menu'));
+  const items = snap.docs.map(d => ({id:d.id,...d.data()}));
 
   const rows = items.map(m => {
-    const isOOS = !m.available || m.stock === 0;
-    const img = m.image || 'https://placehold.co/36x36/1a2232/3d4f70?text=🥗';
-    const stkDisp = m.stock >= 0 ? m.stock : '∞';
+    const img = m.image ? `<img src="${m.image}" style="width:40px;height:40px;border-radius:6px;object-fit:cover">` : `<div style="width:40px;height:40px;border-radius:6px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:18px">🥗</div>`;
+    const stk = m.stock >= 0 ? m.stock : '∞';
     return `<tr>
-      <td><img src="${img}" style="width:36px;height:36px;border-radius:6px;object-fit:cover"/></td>
+      <td>${img}</td>
       <td><strong>${m.name}</strong><div style="font-size:11px;color:var(--txt3)">${m.category||'—'}</div></td>
       <td style="font-family:var(--mono);color:var(--acc);font-weight:700">${fmt(m.price)}</td>
+      <td><label class="tog-wrap"><label class="tog"><input type="checkbox" ${m.available?'checked':''} onchange="toggleAvail('${m.id}',this.checked)"><span class="tog-sl"></span></label><span class="tog-lbl">${m.available?'Bán':'Tắt'}</span></label></td>
+      <td>${stk} <button style="background:var(--s3);border:1px solid var(--brd);padding:2px 6px;border-radius:4px;font-size:10px" onclick="editStock('${m.id}','${m.name.replace(/'/g,"\\'")}',${m.stock})">Sửa</button></td>
       <td>
-        <label class="tog-wrap"><label class="tog"><input type="checkbox" ${m.available?'checked':''} onchange="toggleAvail('${m.id}',this.checked)"/><span class="tog-sl"></span></label><span class="tog-lbl">${m.available?'Đang bán':'Đã tắt'}</span></label>
-      </td>
-      <td>${stkDisp} <button style="background:var(--s3);border:1px solid var(--brd);padding:2px 6px;border-radius:4px;font-size:10px" onclick="editStock('${m.id}','${m.name.replace(/'/g,"\\'")}',${m.stock})">Sửa</button></td>
-      <td>
-        <button style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px" onclick="openEditMenuItem('${m.id}')">✏️ Sửa</button>
-        <button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;margin-left:4px" onclick="delMenuItem('${m.id}')">🗑️ Xóa</button>
+        <button style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px 8px;font-size:12px" onclick="openEditMenuItem('${m.id}')">✏️</button>
+        <button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;font-size:12px;margin-left:4px" onclick="delMenuItem('${m.id}')">🗑️</button>
       </td>
     </tr>`;
   }).join('');
 
   document.getElementById('pg-c').innerHTML = `
   <div class="cvd" style="overflow-x:auto">
-    <table class="dt"><thead><tr><th>Ảnh</th><th>Tên món</th><th>Giá</th><th>Bật/Tắt</th><th>Tồn kho</th><th>Thao tác</th></tr></thead>
-    <tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:24px">Chưa có món ăn</td></tr>'}</tbody></table>
+    <table class="dt"><thead><tr><th>Ảnh</th><th>Tên món</th><th>Giá</th><th>Trạng thái</th><th>Tồn kho</th><th>Thao tác</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--txt3)">Chưa có món</td></tr>'}</tbody></table>
   </div>`;
 }
 
-let _mImgUrl = '';
-function menuItemForm(m = {}) {
-  const submitLabel = m.id ? 'Lưu thay đổi' : 'Thêm món mới';
-  return `<form id="mitem-form">
-  <div class="fg">
-    <div class="ff full"><label>Tên món *</label><input id="mi-name" value="${m.name||''}" required/></div>
-    <div class="ff"><label>Giá (VNĐ) *</label><input id="mi-price" type="number" min="0" value="${m.price!=null?m.price:''}" required/></div>
-    <div class="ff"><label>Danh mục</label><input id="mi-cat" value="${m.category||''}"/></div>
+function menuItemForm(m={}) {
+  return `<div class="fg">
+    <div class="ff full"><label>Tên món *</label><input id="mi-name" value="${m.name||''}" required></div>
+    <div class="ff"><label>Giá (VNĐ) *</label><input id="mi-price" type="number" min="0" value="${m.price??''}"></div>
+    <div class="ff"><label>Danh mục</label><input id="mi-cat" value="${m.category||''}"></div>
     <div class="ff full"><label>Mô tả</label><textarea id="mi-desc">${m.description||''}</textarea></div>
-    <div class="ff full">
-      <label>Ảnh (tự động nén WebP)</label>
+    <div class="ff full"><label>Ảnh</label>
       <div class="iua">
-        <img id="mi-pv" src="${m.image||''}" style="display:${m.image?'block':'none'}"/>
+        <img id="mi-pv" src="${m.image||''}" style="display:${m.image?'block':'none'}">
         <p id="mi-tx">${m.image?'Nhấn để đổi':'📷 Click hoặc kéo thả ảnh'}</p>
         <div class="upb"><div class="upbf" id="mi-pb"></div></div>
-        <div class="compress-info" id="compress-info"></div>
-        <input type="file" accept="image/*" onchange="upImg(this)"/>
+        <input type="file" accept="image/*" onchange="upMenuImg(this)">
       </div>
     </div>
   </div>
-  <div class="fa"><button type="button" class="fcn" onclick="closeMo2()">Huỷ</button><button type="button" class="fsv" onclick="saveMenuItem('${m.id||''}')">${submitLabel}</button></div>
-  </form>`;
+  <div class="fa">
+    <button class="fcn" onclick="closeMo2()">Huỷ</button>
+    <button class="fsv" onclick="saveMenuItem('${m.id||''}')">💾 ${m.id?'Lưu thay đổi':'Thêm món'}</button>
+  </div>`;
 }
-window.openAddMenuItem = () => { _mImgUrl = ''; openMo('➕ Thêm món ăn', menuItemForm()); };
+window.openAddMenuItem = () => { _mImgUrl = ''; openMo('➕ Thêm món ăn mới', menuItemForm()); };
 window.openEditMenuItem = async id => {
   const s = await getDoc(doc(db,'Branches',curBrId,'Menu',id));
-  if(s.exists()){ _mImgUrl = s.data().image||''; openMo('✏️ Sửa món', menuItemForm({id:s.id, ...s.data()})); }
+  if (s.exists()) { _mImgUrl = s.data().image||''; openMo('✏️ Sửa món', menuItemForm({id:s.id,...s.data()})); }
 };
 window.saveMenuItem = async id => {
   const data = {
@@ -505,135 +502,445 @@ window.saveMenuItem = async id => {
     price: Number(document.getElementById('mi-price').value),
     category: document.getElementById('mi-cat').value.trim(),
     description: document.getElementById('mi-desc').value.trim(),
-    image: _mImgUrl || null,
-    updatedAt: serverTimestamp()
+    image: _mImgUrl || null, updatedAt: serverTimestamp()
   };
-  if(!data.name || !data.price) return showT('Nhập tên và giá','err');
-  if(id) { await updateDoc(doc(db,'Branches',curBrId,'Menu',id), data); showT('Đã cập nhật','ok'); }
-  else { data.createdAt = serverTimestamp(); data.available = true; data.stock = -1; await addDoc(collection(db,'Branches',curBrId,'Menu'), data); showT('Đã thêm món','ok'); }
+  if (!data.name || !data.price) return showT('Nhập tên và giá','err');
+  if (id) { await updateDoc(doc(db,'Branches',curBrId,'Menu',id), data); showT('Đã cập nhật','ok'); }
+  else { data.available = true; data.stock = -1; data.createdAt = serverTimestamp(); await addDoc(collection(db,'Branches',curBrId,'Menu'), data); showT('Đã thêm món','ok'); }
   closeMo2(); rMenu();
 };
 window.delMenuItem = async id => {
-  if(!confirm('Xóa món này vĩnh viễn?')) return;
+  if (!confirm('Xóa món này vĩnh viễn?')) return;
   await deleteDoc(doc(db,'Branches',curBrId,'Menu',id)); showT('Đã xóa','inf'); rMenu();
 };
-window.toggleAvail = async (id, st) => { await updateDoc(doc(db,'Branches',curBrId,'Menu',id), {available:st}); };
+window.toggleAvail = async (id, st) => {
+  await updateDoc(doc(db,'Branches',curBrId,'Menu',id), {available:st}); showT(st?'Bật món':'Tắt món','ok');
+};
 window.editStock = async (id, name, cur) => {
-  const n = prompt(`Tồn kho mới cho "${name}" (nhập -1 = vô hạn):`);
-  if(n!==null && !isNaN(n)) { await updateDoc(doc(db,'Branches',curBrId,'Menu',id), {stock: parseInt(n)}); rMenu(); }
+  const n = prompt(`Tồn kho cho "${name}" (-1 = vô hạn):`); if (n===null) return;
+  await updateDoc(doc(db,'Branches',curBrId,'Menu',id), {stock:parseInt(n)}); showT('Đã cập nhật tồn kho','ok'); rMenu();
 };
-
-window.upImg = async input => {
+window.upMenuImg = async input => {
   const file = input.files[0]; if (!file) return;
-  const pb = document.getElementById('mi-pb'); const pv = document.getElementById('mi-pv'); const tx = document.getElementById('mi-tx');
   try {
-    const url = await uploadToCloudinary(file, pct => { pb.style.width = pct+'%'; });
-    _mImgUrl = url; pv.src = url; pv.style.display = 'block';
-    if (tx) tx.textContent = 'Nhấn để đổi'; showT('✅ Upload thành công!','ok');
-  } catch(e) { showT('Lỗi upload: '+e.message,'err'); }
-  setTimeout(() => pb.style.width = '0', 1200);
+    const url = await uploadToCloudinary(file, pct => document.getElementById('mi-pb').style.width = pct+'%');
+    _mImgUrl = url;
+    document.getElementById('mi-pv').src = url; document.getElementById('mi-pv').style.display = 'block';
+    document.getElementById('mi-tx').textContent = 'Nhấn để đổi'; showT('Upload thành công','ok');
+  } catch(e) { showT('Lỗi: '+e.message,'err'); }
+  setTimeout(() => document.getElementById('mi-pb').style.width='0', 1500);
 };
 
-// ── 3. CẬP NHẬT RBRANCHES: Hiển thị PartnerRequests & Nút Duyệt ──
-async function rBranches() {
+// ════════════════════════════════════════════════════════
+//  STAFF
+// ════════════════════════════════════════════════════════
+async function rStaff() {
+  if (curBrId === 'all') return;
+  document.getElementById('pg-acts').innerHTML = `<button class="bs-acc" onclick="openAddStaff()">+ Thêm nhân viên</button>`;
+  const snap = await getDocs(collection(db,'Branches',curBrId,'Staff'));
+  const rows = snap.docs.map(d => {
+    const s = d.data(); const isAdmin = s.role === 'admin';
+    return `<tr>
+      <td>${d.id}</td>
+      <td>${s.name||'—'}</td>
+      <td><span class="bdg ${isAdmin?'badm':'bins'}">${isAdmin?'Admin':'Cashier'}</span></td>
+      <td><button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;font-size:12px" onclick="delStaff('${d.id}')">🗑️ Xóa</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('pg-c').innerHTML = `
+  <div class="cvd" style="overflow-x:auto">
+    <table class="dt"><thead><tr><th>Email</th><th>Tên</th><th>Vai trò</th><th>Thao tác</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--txt3)">Chưa có nhân viên</td></tr>'}</tbody></table>
+  </div>`;
+}
+window.openAddStaff = () => openMo('👤 Thêm nhân viên', `
+  <div class="fg">
+    <div class="ff full"><label>Email nhân viên *</label><input id="st-email" type="email" placeholder="nhanvien@email.com"></div>
+    <div class="ff full"><label>Họ tên</label><input id="st-name" placeholder="Nguyễn Văn A"></div>
+    <div class="ff full"><label>Vai trò</label>
+      <select id="st-role" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px;color:var(--txt)">
+        <option value="cashier">Thu ngân (Cashier)</option>
+        <option value="admin">Quản lý (Admin)</option>
+      </select>
+    </div>
+  </div>
+  <div class="fa"><button class="fcn" onclick="closeMo2()">Huỷ</button><button class="fsv" onclick="saveStaff()">💾 Thêm</button></div>`);
+window.saveStaff = async () => {
+  const email = document.getElementById('st-email').value.trim();
+  if (!email) return showT('Nhập email','err');
+  await setDoc(doc(db,'Branches',curBrId,'Staff',email), {
+    name: document.getElementById('st-name').value.trim(),
+    role: document.getElementById('st-role').value, addedAt: serverTimestamp()
+  });
+  showT('Đã thêm nhân viên','ok'); closeMo2(); rStaff();
+};
+window.delStaff = async email => {
+  if (!confirm(`Xóa ${email}?`)) return;
+  await deleteDoc(doc(db,'Branches',curBrId,'Staff',email)); showT('Đã xóa','inf'); rStaff();
+};
+
+// ════════════════════════════════════════════════════════
+//  VOUCHERS
+// ════════════════════════════════════════════════════════
+async function rVouchers() {
+  if (curBrId === 'all') return;
+  document.getElementById('pg-acts').innerHTML = `<button class="bs-acc" onclick="openAddVoucher()">+ Thêm voucher</button>`;
+  const snap = await getDocs(collection(db,'Branches',curBrId,'Vouchers'));
+  const rows = snap.docs.map(d => {
+    const v = d.data();
+    return `<tr>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--ylw)">${d.id}</td>
+      <td>${v.percent}% giảm</td>
+      <td><label class="tog-wrap"><label class="tog"><input type="checkbox" ${v.active!==false?'checked':''} onchange="toggleVoucher('${d.id}',this.checked)"><span class="tog-sl"></span></label></label></td>
+      <td><button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;font-size:12px" onclick="delVoucher('${d.id}')">🗑️</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('pg-c').innerHTML = `
+  <div class="cvd" style="overflow-x:auto">
+    <table class="dt"><thead><tr><th>Mã</th><th>Giảm giá</th><th>Hoạt động</th><th>Xóa</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--txt3)">Chưa có voucher</td></tr>'}</tbody></table>
+  </div>`;
+}
+window.openAddVoucher = () => openMo('🎟️ Tạo Voucher', `
+  <div class="fg">
+    <div class="ff full"><label>Mã voucher (viết hoa, không dấu) *</label><input id="vc-code" placeholder="GIAM20" style="text-transform:uppercase"></div>
+    <div class="ff full"><label>Phần trăm giảm (%) *</label><input id="vc-pct" type="number" min="1" max="100" placeholder="20"></div>
+  </div>
+  <div class="fa"><button class="fcn" onclick="closeMo2()">Huỷ</button><button class="fsv" onclick="saveVoucher()">💾 Tạo</button></div>`);
+window.saveVoucher = async () => {
+  const code = document.getElementById('vc-code').value.trim().toUpperCase();
+  const pct  = Number(document.getElementById('vc-pct').value);
+  if (!code || !pct) return showT('Nhập đủ thông tin','err');
+  await setDoc(doc(db,'Branches',curBrId,'Vouchers',code), {percent:pct, active:true, createdAt:serverTimestamp()});
+  showT('Đã tạo voucher','ok'); closeMo2(); rVouchers();
+};
+window.toggleVoucher = async (id, st) => { await updateDoc(doc(db,'Branches',curBrId,'Vouchers',id), {active:st}); };
+window.delVoucher    = async id => {
+  if (!confirm('Xóa voucher?')) return;
+  await deleteDoc(doc(db,'Branches',curBrId,'Vouchers',id)); showT('Đã xóa','inf'); rVouchers();
+};
+
+// ════════════════════════════════════════════════════════
+//  SETTINGS — Partner tự cập nhật thông tin quán
+// ════════════════════════════════════════════════════════
+async function rSettings() {
+  if (curBrId === 'all') return;
+  const bSnap = await getDoc(doc(db,'Branches',curBrId));
+  const info  = bSnap.data()?.info || {};
+  _brImgUrl   = info.logo || '';
+
+  document.getElementById('pg-c').innerHTML = `
+  <div class="cvd">
+    <h3 style="margin-bottom:16px;font-size:15px;font-weight:800">Thông tin Nhà hàng</h3>
+    <div class="fg">
+      <div class="ff full"><label>Tên nhà hàng *</label><input id="set-name" value="${info.name||''}"></div>
+      <div class="ff full"><label>Ảnh đại diện quán</label>
+        <div class="iua">
+          <img id="set-logo-pv" src="${info.logo||''}" style="display:${info.logo?'block':'none'}">
+          <p id="set-logo-tx">${info.logo?'Nhấn để đổi':'📷 Upload logo quán'}</p>
+          <div class="upb"><div class="upbf" id="set-logo-pb"></div></div>
+          <input type="file" accept="image/*" onchange="upBrLogo(this)">
+        </div>
+      </div>
+      <div class="ff"><label>Số điện thoại</label><input id="set-phone" value="${info.phone||''}"></div>
+      <div class="ff"><label>Zalo</label><input id="set-zalo" value="${info.zalo||''}"></div>
+      <div class="ff"><label>WhatsApp</label><input id="set-whatsapp" value="${info.whatsapp||''}"></div>
+      <div class="ff"><label>Facebook</label><input id="set-fb" value="${info.facebook||''}"></div>
+      <div class="ff"><label>TikTok</label><input id="set-tiktok" value="${info.tiktok||''}"></div>
+      <div class="ff"><label>YouTube</label><input id="set-yt" value="${info.youtube||''}"></div>
+      <div class="ff full"><label>Địa chỉ</label><input id="set-address" value="${info.address||''}"></div>
+      <div class="ff"><label>Tên đường</label><input id="set-street" value="${info.street||''}"></div>
+      <div class="ff"><label>Phường / Xã</label><input id="set-ward" value="${info.ward||''}"></div>
+      <div class="ff full"><label>Google Maps link</label><input id="set-maps" value="${info.googleMap||''}"></div>
+      <div class="ff"><label>Giờ mở cửa</label><input type="time" id="set-open" value="${info.openTime||'07:00'}"></div>
+      <div class="ff"><label>Giờ đóng cửa</label><input type="time" id="set-close" value="${info.closeTime||'21:00'}"></div>
+      <div class="ff full"><label>Mô tả quán</label><textarea id="set-desc">${info.description||''}</textarea></div>
+      <div class="ff"><label>VAT (%)</label><input id="set-vat" type="number" min="0" max="20" value="${info.vat||DEFAULT_VAT}"></div>
+    </div>
+    <div class="fa"><button class="fsv" onclick="saveSettings()">💾 Lưu thông tin</button></div>
+  </div>`;
+}
+window.upBrLogo = async input => {
+  const file = input.files[0]; if (!file) return;
+  try {
+    const url = await uploadToCloudinary(file, pct => document.getElementById('set-logo-pb').style.width = pct+'%');
+    _brImgUrl = url;
+    document.getElementById('set-logo-pv').src = url; document.getElementById('set-logo-pv').style.display = 'block';
+    document.getElementById('set-logo-tx').textContent = 'Nhấn để đổi'; showT('Upload thành công','ok');
+  } catch(e) { showT('Lỗi: '+e.message,'err'); }
+  setTimeout(() => document.getElementById('set-logo-pb').style.width='0', 1500);
+};
+window.saveSettings = async () => {
+  await updateDoc(doc(db,'Branches',curBrId), {
+    'info.name':        document.getElementById('set-name').value.trim(),
+    'info.logo':        _brImgUrl,
+    'info.phone':       document.getElementById('set-phone').value.trim(),
+    'info.zalo':        document.getElementById('set-zalo').value.trim(),
+    'info.whatsapp':    document.getElementById('set-whatsapp').value.trim(),
+    'info.facebook':    document.getElementById('set-fb').value.trim(),
+    'info.tiktok':      document.getElementById('set-tiktok').value.trim(),
+    'info.youtube':     document.getElementById('set-yt').value.trim(),
+    'info.address':     document.getElementById('set-address').value.trim(),
+    'info.street':      document.getElementById('set-street').value.trim(),
+    'info.ward':        document.getElementById('set-ward').value.trim(),
+    'info.googleMap':   document.getElementById('set-maps').value.trim(),
+    'info.openTime':    document.getElementById('set-open').value,
+    'info.closeTime':   document.getElementById('set-close').value,
+    'info.description': document.getElementById('set-desc').value.trim(),
+    'info.vat':         Number(document.getElementById('set-vat').value) || DEFAULT_VAT,
+    updatedAt: serverTimestamp()
+  });
+  showT('Đã lưu thông tin quán','ok');
+  // Reload branch list
+  const sel = document.getElementById('brs');
+  const idx = sel.selectedIndex;
+  await loadBranches(me);
+  sel.selectedIndex = idx;
+};
+
+// ════════════════════════════════════════════════════════
+//  REQUESTS — SA: Xem & duyệt đăng ký mới
+// ════════════════════════════════════════════════════════
+async function rRequests() {
   if (!isSA) return;
+  const snap = await getDocs(query(collection(db,'PartnerRequests'), where('status','==','pending'), orderBy('createdAt','desc')));
+  const requests = snap.docs.map(d => ({id:d.id,...d.data()}));
 
-  // Lấy các Request chờ duyệt
-  const reqSnap = await getDocs(query(collection(db, 'PartnerRequests'), where('status','==','pending')));
-  const requests = reqSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-  const reqRows = requests.map(r => `<tr>
+  const rows = requests.map(r => `<tr>
     <td><strong>${r.restaurantName}</strong><br><span style="font-size:11px;color:var(--txt3)">${r.address||'—'}</span></td>
-    <td>${r.ownerName}</td>
-    <td>${r.email}<br>${r.phone}</td>
-    <td><button style="background:var(--grn);color:#000;border-radius:6px;padding:6px 12px;font-weight:bold" onclick="approvePartner('${r.id}')">✅ Duyệt Quán</button></td>
+    <td>${r.ownerName}<br><span style="font-size:11px;color:var(--txt3)">${r.email}</span></td>
+    <td>${r.phone}</td>
+    <td style="font-size:11px;color:var(--txt3)">${r.createdAt?.toDate?.().toLocaleString('vi-VN')||'—'}</td>
+    <td>
+      <button style="background:var(--acc-d);border:1px solid var(--acc);color:var(--acc);border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700" onclick="viewRequest('${r.id}')">👁 Xem</button>
+    </td>
   </tr>`).join('');
 
-  // Lấy các Branch hiện tại
-  const bSnap = await getDocs(collection(db,'Branches'));
-  const brs = bSnap.docs.map(d => ({ id:d.id, ...d.data() }));
-  
-  const brRows = brs.map(b => {
+  document.getElementById('pg-c').innerHTML = `
+  <div class="cvd" style="overflow-x:auto">
+    <div style="font-size:13px;color:var(--txt2);margin-bottom:12px">Tổng ${requests.length} yêu cầu đang chờ duyệt</div>
+    <table class="dt"><thead><tr><th>Tên Quán / Địa chỉ</th><th>Chủ quán</th><th>SĐT</th><th>Ngày đăng ký</th><th>Thao tác</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--txt3)">Không có yêu cầu mới</td></tr>'}</tbody></table>
+  </div>`;
+}
+
+window.viewRequest = async (reqId) => {
+  const snap = await getDoc(doc(db,'PartnerRequests',reqId));
+  if (!snap.exists()) return;
+  const r = snap.data();
+  const menuHtml = (r.menuItems||[]).map((m,i) => `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--brd2)">${i+1}. <b>${m.name}</b> — ${fmt(m.price)} <span style="color:var(--txt3)">${m.category||''}</span></div>`).join('') || '<div style="color:var(--txt3);font-size:12px">Chưa có món</div>';
+
+  openMo('📋 Chi tiết đăng ký', `
+    <div style="font-size:13px;line-height:1.8">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+        <div><span style="color:var(--txt3)">Quán:</span> <b>${r.restaurantName}</b></div>
+        <div><span style="color:var(--txt3)">Chủ:</span> ${r.ownerName}</div>
+        <div><span style="color:var(--txt3)">Email:</span> ${r.email}</div>
+        <div><span style="color:var(--txt3)">SĐT:</span> ${r.phone}</div>
+        <div><span style="color:var(--txt3)">Địa chỉ:</span> ${r.address||'—'}</div>
+        <div><span style="color:var(--txt3)">Phường:</span> ${r.ward||'—'}</div>
+        <div><span style="color:var(--txt3)">Giờ:</span> ${r.openTime||'—'} – ${r.closeTime||'—'}</div>
+        <div><span style="color:var(--txt3)">Zalo:</span> ${r.zalo||'—'}</div>
+      </div>
+      <div style="margin-bottom:12px"><span style="color:var(--txt3)">Mô tả:</span> ${r.description||'—'}</div>
+      <div style="font-weight:700;margin-bottom:6px">Thực đơn đăng ký (${(r.menuItems||[]).length} món):</div>
+      <div style="max-height:160px;overflow-y:auto;margin-bottom:16px">${menuHtml}</div>
+    </div>
+    <div class="fa">
+      <button class="fcn" onclick="rejectRequest('${reqId}')">✕ Từ chối</button>
+      <button class="fsv green" onclick="approveRequest('${reqId}')">✅ Duyệt & Phân quyền</button>
+    </div>`);
+};
+
+window.approveRequest = async (reqId) => {
+  if (!confirm('Xác nhận duyệt quán này và cấp quyền quản lý cho họ?')) return;
+  const snap = await getDoc(doc(db,'PartnerRequests',reqId));
+  if (!snap.exists()) return;
+  const r = snap.data();
+
+  // Tìm branch đã được tạo trước đó từ form đăng ký
+  const brSnap = await getDocs(query(collection(db,'Branches'), where('requestId','==',reqId)));
+  let branchId = null;
+
+  if (!brSnap.empty) {
+    // Branch đã tồn tại — chỉ cần phân quyền
+    branchId = brSnap.docs[0].id;
+    await updateDoc(doc(db,'Branches',branchId), {
+      isPartnerApproved: true,
+      approvedAt: serverTimestamp(),
+      approvedBy: me.email
+    });
+  } else {
+    // Tạo branch mới
+    const newRef = await addDoc(collection(db,'Branches'), {
+      isPartnerApproved: true,
+      hidden: false, isOpen: false, featured: false, displayOrder: 999,
+      info: {
+        name: r.restaurantName, owner: r.ownerName, email: r.email, phone: r.phone,
+        address: r.address||'', street: r.street||'', ward: r.ward||'',
+        zalo: r.zalo||'', whatsapp: r.whatsapp||'', facebook: r.facebook||'',
+        tiktok: r.tiktok||'', youtube: r.youtube||'', googleMap: r.googleMap||'',
+        openTime: r.openTime||'07:00', closeTime: r.closeTime||'21:00',
+        description: r.description||'', logo: r.logo||'', vat: DEFAULT_VAT
+      },
+      requestId: reqId, createdAt: serverTimestamp(), approvedAt: serverTimestamp(), approvedBy: me.email
+    });
+    branchId = newRef.id;
+    // Thêm menu items
+    for (const item of (r.menuItems||[])) {
+      await addDoc(collection(db,'Branches',branchId,'Menu'), {...item, createdAt:serverTimestamp(), updatedAt:serverTimestamp()});
+    }
+  }
+
+  // Tạo Staff/Admin cho chủ quán
+  await setDoc(doc(db,'Branches',branchId,'Staff',r.email), {
+    name: r.ownerName, role: 'admin', addedAt: serverTimestamp()
+  });
+
+  // Đánh dấu request đã xử lý
+  await updateDoc(doc(db,'PartnerRequests',reqId), {status:'approved', approvedAt:serverTimestamp()});
+
+  showT(`✅ Đã duyệt "${r.restaurantName}"! Tài khoản ${r.email} đã có quyền quản lý.`,'ok');
+  closeMo2();
+  await loadBranches(me);
+  rRequests();
+};
+
+window.rejectRequest = async (reqId) => {
+  const reason = prompt('Lý do từ chối (tùy chọn):');
+  if (reason === null) return;
+  await updateDoc(doc(db,'PartnerRequests',reqId), {status:'rejected', rejectReason: reason, rejectedAt: serverTimestamp()});
+  // Ẩn branch đã tạo từ form đăng ký
+  const brSnap = await getDocs(query(collection(db,'Branches'), where('requestId','==',reqId)));
+  if (!brSnap.empty) await updateDoc(doc(db,'Branches',brSnap.docs[0].id), {hidden:true});
+  showT('Đã từ chối yêu cầu','inf'); closeMo2(); rRequests();
+};
+
+// ════════════════════════════════════════════════════════
+//  BRANCHES — SA: Quản lý toàn bộ quán
+// ════════════════════════════════════════════════════════
+async function rBranches() {
+  if (!isSA) return;
+  const snap = await getDocs(collection(db,'Branches'));
+  const brs  = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+  brs.sort((a,b) => (a.displayOrder||999) - (b.displayOrder||999));
+
+  const rows = brs.map(b => {
     const info = b.info || {};
+    const approved = b.isPartnerApproved && !b.hidden;
+    const isOpen   = getIsOpen(b);
+    let statusBadge = '';
+    if (b.hidden) statusBadge = `<span class="bdg bhid">Ẩn</span>`;
+    else if (!b.isPartnerApproved) statusBadge = `<span class="bdg bpnd">Chờ duyệt</span>`;
+    else if (isOpen) statusBadge = `<span class="bdg bact">Đang mở</span>`;
+    else statusBadge = `<span class="bdg" style="background:var(--red-d);color:var(--red)">Đóng cửa</span>`;
+
     return `<tr>
-      <td style="font-family:var(--mono);font-size:11px">${b.id}</td>
-      <td><strong>${info.name||'—'}</strong></td>
-      <td><span class="bdg ${b.isPartnerApproved?'bact':'bins'}">${b.isPartnerApproved?'Đã Duyệt':'Chưa Duyệt'}</span></td>
       <td>
-        <button style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px 8px;font-size:12px;" onclick="openEditBr('${b.id}')">✏️ Sửa</button>
-        <button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;font-size:12px;margin-left:4px" onclick="delBr('${b.id}')">🗑️</button>
+        ${info.logo ? `<img src="${info.logo}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">` : '<div style="width:36px;height:36px;border-radius:8px;background:var(--s3);display:flex;align-items:center;justify-content:center">🥬</div>'}
+      </td>
+      <td><strong>${info.name||b.id}</strong><br><span style="font-size:11px;color:var(--txt3)">${info.ward||info.address||'—'}</span></td>
+      <td>${statusBadge}</td>
+      <td>${b.featured ? '<span style="color:#ffcb47">⭐ Nổi bật</span>' : '—'}</td>
+      <td><input type="number" value="${b.displayOrder||999}" style="width:56px;background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px;color:var(--txt);font-size:12px" onchange="setDisplayOrder('${b.id}',this.value)"></td>
+      <td>
+        <button style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px 8px;font-size:11px;margin-right:4px" onclick="openEditBranch('${b.id}')">✏️ Sửa</button>
+        <button style="background:${b.hidden?'var(--grn-d)':'var(--ylw-d)'};border:1px solid ${b.hidden?'var(--grn)':'var(--ylw)'};color:${b.hidden?'var(--grn)':'var(--ylw)'};border-radius:6px;padding:4px 8px;font-size:11px" onclick="toggleHideBranch('${b.id}',${b.hidden})">
+          ${b.hidden?'👁 Hiện':'🙈 Ẩn'}
+        </button>
+        ${!b.isPartnerApproved ? `<button style="background:var(--grn-d);border:1px solid var(--grn);color:var(--grn);border-radius:6px;padding:4px 8px;font-size:11px;margin-left:4px" onclick="quickApprove('${b.id}')">✅ Duyệt</button>` : ''}
       </td>
     </tr>`;
   }).join('');
 
+  document.getElementById('pg-acts').innerHTML = '';
   document.getElementById('pg-c').innerHTML = `
-  <div style="margin-bottom:20px">
-    <h3 style="margin-bottom:10px; color:var(--grn)">📥 Yêu cầu Đăng ký Đối tác (Chờ duyệt)</h3>
-    <div class="cvd" style="overflow-x:auto">
-      <table class="dt"><thead><tr><th>Tên Quán & Địa chỉ</th><th>Chủ quán</th><th>Liên hệ</th><th>Thao tác</th></tr></thead>
-      <tbody>${reqRows||'<tr><td colspan="4" style="text-align:center;padding:24px">Không có yêu cầu mới</td></tr>'}</tbody></table>
-    </div>
-  </div>
-  <div>
-    <h3 style="margin-bottom:10px; color:var(--blu)">🏢 Danh sách Đối tác (Đã cấp tài khoản)</h3>
-    <div class="cvd" style="overflow-x:auto">
-      <table class="dt"><thead><tr><th>Branch ID</th><th>Tên Quán</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
-      <tbody>${brRows||'<tr><td colspan="4" style="text-align:center;padding:24px">Chưa có chi nhánh</td></tr>'}</tbody></table>
-    </div>
+  <div class="cvd" style="overflow-x:auto">
+    <div style="font-size:12px;color:var(--txt2);margin-bottom:12px">Tổng ${brs.length} nhà hàng · ${brs.filter(b=>b.isPartnerApproved&&!b.hidden).length} đang hoạt động</div>
+    <table class="dt"><thead><tr><th>Logo</th><th>Tên Quán / Khu vực</th><th>Trạng thái</th><th>Featured</th><th>Thứ tự</th><th>Thao tác</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--txt3)">Chưa có chi nhánh</td></tr>'}</tbody></table>
   </div>`;
 }
 
-// Hàm duyệt đối tác: Chuyển Request thành Branch
-window.approvePartner = async (reqId) => {
-  if(!confirm("Bạn có chắc chắn muốn duyệt quán này và cấp tài khoản Admin cho họ không?")) return;
-  try {
-    const reqDoc = await getDoc(doc(db, "PartnerRequests", reqId));
-    if(!reqDoc.exists()) return;
-    const req = reqDoc.data();
+function getIsOpen(branch) {
+  const info = branch.info || {};
+  if (!info.openTime || !info.closeTime) return branch.isOpen !== false;
+  const now  = new Date();
+  const [oh,om] = info.openTime.split(':').map(Number);
+  const [ch,cm] = info.closeTime.split(':').map(Number);
+  const cur  = now.getHours()*60+now.getMinutes();
+  return cur >= oh*60+om && cur < ch*60+cm;
+}
 
-    // 1. Tạo Branch mới
-    const newBranchRef = await addDoc(collection(db, "Branches"), {
-      isPartnerApproved: true,
-      isOpen: false, // Mặc định đóng cửa để họ set up menu trước
-      info: {
-        name: req.restaurantName,
-        owner: req.ownerName,
-        phone: req.phone,
-        email: req.email,
-        address: req.address || "",
-        vat: DEFAULT_VAT
-      },
-      createdAt: serverTimestamp()
-    });
-
-    // 2. Tạo Staff/Admin role
-    await setDoc(doc(db, "Branches", newBranchRef.id, "Staff", req.email), {
-      name: req.ownerName,
-      role: "admin",
-      addedAt: serverTimestamp()
-    });
-
-    // 3. Đánh dấu Request là approved
-    await updateDoc(doc(db, "PartnerRequests", reqId), { status: "approved" });
-
-    showT(`✅ Đã duyệt! Quán "${req.restaurantName}" đã được cấp tài khoản.`, "ok");
-    loadBranches(me); // Reload dropdown
-    rBranches(); // Reload table
-  } catch(e) {
-    showT("Lỗi duyệt quán: " + e.message, "err");
+window.toggleHideBranch = async (id, hidden) => {
+  await updateDoc(doc(db,'Branches',id), {hidden:!hidden});
+  showT(hidden?'Đã hiện quán':'Đã ẩn quán','ok'); rBranches();
+};
+window.setDisplayOrder = async (id, val) => {
+  await updateDoc(doc(db,'Branches',id), {displayOrder:parseInt(val)||999});
+  showT('Đã cập nhật thứ tự','ok');
+};
+window.quickApprove = async (id) => {
+  if (!confirm('Phân quyền nhanh cho quán này?')) return;
+  const bSnap = await getDoc(doc(db,'Branches',id));
+  const email = bSnap.data()?.info?.email;
+  await updateDoc(doc(db,'Branches',id), {isPartnerApproved:true, approvedAt:serverTimestamp(), approvedBy:me.email});
+  if (email) {
+    await setDoc(doc(db,'Branches',id,'Staff',email), {name:bSnap.data()?.info?.owner||'', role:'admin', addedAt:serverTimestamp()});
   }
+  showT('Đã phân quyền','ok'); rBranches();
 };
 
-// -- GIỮ LẠI CÁC HÀM STAFF, SETTINGS, VOUCHERS --
-async function rStaff() { if (curBrId === 'all') return; /*... logic cũ...*/ document.getElementById('pg-c').innerHTML = `<div class="cvd">Module Staff đang chạy tốt!</div>`; }
-async function rVouchers() { if (curBrId === 'all') return; /*... logic cũ...*/ document.getElementById('pg-c').innerHTML = `<div class="cvd">Module Vouchers đang chạy tốt!</div>`; }
-async function rSettings() { if (curBrId === 'all') return; /*... logic cũ...*/ document.getElementById('pg-c').innerHTML = `<div class="cvd">Module Settings đang chạy tốt!</div>`; }
+window.openEditBranch = async (id) => {
+  const snap = await getDoc(doc(db,'Branches',id));
+  const b    = {id, ...snap.data()};
+  const info = b.info || {};
+  openMo(`✏️ Sửa thông tin: ${info.name||id}`, `
+    <div class="fg">
+      <div class="ff full"><label>Tên quán</label><input id="eb-name" value="${info.name||''}"></div>
+      <div class="ff full"><label>Địa chỉ</label><input id="eb-addr" value="${info.address||''}"></div>
+      <div class="ff"><label>Phường/Xã</label><input id="eb-ward" value="${info.ward||''}"></div>
+      <div class="ff"><label>Tên đường</label><input id="eb-street" value="${info.street||''}"></div>
+      <div class="ff"><label>Giờ mở</label><input type="time" id="eb-open" value="${info.openTime||'07:00'}"></div>
+      <div class="ff"><label>Giờ đóng</label><input type="time" id="eb-close" value="${info.closeTime||'21:00'}"></div>
+      <div class="ff"><label>Thứ tự hiển thị</label><input type="number" id="eb-order" value="${b.displayOrder||999}"></div>
+      <div class="ff"><label>Featured (Nổi bật)</label>
+        <label class="tog-wrap" style="margin-top:8px"><label class="tog"><input type="checkbox" id="eb-feat" ${b.featured?'checked':''}><span class="tog-sl"></span></label><span class="tog-lbl">Nổi bật</span></label>
+      </div>
+      <div class="ff full"><label>Banner/Quảng cáo (URL ảnh)</label><input id="eb-banner" value="${b.bannerUrl||''}"></div>
+    </div>
+    <div class="fa"><button class="fcn" onclick="closeMo2()">Huỷ</button><button class="fsv" onclick="saveEditBranch('${id}')">💾 Lưu</button></div>`);
+};
+window.saveEditBranch = async (id) => {
+  await updateDoc(doc(db,'Branches',id), {
+    'info.name':      document.getElementById('eb-name').value.trim(),
+    'info.address':   document.getElementById('eb-addr').value.trim(),
+    'info.ward':      document.getElementById('eb-ward').value.trim(),
+    'info.street':    document.getElementById('eb-street').value.trim(),
+    'info.openTime':  document.getElementById('eb-open').value,
+    'info.closeTime': document.getElementById('eb-close').value,
+    displayOrder: parseInt(document.getElementById('eb-order').value)||999,
+    featured:     document.getElementById('eb-feat').checked,
+    bannerUrl:    document.getElementById('eb-banner').value.trim(),
+    updatedAt: serverTimestamp()
+  });
+  showT('Đã lưu','ok'); closeMo2(); rBranches();
+};
 
-function openMo(title, html) { document.getElementById('mod-c').innerHTML = `<h3>${title}</h3>${html}`; document.getElementById('mo').classList.add('open'); }
-window.closeMo = e => { if (e.target === document.getElementById('mo')) closeMo2(); };
+// ── HELPERS ──
+function openMo(title, html) {
+  document.getElementById('mod-c').innerHTML = `<h3>${title}</h3>${html}`;
+  document.getElementById('mo').classList.add('open');
+}
+window.closeMo  = e => { if (e.target === document.getElementById('mo')) closeMo2(); };
 window.closeMo2 = () => document.getElementById('mo').classList.remove('open');
 function fmt(n) { return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(n||0); }
-let _t; function showT(msg, type='inf') { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'show ' + type; clearTimeout(_t); _t = setTimeout(() => el.className='', 3200); }
+let _t;
+function showT(msg, type='inf') {
+  const el = document.getElementById('toast'); el.textContent = msg;
+  el.className = 'show ' + type; clearTimeout(_t); _t = setTimeout(() => el.className='', 3200);
+}
 window.showT = showT;
 </script>
 </body>

@@ -12,7 +12,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
-/* ══ DESIGN TOKENS ══ */
 :root{
   --bg:#08090f;--s1:#0f1117;--s2:#161b27;--s3:#1c2233;--s4:#222840;
   --brd:#2c3450;--brd2:#1c2233;
@@ -33,89 +32,94 @@ html,body{height:100%;overflow:hidden;background:var(--bg)}
 body{font-family:var(--font);font-size:14px;color:var(--txt);display:flex;flex-direction:column;padding-top:var(--safe-t)}
 button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
 input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
-::-webkit-scrollbar{width:3px;height:3px}
-::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+::-webkit-scrollbar{width:3px;height:3px}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
 
 /* AUTH */
-#auth-ov{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
-.auth-wrap{width:100%;max-width:340px;background:var(--s1);border:1px solid var(--brd);border-radius:var(--r2);padding:36px 24px;text-align:center;}
+#auth-ov{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-wrap{width:100%;max-width:340px;background:var(--s1);border:1px solid var(--brd);border-radius:var(--r2);padding:36px 24px;text-align:center}
 .auth-ico{font-size:48px;margin-bottom:6px}
 .auth-ttl{font-size:22px;font-weight:900;color:var(--acc);letter-spacing:-0.5px}
 .auth-sub{font-size:12px;color:var(--txt2);margin:4px 0 24px}
-.auth-inp{width:100%;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:12px 14px;color:var(--txt);font-size:15px;outline:none;margin-bottom:10px;transition:border-color .2s;}
+.auth-inp{width:100%;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:12px 14px;color:var(--txt);font-size:15px;outline:none;margin-bottom:10px;transition:border-color .2s}
 .auth-inp:focus{border-color:var(--acc)}
-.auth-go{width:100%;background:var(--acc);color:#fff;border-radius:var(--r);padding:13px;font-size:15px;font-weight:800;letter-spacing:.3px;}
+.auth-go{width:100%;background:var(--acc);color:#fff;border-radius:var(--r);padding:13px;font-size:15px;font-weight:800}
 .auth-go:active{background:var(--acc2)}
 #auth-err{color:var(--red);font-size:12px;margin-top:8px;min-height:14px}
 
 /* TOPBAR */
-#topbar{height:50px;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px;padding:0 12px;z-index:50;}
+#topbar{height:50px;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px;padding:0 12px;z-index:50}
 .tb-logo{font-size:17px;font-weight:900;color:var(--acc);letter-spacing:-0.5px}
-.tb-br{font-size:11px;color:var(--txt2);background:var(--s3);border:1px solid var(--brd);padding:2px 8px;border-radius:14px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tb-br{font-size:11px;color:var(--txt2);background:var(--s3);border:1px solid var(--brd);padding:2px 8px;border-radius:14px;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tb-sp{flex:1}
 .tb-role{font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
 .role-admin{background:var(--pur-d);color:var(--pur)}
 .role-cashier{background:var(--grn-d);color:var(--grn)}
-.tb-langbtn{background:var(--s3);border:1px solid var(--brd);color:var(--txt2);border-radius:8px;padding:4px 10px;font-size:12px;font-weight:700;}
+/* Table session selector in topbar */
+.tb-session{font-size:11px;background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:3px 8px;color:var(--txt2);cursor:pointer}
+.tb-session-active{border-color:var(--acc);color:var(--acc)}
 
 /* PAGES */
 #pages{flex:1;overflow:hidden;position:relative}
-.pg{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .18s;}
+.pg{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none;transition:opacity .18s}
 .pg.on{opacity:1;pointer-events:all}
 
 /* BOTTOM NAV */
-#bnav{height:56px;flex-shrink:0;background:var(--s1);border-top:1px solid var(--brd);display:flex;padding-bottom:var(--safe-b);}
-.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;color:var(--txt3);transition:color .18s;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;position:relative;}
+#bnav{height:56px;flex-shrink:0;background:var(--s1);border-top:1px solid var(--brd);display:flex;padding-bottom:var(--safe-b)}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 4px;color:var(--txt3);transition:color .18s;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;position:relative}
 .bni.on{color:var(--acc)}
 .bni-ico{font-size:20px;line-height:1}
-.bni-badge{position:absolute;top:4px;right:calc(50% - 20px);background:var(--red);color:#fff;min-width:16px;height:16px;border-radius:8px;font-size:9px;font-weight:900;padding:0 3px;display:none;align-items:center;justify-content:center;border:1.5px solid var(--bg);}
+.bni-badge{position:absolute;top:4px;right:calc(50% - 20px);background:var(--red);color:#fff;min-width:16px;height:16px;border-radius:8px;font-size:9px;font-weight:900;padding:0 3px;display:none;align-items:center;justify-content:center;border:1.5px solid var(--bg)}
 
 /* PAGE: MENU */
 #pg-menu{background:var(--bg)}
-.menu-topbar{padding:10px 12px;background:var(--s1);border-bottom:1px solid var(--brd);flex-shrink:0;}
-#search-inp{width:100%;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:9px 12px;font-size:14px;outline:none;color:var(--txt);transition:border-color .2s;}
+.menu-topbar{padding:10px 12px;background:var(--s1);border-bottom:1px solid var(--brd);flex-shrink:0}
+#search-inp{width:100%;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:9px 12px;font-size:14px;outline:none;color:var(--txt);transition:border-color .2s}
 #search-inp:focus{border-color:var(--acc)}
-#cat-bar{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--brd);}
+#cat-bar{display:flex;gap:6px;padding:8px 12px;overflow-x:auto;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--brd)}
 #cat-bar::-webkit-scrollbar{display:none}
-.cat-p{white-space:nowrap;padding:5px 14px;border-radius:16px;border:1.5px solid var(--brd);color:var(--txt2);font-size:12px;font-weight:700;flex-shrink:0;transition:all .15s;background:none;}
+.cat-p{white-space:nowrap;padding:5px 14px;border-radius:16px;border:1.5px solid var(--brd);color:var(--txt2);font-size:12px;font-weight:700;flex-shrink:0;transition:all .15s;background:none}
 .cat-p.on{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
-#menu-grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:max-content;gap:10px;padding:10px;align-content:start;}
-.mc{background:var(--s2);border:1.5px solid var(--brd);border-radius:var(--r);overflow:hidden;cursor:pointer;position:relative;transition:border-color .12s,transform .1s;-webkit-user-select:none;user-select:none;display:flex;flex-direction:column;height:100%;}
+#menu-grid{flex:1;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:max-content;gap:10px;padding:10px;align-content:start}
+.mc{background:var(--s2);border:1.5px solid var(--brd);border-radius:var(--r);overflow:hidden;cursor:pointer;position:relative;transition:border-color .12s,transform .1s;-webkit-user-select:none;user-select:none;display:flex;flex-direction:column}
 .mc:active{transform:scale(.95);border-color:var(--acc)}
 .mc.oos{opacity:.32;pointer-events:none}
-.mc-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--s3);display:block;flex-shrink:0;}
+.mc-img{width:100%;aspect-ratio:1/1;object-fit:cover;background:var(--s3);display:block;flex-shrink:0}
 .mc-body{padding:8px 10px 10px}
 .mc-name{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:3px}
 .mc-price{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--acc)}
 .mc-stk{font-size:10px;color:var(--txt3);margin-top:2px}
-.mc-oos-lbl{position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px;}
-#cart-fab{position:absolute;bottom:14px;right:14px;z-index:20;width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,107,53,.5);transition:transform .15s;}
+.mc-oos-lbl{position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:4px}
+#cart-fab{position:absolute;bottom:14px;right:14px;z-index:20;width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(255,107,53,.5);transition:transform .15s}
 #cart-fab:active{transform:scale(.9)}
-#fab-badge{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;border:2px solid var(--bg);min-width:20px;height:20px;border-radius:10px;font-size:10px;font-weight:900;padding:0 3px;display:none;align-items:center;justify-content:center;}
+#fab-badge{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;border:2px solid var(--bg);min-width:20px;height:20px;border-radius:10px;font-size:10px;font-weight:900;padding:0 3px;display:none;align-items:center;justify-content:center}
 
 /* PAGE: BILL */
 #pg-bill{background:var(--bg)}
-.bill-head{padding:10px 14px;background:var(--s1);border-bottom:1px solid var(--brd);flex-shrink:0;}
+.bill-head{padding:10px 14px;background:var(--s1);border-bottom:1px solid var(--brd);flex-shrink:0}
 .bill-head-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .bill-ttl{font-size:16px;font-weight:800}
 .bill-clr{font-size:12px;color:var(--red);font-weight:700;padding:4px 10px}
+/* Table/note row */
+.bill-meta-row{display:flex;gap:6px;margin-bottom:8px}
+.bill-meta-inp{flex:1;background:var(--s3);border:1.5px solid var(--brd);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--txt);outline:none}
+.bill-meta-inp:focus{border-color:var(--acc)}
 .ot-tabs{display:flex;gap:5px}
-.ot-tab{flex:1;padding:6px 4px;border-radius:8px;border:1.5px solid var(--brd);color:var(--txt2);font-size:11px;font-weight:700;text-align:center;transition:all .15s;background:none;}
+.ot-tab{flex:1;padding:6px 4px;border-radius:8px;border:1.5px solid var(--brd);color:var(--txt2);font-size:11px;font-weight:700;text-align:center;transition:all .15s;background:none}
 .ot-tab.on{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
 #bill-list{flex:1;overflow-y:auto;padding:6px 14px}
-.bill-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--txt3);}
+.bill-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--txt3)}
 .ci{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--brd2)}
 .ci-info{flex:1;min-width:0}
-.ci-name{font-size:13px;font-weight:600;line-height:1.4;word-break:break-word;}
+.ci-name{font-size:13px;font-weight:600;line-height:1.4;word-break:break-word}
 .ci-up{font-size:11px;color:var(--txt2);font-family:var(--mono);margin-top:1px}
 .ci-ctrl{display:flex;align-items:center;gap:5px}
-.qbtn{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--brd);background:var(--s3);color:var(--txt);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;}
+.qbtn{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--brd);background:var(--s3);color:var(--txt);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
 .ci-qty{width:24px;text-align:center;font-family:var(--mono);font-size:14px;font-weight:700}
-.ci-tot{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--acc);width:72px;text-align:right;}
-#bill-box{background:var(--s1);border-top:1px solid var(--brd);padding:10px 14px 14px;flex-shrink:0;}
+.ci-tot{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--acc);width:72px;text-align:right}
+#bill-box{background:var(--s1);border-top:1px solid var(--brd);padding:10px 14px 14px;flex-shrink:0}
 .vrow{display:flex;gap:7px;margin-bottom:6px}
-.vinp{flex:1;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:8px 12px;font-size:13px;outline:none;color:var(--txt);}
-.vapply{background:var(--pur-d);border:1.5px solid var(--pur);color:var(--pur);border-radius:var(--r);padding:8px 13px;font-size:12px;font-weight:700;}
+.vinp{flex:1;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:8px 12px;font-size:13px;outline:none;color:var(--txt)}
+.vapply{background:var(--pur-d);border:1.5px solid var(--pur);color:var(--pur);border-radius:var(--r);padding:8px 13px;font-size:12px;font-weight:700}
 .vmsg{font-size:11px;min-height:13px;margin-bottom:4px}
 .brow{display:flex;justify-content:space-between;padding:2px 0}
 .blbl{font-size:13px;color:var(--txt2)}
@@ -124,47 +128,44 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
 .btlbl{font-size:16px;font-weight:900}
 .btval{font-family:var(--mono);font-size:19px;font-weight:900;color:var(--acc)}
 .pm-row{display:flex;gap:6px;margin:8px 0}
-.pm-btn{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--brd);color:var(--txt2);font-size:12px;font-weight:700;background:none;}
+.pm-btn{flex:1;padding:9px 4px;border-radius:9px;border:1.5px solid var(--brd);color:var(--txt2);font-size:12px;font-weight:700;background:none}
 .pm-btn.on{background:var(--blu-d);border-color:var(--blu);color:var(--blu)}
-#co-btn{width:100%;background:var(--acc);color:#fff;border-radius:var(--r);padding:13px;font-size:15px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px;}
+.co-row{display:flex;gap:8px;margin-top:6px}
+#save-btn{flex:1;background:var(--blu);color:#fff;border-radius:var(--r);padding:13px;font-size:15px;font-weight:900;border:none}
+#co-btn{flex:1;background:var(--acc);color:#fff;border-radius:var(--r);padding:13px;font-size:15px;font-weight:900;border:none}
 
 /* PAGE: LIVE ORDERS */
 #pg-orders{background:var(--bg)}
-.orders-hdr{padding:10px 12px;background:var(--s1);border-bottom:1px solid var(--brd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;}
+.orders-hdr{padding:10px 12px;background:var(--s1);border-bottom:1px solid var(--brd);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .orders-hdr-t{font-size:15px;font-weight:800}
 #orders-cnt{font-size:12px;color:var(--txt2)}
 #orders-list{flex:1;overflow-y:auto;padding:10px}
-.oc{background:var(--s2);border:1.5px solid var(--brd);border-radius:var(--r);padding:12px;margin-bottom:8px;}
+.oc{background:var(--s2);border:1.5px solid var(--brd);border-radius:var(--r);padding:12px;margin-bottom:8px}
 .oc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
 .oc-id{font-family:var(--mono);font-size:11px;color:var(--txt3);font-weight:700}
 .oc-time{font-size:10px;color:var(--txt3)}
 .oc-ch{display:inline-block;font-size:10px;font-weight:800;padding:2px 7px;border-radius:5px;margin-bottom:4px}
-.ch-di{background:var(--blu-d);color:var(--blu)}
-.ch-ta{background:var(--grn-d);color:var(--grn)}
-.ch-wo{background:var(--pur-d);color:var(--pur)}
-.ch-ao{background:var(--ylw-d);color:var(--ylw)}
+.ch-di{background:var(--blu-d);color:var(--blu)}.ch-ta{background:var(--grn-d);color:var(--grn)}
+.ch-wo{background:var(--pur-d);color:var(--pur)}.ch-ao{background:var(--ylw-d);color:var(--ylw)}
 .oc-items{font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:5px}
 .oc-total{font-family:var(--mono);font-weight:800;color:var(--acc);font-size:14px;margin-bottom:8px}
 .status-wrap{display:flex;flex-wrap:wrap;gap:5px}
-.sch{font-size:10px;font-weight:800;padding:4px 9px;border-radius:7px;border:1.5px solid transparent;}
+.sch{font-size:10px;font-weight:800;padding:4px 9px;border-radius:7px;border:1.5px solid transparent}
 .sch.cur{box-shadow:0 0 0 2px currentColor}
-.s-pe{background:var(--ylw-d);color:var(--ylw);border-color:var(--ylw)}
-.s-pa{background:var(--grn-d);color:var(--grn);border-color:var(--grn)}
-.s-pr{background:var(--blu-d);color:var(--blu);border-color:var(--blu)}
-.s-de{background:var(--pur-d);color:var(--pur);border-color:var(--pur)}
-.s-dd{background:rgba(176,111,255,.2);color:#c8a7ff;border-color:#c8a7ff}
-.s-co{background:rgba(0,217,126,.2);color:#4dffa6;border-color:#4dffa6}
+.s-pe{background:var(--ylw-d);color:var(--ylw);border-color:var(--ylw)}.s-pa{background:var(--grn-d);color:var(--grn);border-color:var(--grn)}
+.s-pr{background:var(--blu-d);color:var(--blu);border-color:var(--blu)}.s-de{background:var(--pur-d);color:var(--pur);border-color:var(--pur)}
+.s-dd{background:rgba(176,111,255,.2);color:#c8a7ff;border-color:#c8a7ff}.s-co{background:rgba(0,217,126,.2);color:#4dffa6;border-color:#4dffa6}
 .s-ca{background:var(--red-d);color:var(--red);border-color:var(--red)}
 
-/* PAGE: ACTIVITY & PROFILE */
-#pg-activity, #pg-profile{background:var(--bg)}
-.act-hdr{padding:10px 12px;background:var(--s1);border-bottom:1px solid var(--brd);display:flex;justify-content:space-between;}
+/* PAGE: ACTIVITY */
+#pg-activity{background:var(--bg)}
+.act-hdr{padding:10px 12px;background:var(--s1);border-bottom:1px solid var(--brd);display:flex;justify-content:space-between}
 .act-hdr-t{font-size:15px;font-weight:800}
-.act-filter{display:flex;gap:6px;padding:8px 12px;background:var(--s1);border-bottom:1px solid var(--brd);overflow-x:auto;}
-.af-btn{white-space:nowrap;padding:5px 12px;border-radius:14px;border:1.5px solid var(--brd);color:var(--txt2);font-size:11px;font-weight:700;background:none;}
+.act-filter{display:flex;gap:6px;padding:8px 12px;background:var(--s1);border-bottom:1px solid var(--brd);overflow-x:auto}
+.af-btn{white-space:nowrap;padding:5px 12px;border-radius:14px;border:1.5px solid var(--brd);color:var(--txt2);font-size:11px;font-weight:700;background:none}
 .af-btn.on{background:var(--acc-d);border-color:var(--acc);color:var(--acc)}
 #act-list{flex:1;overflow-y:auto;padding:10px}
-.ai{background:var(--s2);border:1.5px solid var(--brd);border-radius:var(--r);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.ai{background:var(--s2);border:1.5px solid var(--brd);border-radius:var(--r);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
 .ai-left{flex:1;min-width:0}
 .ai-row1{display:flex;align-items:center;gap:6px;margin-bottom:3px}
 .ai-id{font-family:var(--mono);font-size:11px;color:var(--txt3);font-weight:700}
@@ -173,54 +174,44 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
 .ai-right{text-align:right;flex-shrink:0}
 .ai-total{font-family:var(--mono);font-size:14px;font-weight:800;color:var(--acc)}
 
+/* PAGE: PROFILE */
+#pg-profile{background:var(--bg)}
 .prof-wrap{padding:16px}
 .prof-card{background:var(--s2);border:1.5px solid var(--brd);border-radius:var(--r2);padding:20px;margin-bottom:12px}
 .prof-av{width:56px;height:56px;border-radius:50%;background:var(--acc-d);border:2.5px solid var(--acc);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--acc);margin:0 auto 8px}
 .prof-name{text-align:center;font-size:15px;font-weight:800;margin-bottom:3px}
 .prof-email{text-align:center;font-size:11px;color:var(--txt2);margin-bottom:8px}
-.prof-role{display:block;margin:0 auto;width:fit-content;padding:2px 12px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase;}
-.pref-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--brd2)}
-.pref-lbl{font-size:14px;font-weight:600}
-.pref-sub{font-size:11px;color:var(--txt2);margin-top:2px}
-.logout-btn{width:100%;background:var(--red-d);border:1.5px solid var(--red);color:var(--red);border-radius:var(--r);padding:13px;font-size:14px;font-weight:800;}
+.prof-role{display:block;margin:0 auto;width:fit-content;padding:2px 12px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase}
+.logout-btn{width:100%;background:var(--red-d);border:1.5px solid var(--red);color:var(--red);border-radius:var(--r);padding:13px;font-size:14px;font-weight:800}
 
-/* WEBORDER ALERT SYSTEM */
-#wo-alert-overlay {
-  position: fixed; inset: 0; z-index: 9900; background: rgba(0, 0, 0, .75); backdrop-filter: blur(4px);
-  display: none; align-items: center; justify-content: center; padding: 20px;
-  animation: woPulse 1.5s ease-in-out infinite;
-}
-#wo-alert-overlay.show { display: flex; }
-@keyframes woPulse { 0%, 100% { background: rgba(0, 0, 0, .75); } 50% { background: rgba(79, 156, 255, .25); } }
-.wo-alert-box {
-  width: 100%; max-width: 380px; background: var(--s1); border: 2px solid var(--blu); border-radius: 24px;
-  overflow: hidden; box-shadow: 0 0 60px rgba(79, 156, 255, .4), 0 20px 60px rgba(0,0,0,.5);
-  animation: woSlide .35s cubic-bezier(.34,1.56,.64,1) both;
-}
-@keyframes woSlide { from { transform: scale(.8) translateY(40px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-.wo-alert-header { background: linear-gradient(135deg, #1a3a6e 0%, #0d2240 100%); padding: 20px; text-align: center; position: relative; }
-.wo-alert-icon { font-size: 48px; display: block; margin-bottom: 8px; animation: woBounce 0.6s ease infinite alternate; }
-@keyframes woBounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-.wo-alert-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--blu-d); border: 1.5px solid var(--blu); color: var(--blu); border-radius: 20px; padding: 4px 14px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
-.wo-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blu); animation: woDot 1s ease infinite; }
-@keyframes woDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .4; transform: scale(.7); } }
-.wo-alert-title { font-size: 20px; font-weight: 900; color: var(--txt); margin-top: 14px; }
-.wo-alert-subtitle { font-size: 12px; color: var(--txt2); margin-top: 4px; }
-.wo-alert-body { padding: 16px 20px; }
-.wo-detail-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--brd2); }
-.wo-detail-icon { font-size: 16px; flex-shrink: 0; }
-.wo-detail-lbl  { font-size: 11px; color: var(--txt3); font-weight: 700; text-transform: uppercase; }
-.wo-detail-val  { font-size: 14px; color: var(--txt); font-weight: 600; line-height: 1.4; }
-.wo-detail-total { font-family: var(--mono); font-size: 18px; font-weight: 900; color: var(--grn); }
-.wo-alert-actions { padding: 0 20px 20px; display: flex; gap: 10px; }
-.wo-btn-dismiss { flex: 1; padding: 13px; border-radius: 12px; font-size: 13px; font-weight: 700; background: var(--s3); color: var(--txt2); border: 1.5px solid var(--brd); }
-.wo-btn-confirm { flex: 2; padding: 13px; border-radius: 12px; font-size: 14px; font-weight: 800; background: var(--blu); color: #fff; }
-#weborder-queue-badge { position: absolute; top: 4px; right: calc(50% - 24px); background: var(--blu); color: #fff; min-width: 18px; height: 18px; border-radius: 9px; font-size: 9px; font-weight: 900; padding: 0 4px; display: none; align-items: center; justify-content: center; }
+/* WEBORDER ALERT */
+#wo-alert-overlay{position:fixed;inset:0;z-index:9900;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px;animation:woPulse 1.5s ease-in-out infinite}
+#wo-alert-overlay.show{display:flex}
+@keyframes woPulse{0%,100%{background:rgba(0,0,0,.75)}50%{background:rgba(79,156,255,.25)}}
+.wo-alert-box{width:100%;max-width:380px;background:var(--s1);border:2px solid var(--blu);border-radius:24px;overflow:hidden;box-shadow:0 0 60px rgba(79,156,255,.4);animation:woSlide .35s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes woSlide{from{transform:scale(.8) translateY(40px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.wo-alert-header{background:linear-gradient(135deg,#1a3a6e 0%,#0d2240 100%);padding:20px;text-align:center;position:relative}
+.wo-alert-icon{font-size:48px;display:block;margin-bottom:8px;animation:woBounce .6s ease infinite alternate}
+@keyframes woBounce{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+.wo-alert-badge{display:inline-flex;align-items:center;gap:6px;background:var(--blu-d);border:1.5px solid var(--blu);color:var(--blu);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:800;text-transform:uppercase}
+.wo-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--blu);animation:woDot 1s ease infinite}
+@keyframes woDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.wo-alert-title{font-size:20px;font-weight:900;color:var(--txt);margin-top:14px}
+.wo-alert-subtitle{font-size:12px;color:var(--txt2);margin-top:4px}
+.wo-alert-body{padding:16px 20px}
+.wo-detail-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd2)}
+.wo-detail-icon{font-size:16px;flex-shrink:0}
+.wo-detail-lbl{font-size:11px;color:var(--txt3);font-weight:700;text-transform:uppercase}
+.wo-detail-val{font-size:14px;color:var(--txt);font-weight:600;line-height:1.4}
+.wo-detail-total{font-family:var(--mono);font-size:18px;font-weight:900;color:var(--grn)}
+.wo-alert-actions{padding:0 20px 20px;display:flex;gap:10px}
+.wo-btn-dismiss{flex:1;padding:13px;border-radius:12px;font-size:13px;font-weight:700;background:var(--s3);color:var(--txt2);border:1.5px solid var(--brd)}
+.wo-btn-confirm{flex:2;padding:13px;border-radius:12px;font-size:14px;font-weight:800;background:var(--blu);color:#fff}
 
 /* TOAST */
-#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--s2);border:1.5px solid var(--brd);border-radius:24px;padding:9px 20px;font-size:13px;font-weight:600;z-index:9998;opacity:0;transition:all .25s;pointer-events:none;}
+#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--s2);border:1.5px solid var(--brd);border-radius:24px;padding:9px 20px;font-size:13px;font-weight:600;z-index:9998;opacity:0;transition:all .25s;pointer-events:none}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-#toast.ok{border-color:var(--grn);color:var(--grn)} #toast.err{border-color:var(--red);color:var(--red)} #toast.inf{border-color:var(--blu);color:var(--blu)}
+#toast.ok{border-color:var(--grn);color:var(--grn)}#toast.err{border-color:var(--red);color:var(--red)}#toast.inf{border-color:var(--blu);color:var(--blu)}
 .spin{width:28px;height:28px;border:3px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 .ldr{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;color:var(--txt2)}
@@ -232,9 +223,9 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
   <div class="auth-wrap">
     <div class="auth-ico">🌿</div>
     <div class="auth-ttl" id="auth-app-name">POS</div>
-    <div class="auth-sub">Đăng nhập bằng tài khoản Quản lý chi nhánh</div>
+    <div class="auth-sub">Đăng nhập bằng tài khoản quản lý chi nhánh</div>
     <input id="ai-em" class="auth-inp" type="email" placeholder="Email" autocomplete="email"/>
-    <input id="ai-pw" class="auth-inp" type="password" placeholder="Mật khẩu" autocomplete="current-password"/>
+    <input id="ai-pw" class="auth-inp" type="password" placeholder="Mật khẩu" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
     <button class="auth-go" onclick="doLogin()">Đăng nhập</button>
     <div id="auth-err"></div>
   </div>
@@ -244,61 +235,78 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
   <div class="tb-logo" id="tb-logo">🌿 POS</div>
   <div class="tb-br" id="tb-br">...</div>
   <div class="tb-sp"></div>
+  <button class="tb-session" id="tb-session" onclick="openTableSelector()" title="Chọn bàn / phiên">🪑 <span id="tb-session-label">Bàn?</span></button>
+  &nbsp;
   <span class="tb-role role-cashier" id="tb-role">CASHIER</span>
 </div>
 
 <div id="pages">
+  <!-- MENU -->
   <div class="pg on" id="pg-menu">
     <div class="menu-topbar"><input id="search-inp" placeholder="Tìm món..." oninput="filterMenu(this.value)"/></div>
     <div id="cat-bar"></div>
     <div id="menu-grid"><div class="ldr" style="grid-column:1/-1"><div class="spin"></div></div></div>
-    <button id="cart-fab" onclick="gPage('bill')">🛒<span id="fab-badge">0</span></button>
+    <button id="cart-fab" onclick="gPage('bill')">🛒<span id="fab-badge" class="bni-badge">0</span></button>
   </div>
 
+  <!-- BILL -->
   <div class="pg" id="pg-bill">
     <div class="bill-head">
-      <div class="bill-head-row"><span class="bill-ttl">Hoá Đơn</span><button class="bill-clr" onclick="clearCart()">Xoá tất cả</button></div>
+      <div class="bill-head-row">
+        <span class="bill-ttl" id="bill-title">Hoá Đơn</span>
+        <button class="bill-clr" onclick="clearCart()">Xoá tất cả</button>
+      </div>
+      <div class="bill-meta-row">
+        <input class="bill-meta-inp" id="bill-table" placeholder="Bàn / Table số..." style="max-width:120px">
+        <input class="bill-meta-inp" id="bill-note" placeholder="Ghi chú đơn hàng...">
+      </div>
       <div class="ot-tabs">
-        <button class="ot-tab on" data-ot="dinein" onclick="setOT('dinein')">🪑 Tại chỗ</button>
-        <button class="ot-tab" data-ot="takeaway" onclick="setOT('takeaway')">🥡 Mang về</button>
-        <button class="ot-tab" data-ot="apporder" onclick="setOT('apporder')">📱 App</button>
+        <button class="ot-tab on" data-ot="dinein"   onclick="setOT('dinein')">🪑 Tại chỗ</button>
+        <button class="ot-tab" data-ot="takeaway"    onclick="setOT('takeaway')">🥡 Mang về</button>
+        <button class="ot-tab" data-ot="apporder"    onclick="setOT('apporder')">📱 App</button>
       </div>
     </div>
-    <div id="bill-list"><div class="bill-empty" id="bill-empty">Chưa có món — chọn từ thực đơn</div></div>
+    <div id="bill-list"><div class="bill-empty">Chưa có món — chọn từ thực đơn</div></div>
     <div id="bill-box">
       <div class="vrow"><input class="vinp" id="v-code" placeholder="Mã giảm giá..."/><button class="vapply" onclick="applyVoucher()">Áp dụng</button></div>
       <div class="vmsg" id="v-msg"></div>
-      <div class="brow"><span class="blbl">Tạm tính</span><span class="bval" id="b-sub">0 ₫</span></div>
+      <div class="brow"><span class="blbl">Tạm tính (chưa VAT)</span><span class="bval" id="b-sub">0 ₫</span></div>
       <div class="brow"><span class="blbl">VAT (<span id="vat-pct">0</span>%)</span><span class="bval" id="b-vat">0 ₫</span></div>
-      <div class="brow" id="b-disc-row" style="display:none"><span class="blbl" style="color:var(--grn)">Giảm giá</span><span class="bval" style="color:var(--grn)" id="b-disc">0 ₫</span></div>
+      <div class="brow" id="b-disc-row" style="display:none"><span class="blbl" style="color:var(--grn)">Giảm giá</span><span class="bval" style="color:var(--grn)" id="b-disc">−0 ₫</span></div>
       <div class="btrow"><span class="btlbl">TỔNG</span><span class="btval" id="b-total">0 ₫</span></div>
       <div class="pm-row">
-        <button class="pm-btn on" data-pm="cash" onclick="setPM('cash')">💵 Tiền mặt</button>
-        <button class="pm-btn" data-pm="card" onclick="setPM('card')">💳 Thẻ</button>
-        <button class="pm-btn" data-pm="transfer" onclick="setPM('transfer')">🏦 CK</button>
+        <button class="pm-btn on" data-pm="cash"     onclick="setPM('cash')">💵 Tiền mặt</button>
+        <button class="pm-btn" data-pm="card"        onclick="setPM('card')">💳 Thẻ</button>
+        <button class="pm-btn" data-pm="transfer"    onclick="setPM('transfer')">🏦 CK</button>
       </div>
-      <div style="display:flex; gap:8px; margin-top:6px;">
-        <button id="save-btn" onclick="saveOrder()" style="flex:1; background:var(--blu); color:#fff; border-radius:var(--r); padding:13px; font-weight:900; border:none;">⏳ Lưu Đơn</button>
-        <button id="co-btn" onclick="checkout()" style="flex:1; background:var(--acc); color:#fff; border-radius:var(--r); padding:13px; font-weight:900; border:none;">✅ Thanh Toán</button>
+      <div class="co-row">
+        <button id="save-btn" onclick="saveOrder()">⏳ Lưu Đơn</button>
+        <button id="co-btn"   onclick="checkout()">✅ Thanh Toán</button>
       </div>
     </div>
   </div>
 
+  <!-- LIVE ORDERS -->
   <div class="pg" id="pg-orders">
-    <div class="orders-hdr"><span class="orders-hdr-t">Đơn Realtime</span><span id="orders-cnt"></span></div>
+    <div class="orders-hdr">
+      <span class="orders-hdr-t">Đơn Realtime</span>
+      <span id="orders-cnt"></span>
+    </div>
     <div id="orders-list"><div class="ldr"><div class="spin"></div></div></div>
   </div>
 
+  <!-- ACTIVITY -->
   <div class="pg" id="pg-activity">
     <div class="act-hdr"><span class="act-hdr-t">Lịch Sử</span></div>
     <div class="act-filter" id="act-filter">
       <button class="af-btn on" data-f="today" onclick="setActFilter('today')">Hôm nay</button>
-      <button class="af-btn" data-f="week" onclick="setActFilter('week')">7 ngày</button>
-      <button class="af-btn" data-f="all" onclick="setActFilter('all')">Tất cả</button>
+      <button class="af-btn" data-f="week"     onclick="setActFilter('week')">7 ngày</button>
+      <button class="af-btn" data-f="all"      onclick="setActFilter('all')">Tất cả</button>
     </div>
     <div id="act-list"><div class="ldr"><div class="spin"></div></div></div>
   </div>
 
+  <!-- PROFILE -->
   <div class="pg" id="pg-profile">
     <div class="prof-wrap">
       <div class="prof-card">
@@ -308,66 +316,92 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
         <span class="prof-role role-cashier" id="p-role">CASHIER</span>
       </div>
       <div class="prof-card">
-        <div class="pref-row"><div><div class="pref-lbl">Chi nhánh</div><div class="pref-sub" id="p-br">...</div></div></div>
+        <div style="font-size:13px;color:var(--txt2);margin-bottom:8px">Chi nhánh</div>
+        <div style="font-size:15px;font-weight:800" id="p-br">...</div>
       </div>
       <button class="logout-btn" onclick="doLogout()">🚪 Đăng xuất</button>
     </div>
   </div>
 </div>
 
+<!-- BOTTOM NAV -->
 <div id="bnav">
-  <button class="bni on" id="bn-menu" onclick="gPage('menu')"><span class="bni-ico">🍽️</span>Menu</button>
-  <button class="bni" id="bn-bill" onclick="gPage('bill')"><span class="bni-ico">🧾</span>Hoá đơn<span class="bni-badge" id="bn-bill-badge">0</span></button>
-  <button class="bni" data-pg="orders" id="bn-orders" onclick="gPage('orders')"><span class="bni-ico">📋</span>Đơn<span class="bni-badge" id="bn-orders-badge">0</span></button>
-  <button class="bni" id="bn-activity" onclick="gPage('activity')"><span class="bni-ico">📂</span>Lịch sử</button>
-  <button class="bni" id="bn-profile" onclick="gPage('profile')"><span class="bni-ico">👤</span>Tôi</button>
+  <button class="bni on" id="bn-menu"     onclick="gPage('menu')">    <span class="bni-ico">🍽️</span>Menu</button>
+  <button class="bni" id="bn-bill"        onclick="gPage('bill')">    <span class="bni-ico">🧾</span>Hoá đơn<span class="bni-badge" id="bn-bill-badge">0</span></button>
+  <button class="bni" id="bn-orders"      onclick="gPage('orders')">  <span class="bni-ico">📋</span>Đơn<span class="bni-badge" id="bn-orders-badge">0</span></button>
+  <button class="bni" id="bn-activity"    onclick="gPage('activity')"><span class="bni-ico">📂</span>Lịch sử</button>
+  <button class="bni" id="bn-profile"     onclick="gPage('profile')"> <span class="bni-ico">👤</span>Tôi</button>
 </div>
 
+<!-- WEB ORDER ALERT -->
 <div id="wo-alert-overlay" role="alertdialog" aria-modal="true">
   <div class="wo-alert-box">
     <div class="wo-alert-header">
       <span class="wo-alert-icon">🌐</span>
       <div class="wo-alert-badge"><span class="wo-badge-dot"></span> ĐƠN WEB MỚI</div>
       <div class="wo-alert-title">Có đơn đặt từ website!</div>
-      <div class="wo-alert-subtitle">Gọi ngay cho khách để xác nhận</div>
+      <div class="wo-alert-subtitle">Gọi ngay để xác nhận</div>
     </div>
     <div class="wo-alert-body" id="wo-alert-body"></div>
     <div class="wo-alert-actions">
       <button class="wo-btn-dismiss" onclick="webOrderAlertDismiss()">Để sau</button>
-      <button class="wo-btn-confirm" onclick="webOrderAlertConfirm()">📞 Đã liên hệ → Chuẩn bị</button>
+      <button class="wo-btn-confirm" onclick="webOrderAlertConfirm()">✅ Xác nhận → Chuẩn bị</button>
     </div>
   </div>
 </div>
 
 <div id="toast"></div>
 
+<!-- TABLE SELECTOR MODAL (inline, no position:fixed issue) -->
+<div id="table-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8000;align-items:flex-end;justify-content:center">
+  <div style="background:var(--s1);border-radius:24px 24px 0 0;padding:20px;width:100%;max-width:500px">
+    <h3 style="margin-bottom:14px;font-size:16px;font-weight:800">🪑 Chọn bàn / Phiên làm việc</h3>
+    <p style="font-size:12px;color:var(--txt2);margin-bottom:14px">Mỗi bàn là một phiên độc lập. Bạn có thể giữ nhiều bàn song song.</p>
+    <div id="table-slots" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px">
+      <input id="custom-table-input" style="flex:1;background:var(--s3);border:1.5px solid var(--brd);border-radius:10px;padding:10px 13px;color:var(--txt);font-size:14px;outline:none" placeholder="Tên bàn khác... (Bàn VIP, Bàn 12...)">
+      <button onclick="selectCustomTable()" style="background:var(--acc);color:#fff;border-radius:10px;padding:10px 16px;font-weight:700;font-size:13px">Chọn</button>
+    </div>
+    <button onclick="closeTableModal()" style="width:100%;margin-top:10px;background:var(--s3);border:1px solid var(--brd);border-radius:10px;padding:10px;color:var(--txt2);font-size:13px;font-weight:600">Đóng</button>
+  </div>
+</div>
+
 <script type="module">
 import { FIREBASE_CONFIG, APP_NAME, APP_LOGO_EMOJI, DEFAULT_VAT } from './config.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, doc, onSnapshot, query, where, orderBy, limit, addDoc, updateDoc, getDoc, getDocs, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, doc, onSnapshot, query, orderBy, limit,
+         addDoc, updateDoc, getDoc, getDocs, serverTimestamp, Timestamp, where }
+  from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const fbApp = initializeApp(FIREBASE_CONFIG);
 const auth  = getAuth(fbApp);
 const db    = getFirestore(fbApp);
 
 document.getElementById('auth-app-name').textContent = APP_NAME + ' POS';
-document.getElementById('tb-logo').textContent = APP_LOGO_EMOJI + ' ' + APP_NAME;
+document.getElementById('tb-logo').textContent       = APP_LOGO_EMOJI + ' ' + APP_NAME;
 
+// ── STATE ──
 let me = null, myRole = null, brId = null, brName = "";
-let branchVAT = DEFAULT_VAT;
-let menuItems = [], allCats = [];
-let cart = [], discPct = 0, vCode = "", pm = "cash", ot = "dinein";
-let liveUnsub = null, actUnsub = null, menuUnsub = null;
-let currentActOrders = [];
+let branchVAT    = DEFAULT_VAT;
+let menuItems    = [], allCats = [];
+let discPct      = 0, vCode = "", pm = "cash", ot = "dinein";
+let liveUnsub    = null, actUnsub = null, menuUnsub = null;
 let editingOrderId = null;
 
-// -- AUTH --
+// Multi-session: sessions = { "Bàn 1": [...cart], "Bàn 2": [...cart] }
+let sessions     = {};
+let activeSession = "Bàn 1";
+
+function getCart() { return sessions[activeSession] || []; }
+function setCart(items) { sessions[activeSession] = items; }
+
+// ── AUTH ──
 window.doLogin = async () => {
-  const em = document.getElementById("ai-em").value.trim();
-  const pw = document.getElementById("ai-pw").value;
-  try { await signInWithEmailAndPassword(auth, em, pw); }
-  catch (e) { document.getElementById("auth-err").textContent = "Sai email hoặc mật khẩu."; }
+  document.getElementById("auth-err").textContent = "";
+  try { await signInWithEmailAndPassword(auth, document.getElementById("ai-em").value.trim(), document.getElementById("ai-pw").value); }
+  catch { document.getElementById("auth-err").textContent = "Sai email hoặc mật khẩu."; }
 };
 window.doLogout = () => signOut(auth);
 
@@ -377,28 +411,66 @@ onAuthStateChanged(auth, async user => {
   const bSnap = await getDocs(collection(db, "Branches"));
   let found = false;
   for (const b of bSnap.docs) {
+    if (!b.data().isPartnerApproved) continue; // Chỉ các quán đã được duyệt
     const sd = await getDoc(doc(db, "Branches", b.id, "Staff", user.email));
     if (sd.exists()) {
-      brId = b.id; brName = b.data().info?.name || b.id; branchVAT = b.data().info?.vat ?? DEFAULT_VAT;
+      brId = b.id; brName = b.data().info?.name || b.id;
+      branchVAT = b.data().info?.vat ?? DEFAULT_VAT;
       myRole = sd.data().role || "cashier"; found = true; break;
     }
   }
-  if (!found) { toast("Không có quyền truy cập.", "err"); signOut(auth); return; }
+  if (!found) { toast("Không có quyền truy cập hoặc quán chưa được phân quyền.", "err"); signOut(auth); return; }
   bootApp();
 });
 
 function bootApp() {
-  document.getElementById("auth-ov").style.display = "none";
-  document.getElementById("tb-br").textContent = brName;
-  document.getElementById("tb-role").textContent = myRole.toUpperCase();
-  document.getElementById("p-av").textContent = me.email[0].toUpperCase();
-  document.getElementById("p-name").textContent = me.email.split("@")[0];
-  document.getElementById("p-email").textContent = me.email;
-  document.getElementById("p-br").textContent = brName;
-  document.getElementById("vat-pct").textContent = branchVAT;
-  loadMenu(); subscribeOrders(); loadActivity("today"); updateBill();
+  document.getElementById("auth-ov").style.display    = "none";
+  document.getElementById("tb-br").textContent        = brName;
+  document.getElementById("tb-role").textContent      = myRole.toUpperCase();
+  document.getElementById("tb-role").className        = `tb-role ${myRole === 'admin' ? 'role-admin' : 'role-cashier'}`;
+  document.getElementById("p-av").textContent         = me.email[0].toUpperCase();
+  document.getElementById("p-name").textContent       = me.email.split("@")[0];
+  document.getElementById("p-email").textContent      = me.email;
+  document.getElementById("p-br").textContent         = brName;
+  document.getElementById("vat-pct").textContent      = branchVAT;
+  document.getElementById("tb-session-label").textContent = activeSession;
+  sessions[activeSession] = sessions[activeSession] || [];
+  loadMenu(); subscribeOrders(); loadActivity("today"); updateBill(); renderCart();
 }
 
+// ── TABLE SESSIONS ──
+window.openTableSelector = () => {
+  const modal = document.getElementById("table-modal");
+  modal.style.display = "flex";
+  const slots = document.getElementById("table-slots");
+  const tables = ["Bàn 1","Bàn 2","Bàn 3","Bàn 4","Bàn 5","Bàn 6","Mang về","App"];
+  slots.innerHTML = tables.map(t => {
+    const count = (sessions[t] || []).reduce((s,c) => s+c.qty, 0);
+    const isActive = t === activeSession;
+    return `<button onclick="switchSession('${t}')" style="
+      background:${isActive ? 'var(--acc-d)' : 'var(--s3)'};
+      border:1.5px solid ${isActive ? 'var(--acc)' : 'var(--brd)'};
+      color:${isActive ? 'var(--acc)' : 'var(--txt2)'};
+      border-radius:10px;padding:10px 4px;font-size:12px;font-weight:700;text-align:center;position:relative">
+      ${t}
+      ${count > 0 ? `<span style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;border-radius:8px;font-size:9px;padding:1px 5px;font-weight:900">${count}</span>` : ''}
+    </button>`;
+  }).join("");
+};
+window.switchSession = (name) => {
+  activeSession = name;
+  sessions[name] = sessions[name] || [];
+  document.getElementById("tb-session-label").textContent = name;
+  document.getElementById("bill-table").value = name;
+  closeTableModal(); updateBill(); renderCart(); updateBadge();
+};
+window.selectCustomTable = () => {
+  const val = document.getElementById("custom-table-input").value.trim();
+  if (val) switchSession(val);
+};
+window.closeTableModal = () => { document.getElementById("table-modal").style.display = "none"; };
+
+// ── NAVIGATION ──
 window.gPage = page => {
   document.querySelectorAll(".pg").forEach(p => p.classList.remove("on"));
   document.querySelectorAll(".bni").forEach(b => b.classList.remove("on"));
@@ -407,207 +479,345 @@ window.gPage = page => {
   if (page === "bill") renderCart();
 };
 
-// -- MENU --
+// ── MENU ──
 function loadMenu() {
+  if (menuUnsub) menuUnsub();
   menuUnsub = onSnapshot(collection(db, "Branches", brId, "Menu"), snap => {
     menuItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    allCats = [...new Set(menuItems.map(m => m.category).filter(Boolean))];
+    allCats   = [...new Set(menuItems.map(m => m.category).filter(Boolean))];
     renderCats(); renderMenu();
   });
 }
 
 let activeCat = "all", menuSearch = "";
 function renderCats() {
-  document.getElementById("cat-bar").innerHTML = `<button class="cat-p ${activeCat === "all" ? "on" : ""}" onclick="setCat('all')">Tất cả</button>` + allCats.map(c => `<button class="cat-p ${activeCat === c ? "on" : ""}" onclick="setCat('${c}')">${c}</button>`).join("");
+  document.getElementById("cat-bar").innerHTML =
+    `<button class="cat-p ${activeCat === 'all' ? 'on' : ''}" onclick="setCat('all')">Tất cả</button>` +
+    allCats.map(c => `<button class="cat-p ${activeCat === c ? 'on' : ''}" onclick="setCat('${c}')">${c}</button>`).join("");
 }
-window.setCat = c => { activeCat = c; renderCats(); renderMenu(); };
+window.setCat    = c => { activeCat = c; renderCats(); renderMenu(); };
 window.filterMenu = v => { menuSearch = v.toLowerCase(); renderMenu(); };
+
+const PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%231c2233' width='200' height='200'/%3E%3Ctext y='120' x='55' font-size='72'%3E🥗%3C/text%3E%3C/svg%3E";
 
 function renderMenu() {
   let items = menuItems;
   if (activeCat !== "all") items = items.filter(m => m.category === activeCat);
-  if (menuSearch) items = items.filter(m => m.name.toLowerCase().includes(menuSearch));
-  const g = document.getElementById("menu-grid");
-  g.innerHTML = items.map(m => {
-    const isOOS = !m.available || m.stock === 0;
-    return `<div class="mc ${isOOS ? "oos" : ""}" onclick="addToCart('${m.id}')">
-      ${isOOS ? `<span class="mc-oos-lbl">Hết/Tắt</span>` : ""}
-      <img class="mc-img" src="${m.image || 'https://via.placeholder.com/300'}"/>
+  if (menuSearch) items = items.filter(m => m.name?.toLowerCase().includes(menuSearch));
+  document.getElementById("menu-grid").innerHTML = items.map(m => {
+    const oos = !m.available || m.stock === 0;
+    return `<div class="mc ${oos ? 'oos' : ''}" onclick="addToCart('${m.id}')">
+      ${oos ? '<span class="mc-oos-lbl">Hết/Tắt</span>' : ''}
+      <img class="mc-img" src="${m.image || PLACEHOLDER_IMG}" onerror="this.src='${PLACEHOLDER_IMG}'">
       <div class="mc-body">
         <div class="mc-name">${m.name}</div>
         <div class="mc-price">${fmt(m.price)}</div>
-        <div class="mc-stk">${m.stock >= 0 ? "Còn: " + m.stock : "∞"}</div>
+        <div class="mc-stk">${m.stock >= 0 ? 'Còn: ' + m.stock : '∞'}</div>
       </div>
     </div>`;
-  }).join("");
+  }).join("") || `<div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--txt3)">Không có món nào</div>`;
 }
 
-// -- CART --
+// ── CART ──
 window.addToCart = id => {
   const item = menuItems.find(m => m.id === id);
   if (!item || !item.available || item.stock === 0) return;
-  const ex = cart.find(c => c.id === id);
+  const cart = getCart();
+  const ex   = cart.find(c => c.id === id);
   if (ex) ex.qty++; else cart.push({ id, name: item.name, price: item.price, qty: 1 });
+  sessions[activeSession] = cart;
   updateBadge(); toast("+ " + item.name, "ok");
 };
+
 window.chQty = (id, d) => {
-  const i = cart.findIndex(c => c.id === id); if (i < 0) return;
-  cart[i].qty += d; if (cart[i].qty <= 0) cart.splice(i, 1);
+  const cart = getCart();
+  const i    = cart.findIndex(c => c.id === id);
+  if (i < 0) return;
+  cart[i].qty += d;
+  if (cart[i].qty <= 0) cart.splice(i, 1);
+  sessions[activeSession] = cart;
   renderCart(); updateBadge();
 };
-window.clearCart = () => { cart = []; discPct = 0; vCode = ""; updateBill(); renderCart(); updateBadge(); };
+
+window.clearCart = () => {
+  sessions[activeSession] = [];
+  discPct = 0; vCode = "";
+  document.getElementById("v-code").value = "";
+  document.getElementById("v-msg").textContent = "";
+  updateBill(); renderCart(); updateBadge();
+};
+
 function updateBadge() {
-  const n = cart.reduce((s, c) => s + c.qty, 0);
-  [document.getElementById("fab-badge"), document.getElementById("bn-bill-badge")].forEach(b => { b.style.display = n ? "flex" : "none"; b.textContent = n; });
+  const cart = getCart();
+  const n     = cart.reduce((s, c) => s + c.qty, 0);
+  const badge = document.getElementById("fab-badge");
+  const bnBadge = document.getElementById("bn-bill-badge");
+  badge.style.display   = n ? "flex" : "none"; badge.textContent   = n;
+  bnBadge.style.display = n ? "flex" : "none"; bnBadge.textContent = n;
 }
+
 function renderCart() {
+  const cart = getCart();
+  document.getElementById("bill-title").textContent = `Hoá Đơn · ${activeSession}`;
+  document.getElementById("bill-table").value       = activeSession;
   const list = document.getElementById("bill-list");
-  list.innerHTML = cart.length ? cart.map(c => `<div class="ci"><div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-up">${fmt(c.price)}</div></div><div class="ci-ctrl"><button class="qbtn" onclick="chQty('${c.id}',-1)">−</button><span class="ci-qty">${c.qty}</span><button class="qbtn" onclick="chQty('${c.id}',1)">+</button></div><div class="ci-tot">${fmt(c.price * c.qty)}</div></div>`).join("") : `<div class="bill-empty">Chưa có món</div>`;
+  if (!cart.length) {
+    list.innerHTML = `<div class="bill-empty">Chưa có món — chọn từ thực đơn</div>`;
+  } else {
+    list.innerHTML = cart.map(c =>
+      `<div class="ci">
+        <div class="ci-info"><div class="ci-name">${c.name}</div><div class="ci-up">${fmt(c.price)}</div></div>
+        <div class="ci-ctrl">
+          <button class="qbtn" onclick="chQty('${c.id}',-1)">−</button>
+          <span class="ci-qty">${c.qty}</span>
+          <button class="qbtn" onclick="chQty('${c.id}',1)">+</button>
+        </div>
+        <div class="ci-tot">${fmt(c.price * c.qty)}</div>
+      </div>`
+    ).join("");
+  }
   updateBill();
 }
+
 function updateBill() {
-  const cartSum = cart.reduce((s, c) => s + c.price * c.qty, 0);
-  const disc = Math.round(cartSum * discPct / 100);
-  let tot = cartSum - disc; if (tot < 0) tot = 0;
-  const sub = Math.round(tot / (1 + branchVAT / 100)); const vat = tot - sub;
-  document.getElementById("b-sub").textContent = fmt(sub);
-  document.getElementById("b-vat").textContent = fmt(vat);
-  document.getElementById("b-disc").textContent = `-${fmt(disc)}`;
-  document.getElementById("b-total").textContent = fmt(tot);
+  const cart = getCart();
+  const rawSum  = cart.reduce((s, c) => s + c.price * c.qty, 0);
+  // VAT tính trên giá chưa có VAT: giá menu = giá chưa VAT
+  const disc    = Math.round(rawSum * discPct / 100);
+  const afterDisc = rawSum - disc;
+  const vatAmt  = Math.round(afterDisc * branchVAT / 100);
+  const total   = afterDisc + vatAmt;
+
+  document.getElementById("b-sub").textContent       = fmt(afterDisc);
+  document.getElementById("b-vat").textContent       = fmt(vatAmt);
+  document.getElementById("b-disc").textContent      = `−${fmt(disc)}`;
+  document.getElementById("b-total").textContent     = fmt(total);
   document.getElementById("b-disc-row").style.display = discPct ? "flex" : "none";
-  window._bill = { sub, vat, disc, tot };
+  window._bill = { sub: afterDisc, vat: vatAmt, disc, total };
 }
+
 window.setOT = type => { ot = type; document.querySelectorAll(".ot-tab").forEach(b => b.classList.toggle("on", b.dataset.ot === type)); };
 window.setPM = method => { pm = method; document.querySelectorAll(".pm-btn").forEach(b => b.classList.toggle("on", b.dataset.pm === method)); };
 
 window.applyVoucher = async () => {
-  const code = document.getElementById("v-code").value.trim().toUpperCase(); const msg = document.getElementById("v-msg");
+  const code = document.getElementById("v-code").value.trim().toUpperCase();
+  const msg  = document.getElementById("v-msg");
   if (!code) { discPct = 0; vCode = ""; updateBill(); msg.textContent = ""; return; }
-  const vs = await getDoc(doc(db, "Branches", brId, "Vouchers", code));
-  if (!vs.exists() || vs.data().active === false) { msg.style.color = "var(--red)"; msg.textContent = "Mã không hợp lệ"; discPct = 0; updateBill(); return; }
-  discPct = vs.data().percent || 0; vCode = code; msg.style.color = "var(--grn)"; msg.textContent = `✓ Giảm ${discPct}%`; updateBill();
+  const vs   = await getDoc(doc(db, "Branches", brId, "Vouchers", code));
+  if (!vs.exists() || vs.data().active === false) {
+    msg.style.color = "var(--red)"; msg.textContent = "Mã không hợp lệ hoặc đã hết hạn";
+    discPct = 0; updateBill(); return;
+  }
+  discPct = vs.data().percent || 0; vCode = code;
+  msg.style.color = "var(--grn)"; msg.textContent = `✓ Áp dụng giảm ${discPct}%`;
+  updateBill();
 };
 
+// ── CHECKOUT ──
 window.saveOrder = async () => await processOrder("pending");
-window.checkout = async () => await processOrder("completed");
+window.checkout  = async () => await processOrder("completed");
+
 async function processOrder(targetStatus) {
+  const cart = getCart();
   if (!cart.length) { toast("Chưa có món", "err"); return; }
-  const orderData = { items: cart, subtotal: window._bill.sub, vat: window._bill.vat, discount: window._bill.disc, total: window._bill.tot, paymentMethod: pm, orderType: ot, voucherCode: vCode || null, status: targetStatus, cashierEmail: me.email, updatedAt: serverTimestamp() };
+  const tableNo = document.getElementById("bill-table").value.trim() || activeSession;
+  const note    = document.getElementById("bill-note").value.trim();
+
+  const orderData = {
+    items:         cart,
+    subtotal:      window._bill.sub,
+    vat:           window._bill.vat,
+    vatPercent:    branchVAT,
+    discount:      window._bill.disc,
+    discountPercent: discPct,
+    total:         window._bill.total,
+    paymentMethod: pm,
+    orderType:     ot,
+    voucherCode:   vCode || null,
+    status:        targetStatus,
+    cashierEmail:  me.email,
+    tableNo,
+    note:          note || null,
+    updatedAt:     serverTimestamp()
+  };
+
   try {
-    if (editingOrderId) { await updateDoc(doc(db, "Branches", brId, "Orders", editingOrderId), orderData); editingOrderId = null; } 
-    else { orderData.createdAt = serverTimestamp(); await addDoc(collection(db, "Branches", brId, "Orders"), orderData); }
-    clearCart(); gPage("menu"); toast("Thành công!", "ok");
+    if (editingOrderId) {
+      await updateDoc(doc(db, "Branches", brId, "Orders", editingOrderId), orderData);
+      editingOrderId = null;
+    } else {
+      orderData.createdAt = serverTimestamp();
+      await addDoc(collection(db, "Branches", brId, "Orders"), orderData);
+    }
+    sessions[activeSession] = []; // Clear chỉ phiên hiện tại
+    discPct = 0; vCode = "";
+    document.getElementById("v-code").value = "";
+    document.getElementById("v-msg").textContent = "";
+    document.getElementById("bill-note").value = "";
+    gPage("menu"); updateBadge(); renderCart();
+    toast(targetStatus === "completed" ? "✅ Thanh toán xong!" : "⏳ Đã lưu đơn!", "ok");
   } catch (e) { toast("Lỗi: " + e.message, "err"); }
 }
 
-// -- WEBORDER ALERT SYSTEM --
-const _alertedOrderIds = new Set(JSON.parse(sessionStorage.getItem("_pos_alerted_ids") || "[]"));
-const _webOrderQueue = [];
-let _alertActive = false;
-let _currentAlertOrder = null;
+// ── WEBORDER ALERT ──
+const _alertedIds   = new Set(JSON.parse(sessionStorage.getItem("_pos_alerted") || "[]"));
+const _woQueue      = [];
+let   _alertActive  = false, _currentAlert = null;
 
-function playWebOrderSound() {
+function playBeep() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const beeps = [{ freq: 880, time: 0, dur: 0.12 }, { freq: 1100, time: 0.16, dur: 0.12 }, { freq: 1320, time: 0.32, dur: 0.25 }, { freq: 1100, time: 0.62, dur: 0.12 }, { freq: 1320, time: 0.78, dur: 0.35 }];
-    beeps.forEach(({ freq, time, dur }) => {
-      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    [[880,.12],[1100,.12],[1320,.25],[1100,.12],[1320,.35]].forEach(([f,d],i) => {
+      const t   = i * 0.16;
+      const osc = ctx.createOscillator(), gain = ctx.createGain();
       osc.connect(gain); gain.connect(ctx.destination);
-      osc.type = "sine"; osc.frequency.setValueAtTime(freq, ctx.currentTime + time);
-      gain.gain.setValueAtTime(0, ctx.currentTime + time);
-      gain.gain.linearRampToValueAtTime(0.6, ctx.currentTime + time + 0.02);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + time + dur);
-      osc.start(ctx.currentTime + time); osc.stop(ctx.currentTime + time + dur + 0.05);
+      osc.type = "sine"; osc.frequency.setValueAtTime(f, ctx.currentTime + t);
+      gain.gain.setValueAtTime(0, ctx.currentTime + t);
+      gain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + t + 0.02);
+      gain.gain.linearRampToValueAtTime(0,   ctx.currentTime + t + d);
+      osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + d + 0.05);
     });
-  } catch (e) {}
+  } catch {}
 }
 
-function showWebOrderAlert(order) {
-  _currentAlertOrder = order; _alertActive = true;
-  const c = order.customer || {};
-  const items = (order.items || []).map(i => `${i.name} ×${i.qty}`).join("<br/>");
+function showAlert(order) {
+  _currentAlert = order; _alertActive = true;
+  const c     = order.customer || {};
+  const items = (order.items || []).map(i => `${i.name} ×${i.qty}`).join("<br>");
   document.getElementById("wo-alert-body").innerHTML = `
-    <div class="wo-detail-row"><span class="wo-detail-icon">👤</span><div><div class="wo-detail-lbl">Khách hàng</div><div class="wo-detail-val">${c.name || "—"}<br/>📞 ${c.phone || "—"}</div></div></div>
-    ${c.address ? `<div class="wo-detail-row"><span class="wo-detail-icon">📍</span><div><div class="wo-detail-lbl">Địa chỉ giao hàng</div><div class="wo-detail-val">${c.address}</div></div></div>` : ""}
+    <div class="wo-detail-row"><span class="wo-detail-icon">👤</span><div><div class="wo-detail-lbl">Khách hàng</div><div class="wo-detail-val">${c.name||'—'}<br>📞 ${c.phone||'—'}</div></div></div>
+    ${c.address ? `<div class="wo-detail-row"><span class="wo-detail-icon">📍</span><div><div class="wo-detail-lbl">Địa chỉ</div><div class="wo-detail-val">${c.address}</div></div></div>` : ''}
     <div class="wo-detail-row"><span class="wo-detail-icon">🛍</span><div><div class="wo-detail-lbl">Món đặt</div><div class="wo-detail-val">${items}</div></div></div>
-    <div class="wo-detail-row" style="border-bottom:none"><span class="wo-detail-icon">💰</span><div><div class="wo-detail-lbl">Tổng tiền</div><div class="wo-detail-total">${fmt(order.total)}</div></div></div>`;
-  
+    <div class="wo-detail-row" style="border:none"><span class="wo-detail-icon">💰</span><div><div class="wo-detail-lbl">Tổng</div><div class="wo-detail-total">${fmt(order.total)}</div></div></div>`;
   document.getElementById("wo-alert-overlay").classList.add("show");
-  playWebOrderSound();
-  clearInterval(window._woSoundInterval);
-  window._woSoundInterval = setInterval(() => { if (_alertActive) playWebOrderSound(); else clearInterval(window._woSoundInterval); }, 8000);
-  _alertedOrderIds.add(order.id); sessionStorage.setItem("_pos_alerted_ids", JSON.stringify([..._alertedOrderIds]));
+  playBeep();
+  clearInterval(window._woInterval);
+  window._woInterval = setInterval(() => { if (_alertActive) playBeep(); else clearInterval(window._woInterval); }, 8000);
+  _alertedIds.add(order.id);
+  sessionStorage.setItem("_pos_alerted", JSON.stringify([..._alertedIds]));
 }
 
 window.webOrderAlertDismiss = () => {
-  _alertActive = false; clearInterval(window._woSoundInterval);
-  document.getElementById("wo-alert-overlay").classList.remove("show"); _currentAlertOrder = null;
-  if (_webOrderQueue.length > 0) setTimeout(() => { const next = _webOrderQueue.shift(); if (next) showWebOrderAlert(next); }, 1500);
+  _alertActive = false; clearInterval(window._woInterval);
+  document.getElementById("wo-alert-overlay").classList.remove("show"); _currentAlert = null;
+  if (_woQueue.length > 0) setTimeout(() => { const next = _woQueue.shift(); if (next) showAlert(next); }, 1500);
 };
-
 window.webOrderAlertConfirm = async () => {
-  if (!_currentAlertOrder) return;
-  await updateDoc(doc(db, "Branches", brId, "Orders", _currentAlertOrder.id), { status: "preparing", updatedAt: serverTimestamp() });
+  if (!_currentAlert) return;
+  await updateDoc(doc(db, "Branches", brId, "Orders", _currentAlert.id), { status: "preparing", updatedAt: serverTimestamp() });
   toast("Đã xác nhận đơn!", "ok"); webOrderAlertDismiss();
 };
 
-function updateWebOrderQueueBadge() {
-  let badge = document.getElementById("weborder-queue-badge");
-  const count = _webOrderQueue.length;
-  badge.style.display = count > 0 ? "flex" : "none"; badge.textContent = count;
-}
-
-// -- LIVE ORDERS --
+// ── LIVE ORDERS ──
 const SLIST = ["pending","paid","preparing","delivering","delivered","completed","cancelled"];
-const S_KEY = { pending:"Chờ XN",paid:"Đã TT",preparing:"Chuẩn bị",delivering:"Đang giao",delivered:"Đã giao",completed:"Hoàn thành",cancelled:"Đã hủy" };
-const S_CLS = { pending:"s-pe",paid:"s-pa",preparing:"s-pr",delivering:"s-de",delivered:"s-dd",completed:"s-co",cancelled:"s-ca" };
+const S_KEY = {pending:"Chờ XN",paid:"Đã TT",preparing:"Chuẩn bị",delivering:"Đang giao",delivered:"Đã giao",completed:"Hoàn thành",cancelled:"Đã hủy"};
+const S_CLS = {pending:"s-pe",paid:"s-pa",preparing:"s-pr",delivering:"s-de",delivered:"s-dd",completed:"s-co",cancelled:"s-ca"};
 
 function subscribeOrders() {
-  if (liveUnsub) liveUnsub(); let isFirstSnapshot = true;
-  liveUnsub = onSnapshot(query(collection(db, "Branches", brId, "Orders"), orderBy("createdAt", "desc"), limit(60)), snap => {
-    const liveOrders = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(o => o.status !== "completed" && o.status !== "cancelled");
-    renderLiveOrders(liveOrders);
-    const n = liveOrders.length; document.getElementById("bn-orders-badge").style.display = n ? "flex" : "none"; document.getElementById("bn-orders-badge").textContent = n;
+  if (liveUnsub) liveUnsub();
+  let isFirst = true;
+  liveUnsub = onSnapshot(
+    query(collection(db, "Branches", brId, "Orders"), orderBy("createdAt", "desc"), limit(60)),
+    snap => {
+      const live = snap.docs.map(d => ({id:d.id,...d.data()})).filter(o => !["completed","cancelled"].includes(o.status));
+      renderLiveOrders(live);
+      const n = live.length;
+      document.getElementById("bn-orders-badge").style.display = n ? "flex" : "none";
+      document.getElementById("bn-orders-badge").textContent   = n;
 
-    if (!isFirstSnapshot) {
-      snap.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const order = { id: change.doc.id, ...change.doc.data() };
-          if (order.orderType === "weborder" && order.status === "pending" && !_alertedOrderIds.has(order.id)) {
-            if (_alertActive) { _webOrderQueue.push(order); updateWebOrderQueueBadge(); } else showWebOrderAlert(order);
+      if (!isFirst) {
+        snap.docChanges().forEach(change => {
+          if (change.type === "added") {
+            const o = {id:change.doc.id,...change.doc.data()};
+            if (o.orderType === "weborder" && o.status === "pending" && !_alertedIds.has(o.id)) {
+              if (_alertActive) { _woQueue.push(o); } else showAlert(o);
+            }
           }
-        }
-      });
+        });
+      }
+      isFirst = false;
     }
-    isFirstSnapshot = false;
-  });
+  );
 }
 
 function renderLiveOrders(orders) {
+  document.getElementById("orders-cnt").textContent = orders.length ? `${orders.length} đơn đang mở` : "";
   document.getElementById("orders-list").innerHTML = orders.length ? orders.map(o => {
-    const ts = o.createdAt?.toDate?.(); const chips = SLIST.map(s => `<button class="sch ${S_CLS[s]} ${o.status === s ? "cur" : ""}" onclick="setSt('${o.id}','${s}')">${S_KEY[s]}</button>`).join("");
-    return `<div class="oc"><div class="oc-top"><div><div class="oc-id">#${o.id.slice(-6).toUpperCase()}</div><span class="oc-ch">${o.orderType}</span></div><div class="oc-time">${ts?ts.toLocaleTimeString("vi-VN"):""}</div></div>
-    ${o.customer?.name ? `<div style="font-size:11px;color:var(--blu);margin:4px 0">👤 ${o.customer.name} - 📞 ${o.customer.phone||''}</div>` : ''}
-    <div class="oc-items">${(o.items || []).map(i => `${i.name} ×${i.qty}`).join(" · ")}</div><div class="oc-total">${fmt(o.total)}</div><div class="status-wrap">${chips}</div></div>`;
-  }).join("") : `<div style="text-align:center;color:var(--txt3);margin-top:20px">Không có đơn</div>`;
+    const ts    = o.createdAt?.toDate?.();
+    const chips = SLIST.map(s => `<button class="sch ${S_CLS[s]} ${o.status===s?'cur':''}" onclick="setSt('${o.id}','${s}')">${S_KEY[s]}</button>`).join("");
+    return `<div class="oc">
+      <div class="oc-top">
+        <div>
+          <div class="oc-id">#${o.id.slice(-6).toUpperCase()} ${o.tableNo ? `· ${o.tableNo}` : ''}</div>
+          <span class="oc-ch ch-${o.orderType?.slice(0,2)||'di'}">${o.orderType||''}</span>
+        </div>
+        <div class="oc-time">${ts?ts.toLocaleTimeString('vi-VN'):''}</div>
+      </div>
+      ${o.customer?.name ? `<div style="font-size:11px;color:var(--blu);margin:4px 0">👤 ${o.customer.name} · 📞 ${o.customer.phone||''}</div>` : ''}
+      ${o.note ? `<div style="font-size:11px;color:var(--ylw);margin-bottom:4px">📝 ${o.note}</div>` : ''}
+      <div class="oc-items">${(o.items||[]).map(i=>`${i.name} ×${i.qty}`).join(' · ')}</div>
+      <div class="oc-total">${fmt(o.total)}</div>
+      <div class="status-wrap">${chips}</div>
+    </div>`;
+  }).join("") : `<div style="text-align:center;color:var(--txt3);margin-top:24px">Không có đơn đang mở</div>`;
 }
-window.setSt = async (id, s) => await updateDoc(doc(db, "Branches", brId, "Orders", id), { status: s, updatedAt: serverTimestamp() });
+window.setSt = async (id, s) => {
+  await updateDoc(doc(db, "Branches", brId, "Orders", id), {status:s, updatedAt:serverTimestamp()});
+};
 
-// -- ACTIVITY --
-window.setActFilter = f => { document.querySelectorAll(".af-btn").forEach(b => b.classList.toggle("on", b.dataset.f === f)); loadActivity(f); };
+// ── ACTIVITY ──
+window.setActFilter = f => {
+  document.querySelectorAll(".af-btn").forEach(b => b.classList.toggle("on", b.dataset.f === f));
+  loadActivity(f);
+};
+
 function loadActivity(filter) {
   if (actUnsub) actUnsub();
-  let fromDate = new Date(); if (filter === "today") fromDate.setHours(0, 0, 0, 0); else if (filter === "week") fromDate.setDate(fromDate.getDate() - 7); else fromDate = new Date(2020, 0, 1);
-  actUnsub = onSnapshot(query(collection(db, "Branches", brId, "Orders"), where("createdAt", ">=", Timestamp.fromDate(fromDate)), orderBy("createdAt", "desc"), limit(120)), snap => {
-    document.getElementById("act-list").innerHTML = snap.docs.map(d => {
-      const o = d.data(); const ts = o.createdAt?.toDate?.();
-      return `<div class="ai"><div class="ai-left"><div class="ai-row1"><span class="ai-id">#${d.id.slice(-6).toUpperCase()}</span><span style="font-size:9px;background:#4dffa6;color:#000;padding:2px 6px;border-radius:4px">${S_KEY[o.status]||o.status}</span></div><div class="ai-items">${(o.items||[]).map(i=>i.name).join(", ")}</div><div class="ai-time">${ts?ts.toLocaleString("vi-VN"):""}</div></div><div class="ai-right"><div class="ai-total">${fmt(o.total)}</div></div></div>`;
-    }).join("");
-  });
+  let from = new Date();
+  if (filter === "today") from.setHours(0,0,0,0);
+  else if (filter === "week") from.setDate(from.getDate() - 7);
+  else from = new Date(2020, 0, 1);
+
+  actUnsub = onSnapshot(
+    query(collection(db, "Branches", brId, "Orders"),
+      where("createdAt", ">=", Timestamp.fromDate(from)),
+      orderBy("createdAt", "desc"), limit(150)),
+    snap => {
+      const orders = snap.docs.map(d => ({id:d.id,...d.data()}));
+      const total  = orders.filter(o => ["completed","paid","delivered"].includes(o.status)).reduce((s,o) => s+(o.total||0), 0);
+      document.getElementById("act-list").innerHTML =
+        `<div style="background:var(--s2);border:1px solid var(--brd);border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between">
+          <span style="font-size:13px;color:var(--txt2)">Tổng doanh thu (${filter === 'today' ? 'hôm nay' : filter === 'week' ? '7 ngày' : 'tất cả'})</span>
+          <span style="font-family:var(--mono);font-weight:900;color:var(--grn)">${fmt(total)}</span>
+        </div>` +
+        orders.map(d => {
+          const ts = d.createdAt?.toDate?.();
+          return `<div class="ai">
+            <div class="ai-left">
+              <div class="ai-row1">
+                <span class="ai-id">#${d.id.slice(-6).toUpperCase()}</span>
+                <span style="font-size:9px;background:var(--grn-d);color:var(--grn);padding:2px 6px;border-radius:4px;font-weight:700">${S_KEY[d.status]||d.status}</span>
+                ${d.tableNo ? `<span style="font-size:9px;color:var(--acc)">${d.tableNo}</span>` : ''}
+              </div>
+              <div class="ai-items">${(d.items||[]).map(i=>i.name).join(', ')}</div>
+              <div class="ai-time">${ts?ts.toLocaleString('vi-VN'):''}</div>
+            </div>
+            <div class="ai-right"><div class="ai-total">${fmt(d.total)}</div></div>
+          </div>`;
+        }).join("") || `<div style="text-align:center;color:var(--txt3);padding:30px">Chưa có đơn nào</div>`;
+    }
+  );
 }
 
-function fmt(n) { return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(n || 0); }
-let _toastTimer; window.toast = (msg, type = "inf") => { const el = document.getElementById("toast"); el.textContent = msg; el.className = "show " + type; clearTimeout(_toastTimer); _toastTimer = setTimeout(() => el.className = "", 3000); };
+// ── HELPERS ──
+function fmt(n) { return new Intl.NumberFormat("vi-VN", {style:"currency",currency:"VND"}).format(n||0); }
+let _toastTimer;
+window.toast = (msg, type="inf") => {
+  const el = document.getElementById("toast");
+  el.textContent = msg; el.className = "show " + type;
+  clearTimeout(_toastTimer); _toastTimer = setTimeout(() => el.className="", 3000);
+};
+function toast(msg, type) { window.toast(msg, type); }
 </script>
 </body>
 </html>
