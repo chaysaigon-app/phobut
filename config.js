@@ -39,4 +39,4 @@ export const EMAILJS_CONFIG = {
 // Chỉ dùng trong data-extractor.html trên máy cá nhân.
 // KHÔNG deploy file data-extractor.html lên hosting public.
 // Lấy key tại: https://console.anthropic.com/
-export const ANTHROPIC_API_KEY = ""; // ← Điền key vào đây
+export const ANTHROPIC_API_KEY = "phu-nguyen-first-key"; // ← Điền key vào đây
