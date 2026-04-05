@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegans Da Nang - Marketplace</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LctcKcsAAAAAADXXmFTG2mxgwWbmB9KFW2UpuSS" async defer></script>
+    <style>
+        :root { --main-color: #2e7d32; --dark-color: #1b5e20; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding-bottom: 100px; color: #333; line-height: 1.6; }
+        
+        /* ── GIAO DIỆN PHỞ BÚT GỐC ── */
+        .auth-bar { background: var(--dark-color); color: white; padding: 10px; text-align: right; font-size: 0.85em; }
+        .header { background: var(--main-color); color: white; padding: 35px 20px; text-align: center; position: relative; }
+        .logo-img { width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 3px solid white; display: none; margin: 0 auto 10px; }
+        .header h1 { margin: 0; font-size: 2.1em; }
+        .header p { margin: 5px 0 0; opacity: 0.9; font-style: italic; }
+        .container { max-width: 1000px; margin: auto; padding: 15px; }
+        .section-title { color: var(--main-color); border-left: 5px solid #e67e22; padding-left: 12px; margin: 30px 0 20px; font-weight: bold; font-size: 1.5em; }
+        .menu-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .menu-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.07); text-align: center; border: 1px solid #eee; transition: 0.3s; }
+        .menu-card:hover { transform: translateY(-5px); }
+        .menu-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .btn-add { background: var(--main-color); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 90%; margin-bottom: 15px; font-weight: bold; }
+        .contact-buttons { position: fixed; bottom: 95px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 1000; }
+        .contact-btn { width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 22px; }
+        .btn-phone { background: var(--main-color); animation: pulse-green 2s infinite; }
+        .btn-zalo-float { background: #0068ff; font-weight: bold; }
+        @keyframes pulse-green { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(46, 125, 50, 0); } 100% { transform: scale(0.95); } }
+        .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-top: 3px solid var(--main-color); box-sizing: border-box; z-index: 999; box-shadow: 0 -5px 15px rgba(0,0,0,0.08); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; }
+        .modal-content { background: white; margin: 5vh auto; padding: 35px 25px 25px; width: 90%; max-width: 460px; border-radius: 20px; max-height: 85vh; overflow-y: auto; position: relative; }
+        .modal-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .btn-login { width: 100%; padding: 12px; background: var(--main-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .close-btn { position: absolute; top: 12px; right: 18px; font-size: 26px; font-weight: bold; cursor: pointer; color: #888; transition: 0.2s; line-height: 1; }
+        
+        /* ── GIAO DIỆN MARKETPLACE MỚI ── */
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .hero-section { background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 50%,#004d20 100%); padding: 40px 20px 52px; text-align:center; position:relative; overflow:hidden; }
+        .hero-logo { font-size:36px; color:#fff; font-weight:bold; margin-bottom:4px; }
+        .hero-tagline { font-size:14px; color:rgba(255,255,255,.75); font-weight:600; text-transform:uppercase; margin-bottom:24px; }
+        .hero-partner-btn { display:inline-flex; align-items:center; gap:8px; background:rgba(255,255,255,.15); border:2px solid rgba(255,255,255,.4); color:#fff; border-radius:50px; padding:12px 24px; font-weight:bold; cursor:pointer; }
+        .feed-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+        .feed-card { background:#fff; border-radius:16px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,.08); cursor:pointer; }
+        .feed-card-img { width:100%; aspect-ratio:1/1; object-fit:cover; }
+        .feed-card-body { padding:10px 12px; }
+        .feed-card-name { font-size:13px; font-weight:bold; }
+        .feed-card-branch { font-size:11px; color:#666; margin-bottom:4px; }
+        .feed-card-price { font-size:14px; font-weight:bold; color:#2e7d32; }
+        .listing-card { display:flex; align-items:center; gap:14px; background:#fff; border-radius:16px; padding:14px; margin-bottom:10px; cursor:pointer; }
+        .listing-card.closed { filter:grayscale(1); opacity:0.6; pointer-events:none; }
+        .listing-info { flex:1; }
+        .listing-name { font-size:15px; font-weight:bold; }
+        .cart-branch-warning { position:fixed; bottom:0; left:0; right:0; z-index:8888; background:#fff; border-radius:24px 24px 0 0; padding:24px; transform:translateY(100%); transition:transform .3s ease; display:none; }
+        .cart-branch-warning.open { transform:translateY(0); display:block; }
+    </style>
+</head>
+<body>
+
+<div class="auth-bar" id="auth-status">Đang tải...</div>
+<div id="google_translate_element" style="position:absolute; top:10px; left:10px; z-index:999;"></div>
+
+<div id="screen-marketplace" class="screen">
+  <section class="hero-section">
+    <div class="hero-logo">🥬 Vegans Da Nang</div>
+    <div class="hero-tagline">Ăn chay · Sống xanh · Đặt ngay</div>
+    <button class="hero-partner-btn" onclick="document.getElementById('partner-modal').style.display='block'">
+      🤝 Đăng ký trở thành đối tác
+    </button>
+  </section>
+  <div class="container">
+    <div class="section-title">🍽 Món chay đang phục vụ</div>
+    <div class="feed-grid" id="feed-grid"><div style="padding:20px;">Đang tải món ăn...</div></div>
+    
+    <div class="section-title">🏪 Danh sách nhà hàng</div>
+    <div id="listing-list"><div style="padding:20px;">Đang tải danh sách...</div></div>
+  </div>
+</div>
+
+<div id="screen-menu" class="screen">
+  <div class="header">
+      <h1 id="brand-h1">Tên Nhà Hàng</h1>
+      <p id="brand-slogan">Ẩm thực chay</p>
+      <button onclick="window.goBackMarketplace()" style="margin-top:10px; padding:5px 15px; border-radius:10px; border:none; cursor:pointer;">⬅ Trở về trang chủ</button>
+  </div>
+  <div class="container">
+      <div class="section-title">🍜 Thực Đơn Của Quán</div>
+      <div id="menu-list" class="menu-list">Đang tải món ăn...</div>
+  </div>
+</div>
+
+<div class="contact-buttons">
+    <a href="#" id="float-zalo" target="_blank" class="contact-btn btn-zalo-float">Z</a>
+    <a href="tel:" id="float-phone" class="contact-btn btn-phone">📞</a>
+</div>
+
+<div class="cart-bar">
+    <div>
+        <span style="font-size: 1.1em; color: #d35400; font-weight: bold;" id="cT">0đ</span><br>
+        <span style="font-size: 0.8em; color: #666;"><span id="cC">0</span> món trong giỏ</span>
+    </div>
+    <button onclick="window.moGioHang()" style="background:#e67e22; color:white; border:none; padding:12px 25px; border-radius:25px; font-weight:bold; cursor:pointer;">XEM GIỎ</button>
+</div>
+
+<div class="cart-branch-warning" id="cart-branch-warning">
+  <h3 style="margin-top:0">⚠️ Bạn đang có món trong giỏ hàng</h3>
+  <p>Giỏ hàng hiện tại của bạn là từ quán khác. Để đặt món từ quán mới này, hệ thống cần xóa giỏ hàng cũ.</p>
+  <div style="display:flex; gap:10px;">
+    <button style="flex:1; padding:10px; border-radius:10px; border:none;" onclick="window.dismissCartWarning()">Hủy</button>
+    <button style="flex:1; padding:10px; border-radius:10px; border:none; background:#e74c3c; color:white;" onclick="window.clearCartAndSwitch()">Xóa giỏ cũ</button>
+  </div>
+</div>
+
+<div id="partner-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="document.getElementById('partner-modal').style.display='none'">&times;</span>
+    <h2 style="margin-top:0; color:#2e7d32;">🤝 Đăng ký đối tác</h2>
+    <div id="pm-form-wrap">
+      <input class="modal-input" id="pm-restaurant" placeholder="Tên nhà hàng (*)">
+      <input class="modal-input" id="pm-owner" placeholder="Họ tên chủ quán (*)">
+      <input class="modal-input" id="pm-email" type="email" placeholder="Email đăng nhập (*)">
+      <input class="modal-input" id="pm-phone" type="tel" placeholder="Số điện thoại (*)">
+      <input class="modal-input" id="pm-address" placeholder="Địa chỉ quán">
+      <div id="pm-err" style="color:red; margin-bottom:10px; display:none;"></div>
+      <button class="btn-login" id="pm-submit-btn" onclick="window.submitPartnerRequest()">Gửi đăng ký</button>
+    </div>
+    <div id="pm-success-wrap" style="display:none; text-align:center;">
+      <h3 style="color:#2e7d32;">Đã nhận đăng ký! 🎉</h3>
+      <p>Chúng tôi sẽ xem xét và liên hệ với bạn sớm nhất.</p>
+    </div>
+  </div>
+</div>
+
+<div id="auth-modal" class="modal"><div class="modal-content" id="auth-form-container"></div></div>
+<div id="profile-modal" class="modal"><div class="modal-content" id="profile-container"></div></div>
+<div id="cart-modal" class="modal"><div class="modal-content" id="cart-container"></div></div>
+<div id="checkout-modal" class="modal"><div class="modal-content" id="checkout-container"></div></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, serverTimestamp, getDoc, doc, setDoc, query, where, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    
+    // Đọc API Key từ file config.js của bạn
+    import { FIREBASE_CONFIG } from "./config.js";
+
+    const app = initializeApp(FIREBASE_CONFIG); 
+    const db = getFirestore(app); 
+    const auth = getAuth(app);
+    
+    const RECAPTCHA_SITE_KEY = "6LctcKcsAAAAAADXXmFTG2mxgwWbmB9KFW2UpuSS";
+
+    let currentUser = null, userProfile = {}, cart = {};
+    let currentBranchId = null, currentBranchName = null;
+    let pendingBranchSwitch = null;
+
+    window.addEventListener("DOMContentLoaded", () => {
+        loadMarketplace();
+        showScreen("marketplace");
+    });
+
+    // ── XÁC THỰC NGƯỜI DÙNG ──
+    onAuthStateChanged(auth, async (user) => {
+        const bar = document.getElementById('auth-status');
+        if (user) {
+            currentUser = user; 
+            bar.innerHTML = `Xin chào, <b>${user.email.split('@')[0]}</b> | <span onclick="window.logout()" style="cursor:pointer;text-decoration:underline">Đăng xuất</span>`;
+            const uSnap = await getDoc(doc(db, "Users", user.email)); 
+            if(uSnap.exists()) userProfile = uSnap.data();
+        } else { 
+            currentUser = null; 
+            bar.innerHTML = `<span onclick="window.moLogin()" style="cursor:pointer; border:1px solid white; padding:2px 8px; border-radius:5px;">Đăng nhập mua hàng</span>`; 
+        }
+    });
+
+    // ── ĐIỀU HƯỚNG MÀN HÌNH ──
+    function showScreen(name) {
+        document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+        document.getElementById("screen-" + name).classList.add("active");
+        window.scrollTo(0, 0);
+    }
+    window.goBackMarketplace = () => showScreen("marketplace");
+
+    // ── LOAD MARKETPLACE (Trang chủ) ──
+    async function loadMarketplace() {
+        try {
+            const snap = await getDocs(query(collection(db, "Branches"), where("isPartnerApproved", "==", true)));
+            const branches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            // 1. Danh sách Quán
+            const listEl = document.getElementById("listing-list");
+            listEl.innerHTML = branches.map(b => {
+                const info = b.info || {};
+                const isOpen = b.isOpen !== false;
+                return `
+                <div class="listing-card ${isOpen ? "" : "closed"}" onclick="window.handleBranchClick('${b.id}', '${info.name}')">
+                    <div style="font-size:30px; margin-right:10px;">🍲</div>
+                    <div class="listing-info">
+                        <div class="listing-name">${info.name || b.id}</div>
+                        <div style="font-size:12px; color:#666;">📍 ${info.address || "Đà Nẵng"}</div>
+                        <div style="font-size:11px; color:${isOpen ? '#2e7d32' : '#e74c3c'}; font-weight:bold;">${isOpen ? '🟢 Đang mở cửa' : '💤 Đang đóng cửa'}</div>
+                    </div>
+                </div>`;
+            }).join("");
+
+            // 2. Feed món ăn
+            const openBranches = branches.filter(b => b.isOpen !== false);
+            const feedGrid = document.getElementById("feed-grid");
+            feedGrid.innerHTML = "Đang lấy món ngon...";
+
+            const menuPromises = openBranches.map(async branch => {
+                const mSnap = await getDocs(query(collection(db, "Branches", branch.id, "Menu"), where("available", "!=", false), limit(4)));
+                return mSnap.docs.map(d => ({ id: d.id, branchId: branch.id, branchName: branch.info?.name, ...d.data() }));
+            });
+            const results = await Promise.all(menuPromises);
+            const allItems = results.flat().sort(() => Math.random() - 0.5);
+
+            feedGrid.innerHTML = allItems.map(item => `
+                <div class="feed-card" onclick="window.handleBranchClick('${item.branchId}', '${item.branchName}')">
+                    <img class="feed-card-img" src="${item.image || 'https://via.placeholder.com/300'}">
+                    <div class="feed-card-body">
+                        <div class="feed-card-name">${item.name}</div>
+                        <div class="feed-card-branch">🏪 ${item.branchName}</div>
+                        <div class="feed-card-price">${(item.price||0).toLocaleString()}đ</div>
+                    </div>
+                </div>
+            `).join("");
+        } catch (e) {
+            console.error(e);
+            document.getElementById("listing-list").innerHTML = "Lỗi tải dữ liệu!";
+        }
+    }
+
+    // ── CHỌN QUÁN & BẢO VỆ GIỎ HÀNG ──
+    window.handleBranchClick = (bId, bName) => {
+        if (Object.keys(cart).length > 0 && currentBranchId && currentBranchId !== bId) {
+            pendingBranchSwitch = bId;
+            document.getElementById('cart-branch-warning').classList.add('open');
+        } else {
+            loadBranchMenu(bId, bName);
+        }
+    };
+
+    window.dismissCartWarning = () => {
+        document.getElementById('cart-branch-warning').classList.remove('open');
+        pendingBranchSwitch = null;
+    };
+
+    window.clearCartAndSwitch = () => {
+        cart = {}; updateUI();
+        document.getElementById('cart-branch-warning').classList.remove('open');
+        if(pendingBranchSwitch) loadBranchMenu(pendingBranchSwitch, "Nhà hàng");
+    };
+
+    // ── LOAD MENU CỦA 1 QUÁN CỤ THỂ ──
+    async function loadBranchMenu(bId, bName) {
+        currentBranchId = bId; currentBranchName = bName;
+        document.getElementById("brand-h1").innerText = bName || "Cửa Hàng";
+        showScreen("menu");
+
+        const list = document.getElementById('menu-list');
+        list.innerHTML = "Đang tải thực đơn...";
+
+        try {
+            const bSnap = await getDoc(doc(db, "Branches", bId));
+            const info = bSnap.data().info || {};
+            if(info.phone) {
+                document.getElementById('float-phone').href = "tel:" + info.phone;
+                document.getElementById('float-zalo').href = "https://zalo.me/" + info.phone;
+            }
+
+            const snap = await getDocs(collection(db, "Branches", bId, "Menu"));
+            list.innerHTML = "";
+            snap.forEach(d => {
+                const m = d.data(); const out = m.stock === 0 || !m.available;
+                list.innerHTML += `<div class="menu-card" style="opacity:${out?0.6:1}">
+                    <img src="${m.image || 'https://via.placeholder.com/200'}">
+                    <div style="padding:15px;">
+                        <h3>${m.name}</h3>
+                        <p style="font-weight:bold; color:#d35400;">${(m.price||0).toLocaleString()}đ</p>
+                        <button class="btn-add" ${out?'disabled style="background:#ccc"':''} onclick="window.addToCart('${d.id}', '${m.name}', ${m.price})">${out?'Hết món':'Thêm món'}</button>
+                    </div>
+                </div>`;
+            });
+        } catch (e) {
+            list.innerHTML = "Lỗi tải thực đơn!";
+        }
+    }
+
+    // ── GIỎ HÀNG & THANH TOÁN ──
+    window.addToCart = (id, n, p) => { 
+        if(cart[id]) cart[id].sl++; else cart[id] = { name: n, gia: p, sl: 1 }; 
+        updateUI(); 
+        Swal.fire({toast:true, position:'top-end', icon:'success', title:'Đã thêm ' + n, showConfirmButton:false, timer:1000}); 
+    };
+    
+    function updateUI() { 
+        let c = 0, t = 0; 
+        for(let k in cart) { c += cart[k].sl; t += (cart[k].sl * cart[k].gia); } 
+        document.getElementById('cC').innerText = c; 
+        document.getElementById('cT').innerText = t.toLocaleString() + 'đ'; 
+    }
+    
+    window.qty = (k, v) => { 
+        cart[k].sl += v; 
+        if(cart[k].sl<=0) delete cart[k]; 
+        if(Object.keys(cart).length === 0) document.getElementById('cart-modal').style.display='none'; 
+        else window.moGioHang(); 
+        updateUI(); 
+    };
+    
+    window.moGioHang = () => {
+        if(Object.keys(cart).length === 0) return Swal.fire("Giỏ hàng đang trống!");
+        let h = `<span class="close-btn" onclick="document.getElementById('cart-modal').style.display='none'">&times;</span><h2 style="margin-top:0;">🛒 Giỏ Hàng</h2><p style="color:#666; font-size:12px;">Từ quán: <b>${currentBranchName}</b></p>`;
+        let t = 0;
+        for(let k in cart) { 
+            t += cart[k].sl * cart[k].gia; 
+            h += `<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;"><span>${cart[k].name}</span><div><button onclick="window.qty('${k}',-1)" style="width:30px; height:30px; border-radius:50%; border:none;">-</button> <b>${cart[k].sl}</b> <button onclick="window.qty('${k}',1)" style="width:30px; height:30px; border-radius:50%; border:none;">+</button></div></div>`; 
+        }
+        h += `<h3 style="text-align:right;">Tổng: ${t.toLocaleString()}đ</h3><button class="btn-login" style="background:#e67e22" onclick="window.checkOut()">ĐẶT ĐƠN NGAY</button>`;
+        document.getElementById('cart-container').innerHTML = h; 
+        document.getElementById('cart-modal').style.display='block';
+    };
+
+    window.checkOut = () => { 
+        if(!currentUser) return window.moLogin(); 
+        document.getElementById('cart-modal').style.display='none'; 
+        document.getElementById('checkout-container').innerHTML = `<span class="close-btn" onclick="document.getElementById('checkout-modal').style.display='none'">&times;</span><h2 style="margin-top:0;">Thông Tin Giao Hàng</h2><input id="sPh" class="modal-input" placeholder="SĐT người nhận (*)" value="${userProfile.phone||''}"><textarea id="sAd" class="modal-input" rows="2" placeholder="Địa chỉ giao hàng (*)">${userProfile.address||''}</textarea><button id="btn-sub" class="btn-login" style="background:#e67e22" onclick="window.confirmOrder()">XÁC NHẬN ĐƠN</button>`; 
+        document.getElementById('checkout-modal').style.display='block'; 
+    };
+
+    window.confirmOrder = async () => {
+        const ph = document.getElementById('sPh').value, ad = document.getElementById('sAd').value;
+        if(!ph || !ad) return Swal.fire("Thiếu thông tin", "Vui lòng nhập SĐT và Địa chỉ", "warning");
+        const btn = document.getElementById('btn-sub'); btn.disabled = true; btn.innerText = "Đang xử lý...";
+
+        let tongCong = 0, items = [];
+        for(let k in cart) {
+            tongCong += cart[k].sl * cart[k].gia;
+            items.push({ id: k, name: cart[k].name, price: cart[k].gia, qty: cart[k].sl });
+        }
+
+        try {
+            // GHI THẲNG VÀO COLLECTION CỦA CHI NHÁNH
+            await addDoc(collection(db, "Branches", currentBranchId, "Orders"), {
+                customer: { name: currentUser.email.split('@')[0], phone: ph, address: ad },
+                items: items,
+                total: tongCong,
+                subtotal: tongCong,
+                vat: 0, discount: 0,
+                orderType: "weborder",
+                status: "pending",
+                branchId: currentBranchId,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            });
+
+            Swal.fire("Thành công!", "Đơn hàng đã được chuyển đến nhà hàng.", "success");
+            cart = {}; updateUI(); document.getElementById('checkout-modal').style.display='none';
+            showScreen("marketplace");
+        } catch (e) {
+            alert("Đã xảy ra lỗi: " + e.message);
+            btn.disabled = false; btn.innerText = "XÁC NHẬN ĐƠN";
+        }
+    };
+
+    // ── GỬI FORM ĐĂNG KÝ QUÁN (KÈM RECAPTCHA) ──
+    window.submitPartnerRequest = async () => {
+      const name = document.getElementById("pm-restaurant").value.trim();
+      const owner = document.getElementById("pm-owner").value.trim();
+      const email = document.getElementById("pm-email").value.trim();
+      const phone = document.getElementById("pm-phone").value.trim();
+      const errEl = document.getElementById("pm-err");
+
+      if (!name || !owner || !email || !phone) { errEl.textContent = "Điền đủ các ô có dấu (*)"; errEl.style.display = "block"; return; }
+      const btn = document.getElementById("pm-submit-btn");
+      btn.disabled = true; btn.textContent = "Đang xác thực bảo mật..."; errEl.style.display = "none";
+
+      try {
+        const token = await new Promise((resolve, reject) => {
+          if (typeof grecaptcha === "undefined") return reject(new Error("Lỗi tải Captcha."));
+          grecaptcha.ready(async () => {
+            try { resolve(await grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: "partner_registration" })); } 
+            catch (e) { reject(e); }
+          });
+        });
+
+        btn.textContent = "Đang gửi...";
+        await addDoc(collection(db, "PartnerRequests"), {
+          restaurantName: name, ownerName: owner, email: email, phone: phone,
+          address: document.getElementById("pm-address").value.trim(),
+          status: "pending", recaptchaToken: token, createdAt: serverTimestamp()
+        });
+
+        document.getElementById("pm-form-wrap").style.display = "none";
+        document.getElementById("pm-success-wrap").style.display = "block";
+      } catch (e) {
+        errEl.textContent = "Lỗi: " + e.message; errEl.style.display = "block";
+      } finally {
+        btn.disabled = false; btn.textContent = "Gửi đăng ký";
+      }
+    };
+
+    // ── ĐĂNG NHẬP / ĐĂNG XUẤT ──
+    window.moLogin = () => { 
+        document.getElementById('auth-form-container').innerHTML = `<span class="close-btn" onclick="document.getElementById('auth-modal').style.display='none'">&times;</span><h2 style="margin-top:0;">Đăng Nhập Mua Hàng</h2><input id="lE" class="modal-input" placeholder="Email của bạn"><input id="lP" type="password" class="modal-input" placeholder="Mật khẩu"><button class="btn-login" onclick="window.doLogin()">Đăng Nhập</button>`; 
+        document.getElementById('auth-modal').style.display='block'; 
+    };
+    window.doLogin = async () => { 
+        try { await signInWithEmailAndPassword(auth, document.getElementById('lE').value, document.getElementById('lP').value); document.getElementById('auth-modal').style.display='none'; } 
+        catch (e) { alert("Thông tin đăng nhập không chính xác!"); } 
+    };
+    window.logout = () => signOut(auth);
+</script>
+<script type="text/javascript"> function googleTranslateElementInit() { new google.translate.TranslateElement({ pageLanguage: 'vi', layout: google.translate.TranslateElement.InlineLayout.SIMPLE }, 'google_translate_element'); } </script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>
