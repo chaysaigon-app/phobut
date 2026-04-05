@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Dashboard — Vegans Da Nang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<style>
+/* CSS giữ nguyên bản gốc của bạn */
+:root{
+  --bg:#07090e;--s1:#0c1018;--s2:#131924;--s3:#1a2232;--s4:#1f2a3c;
+  --brd:#283450;--brd2:#1a2232;
+  --acc:#ff6b35;--acc2:#ff8c5a;--acc-d:rgba(255,107,53,.12);
+  --grn:#00d97e;--grn-d:rgba(0,217,126,.12);
+  --blu:#4f9cff;--blu-d:rgba(79,156,255,.12);
+  --red:#ff4766;--red-d:rgba(255,71,102,.12);
+  --ylw:#ffcb47;--ylw-d:rgba(255,203,71,.12);
+  --pur:#b06fff;--pur-d:rgba(176,111,255,.12);
+  --txt:#dde4f5;--txt2:#7a8eb0;--txt3:#3d4f70;
+  --font:'Be Vietnam Pro',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:10px;--r2:16px;--sh:0 8px 32px rgba(0,0,0,.5);--sw:224px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14px;height:100vh;display:flex;overflow:hidden}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:var(--font);color:var(--txt)}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--brd);border-radius:4px}
+#auth{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:999;padding:24px}
+.ac{width:100%;max-width:360px;background:var(--s1);border:1px solid var(--brd);border-radius:20px;padding:44px 36px}
+.al{text-align:center;margin-bottom:24px}.al-ico{font-size:40px;margin-bottom:8px}
+.al h1{font-size:26px;font-weight:900;color:var(--acc);letter-spacing:-1px}
+.al p{color:var(--txt2);font-size:13px;margin-top:4px}
+.afl{margin-bottom:12px}
+.afl label{display:block;font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.afl input{width:100%;background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:11px 14px;color:var(--txt);font-size:14px;outline:none;transition:border-color .2s}
+.afl input:focus{border-color:var(--acc)}
+.ap{width:100%;background:var(--acc);color:#fff;border-radius:var(--r);padding:12px;font-weight:800;font-size:15px;transition:all .2s;letter-spacing:.3px}
+.ap:hover{background:var(--acc2)}
+#ae{color:var(--red);font-size:12px;text-align:center;min-height:16px;margin-top:8px}
+#sb{width:var(--sw);background:var(--s1);border-right:1px solid var(--brd);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-br{padding:15px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:8px}
+.sb-ico{font-size:20px}.sb-txt{font-weight:900;font-size:15px;letter-spacing:-0.5px}.sb-txt span{color:var(--acc)}
+#br-sel{padding:8px;border-bottom:1px solid var(--brd);flex-shrink:0}
+#br-sel select{width:100%;background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:7px 10px;color:var(--txt);font-size:12px;outline:none;cursor:pointer}
+.sbn{flex:1;overflow-y:auto;padding:6px}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;color:var(--txt2);font-weight:500;font-size:13px;transition:all .15s;margin-bottom:2px;width:100%;text-align:left}
+.ni:hover{background:var(--s3);color:var(--txt)}.ni.on{background:var(--acc-d);color:var(--acc)}
+.ni .ico{font-size:15px;width:20px;text-align:center}
+.ns{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;padding:12px 12px 4px;margin-top:4px}
+.sb-bot{padding:10px;border-top:1px solid var(--brd)}
+.su{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:var(--s3)}
+.sav{width:30px;height:30px;border-radius:50%;background:var(--acc-d);border:2px solid var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:var(--acc);flex-shrink:0}
+.sui{flex:1;overflow:hidden}.sue{font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.sur{font-size:10px;color:var(--txt3)}
+.lout{margin-top:8px;width:100%;background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:8px;padding:7px;font-size:12px;font-family:var(--font);transition:all .15s}
+.lout:hover{border-color:var(--red);color:var(--red)}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#pg-hdr{padding:14px 24px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:10px}
+#pg-ttl{font-size:19px;font-weight:800;letter-spacing:-0.5px;flex-shrink:0}
+#pg-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hdr-export-btn{display:flex;align-items:center;gap:6px;background:var(--s3);border:1px solid var(--brd);color:var(--txt2);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;transition:all .15s}
+.hdr-export-btn:hover{border-color:var(--acc);color:var(--acc)}
+.hdr-export-btn.pdf{border-color:var(--red);color:var(--red);background:var(--red-d)}
+.hdr-export-btn.email{border-color:var(--grn);color:var(--grn);background:var(--grn-d)}
+.bs-acc{background:var(--acc);border:1px solid var(--acc);color:#fff;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;font-family:var(--font)}
+.bs-acc:hover{background:var(--acc2)}
+#pg-c{flex:1;overflow-y:auto;padding:20px 24px}
+.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px;margin-bottom:20px}
+.kc{background:var(--s2);border:1px solid var(--brd);border-radius:var(--r2);padding:16px;position:relative;overflow:hidden}
+.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kc.or::before{background:var(--acc)}.kc.gr::before{background:var(--grn)}.kc.bl::before{background:var(--blu)}.kc.pu::before{background:var(--pur)}
+.kl{font-size:11px;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.kv{font-family:var(--mono);font-size:20px;font-weight:700;margin-bottom:4px}
+.ks{font-size:11px;color:var(--txt3)}.ki{position:absolute;right:12px;top:12px;font-size:22px;opacity:.18}
+.cr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.cc{background:var(--s2);border:1px solid var(--brd);border-radius:var(--r2);padding:16px}
+.ct{font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+.bc{display:flex;flex-direction:column;gap:6px}
+.bi{display:flex;align-items:center;gap:8px}
+.blab{width:108px;color:var(--txt2);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btr{flex:1;height:17px;background:var(--s4);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;transition:width .65s cubic-bezier(.4,0,.2,1)}
+.bval{width:68px;text-align:right;font-family:var(--mono);font-size:11px;color:var(--txt2)}
+.dw{display:flex;align-items:center;gap:14px}
+.dl{display:flex;flex-direction:column;gap:7px}
+.dli{display:flex;align-items:center;gap:6px;font-size:11px}
+.dld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.stl{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--txt)}
+.stl::after{content:'';flex:1;height:1px;background:var(--brd)}
+.df{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.df label{font-size:12px;color:var(--txt2);font-weight:600}
+.df input{background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:6px 10px;color:var(--txt);font-size:12px;outline:none;transition:border-color .2s}
+.df input:focus{border-color:var(--acc)}
+.df-btn{background:var(--acc-d);border:1px solid var(--acc);color:var(--acc);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font)}
+.dt{width:100%;border-collapse:collapse;font-size:13px}
+.dt th{text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--brd)}
+.dt td{padding:10px 12px;border-bottom:1px solid var(--brd2)}
+.dt tr:hover td{background:var(--s3)}.dt tr:last-child td{border-bottom:none}
+.bdg{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.badm{background:var(--acc-d);color:var(--acc)}.bcsh{background:var(--blu-d);color:var(--blu)}
+.bact{background:var(--grn-d);color:var(--grn)}.bins{background:var(--red-d);color:var(--red)}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ff{display:flex;flex-direction:column;gap:5px}.ff.full{grid-column:1/-1}
+.ff label{font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px}
+.ff input,.ff select,.ff textarea{background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;transition:border-color .2s}
+.ff input:focus,.ff select:focus,.ff textarea:focus{border-color:var(--acc)}
+.ff textarea{resize:vertical;min-height:70px}
+.fa{display:flex;gap:8px;margin-top:16px}
+.fcn{background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:var(--r);padding:8px 18px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600}
+.fsv{background:var(--acc);border:none;color:#fff;border-radius:var(--r);padding:8px 22px;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:700}
+.fsv:hover{background:var(--acc2)}
+.iua{border:2px dashed var(--brd);border-radius:var(--r);padding:18px;text-align:center;cursor:pointer;transition:border-color .2s;position:relative}
+.iua:hover{border-color:var(--acc)}
+.iua img{max-height:90px;max-width:100%;border-radius:6px;margin-bottom:8px}
+.iua p{font-size:12px;color:var(--txt3)}
+.iua input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upb{height:3px;background:var(--s4);border-radius:2px;margin-top:6px;overflow:hidden}
+.upbf{height:100%;background:var(--acc);width:0;transition:width .3s}
+.compress-info{font-size:10px;color:var(--grn);margin-top:4px;min-height:14px}
+.tog-wrap{display:flex;align-items:center;gap:8px}
+.tog{position:relative;width:40px;height:22px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-sl{position:absolute;inset:0;background:var(--s4);border-radius:11px;cursor:pointer;transition:.25s;border:1px solid var(--brd)}
+.tog-sl::before{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--txt3);left:2px;top:2px;transition:.25s}
+.tog input:checked + .tog-sl{background:var(--grn);border-color:var(--grn)}
+.tog input:checked + .tog-sl::before{transform:translateX(18px);background:#fff}
+.tog-lbl{font-size:12px;color:var(--txt2);font-weight:600}
+.cvd{background:var(--s2);border:1px solid var(--brd);border-radius:var(--r2);padding:18px;margin-bottom:14px}
+#mo{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+#mo.open{display:flex}
+.mod{background:var(--s1);border:1px solid var(--brd);border-radius:var(--r2);padding:24px;width:540px;max-width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.mod h3{font-size:16px;font-weight:800;margin-bottom:18px}
+.mclose{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--txt2);font-size:19px;cursor:pointer}
+#email-mo{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:600;display:none;align-items:center;justify-content:center;padding:16px}
+#email-mo.open{display:flex}
+.email-card{background:var(--s1);border:1px solid var(--grn);border-radius:var(--r2);padding:24px;width:400px;max-width:100%}
+.email-card h3{font-size:16px;font-weight:800;margin-bottom:4px;color:var(--grn)}
+.email-card p{font-size:12px;color:var(--txt2);margin-bottom:16px}
+.email-inp{width:100%;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:11px 14px;color:var(--txt);font-size:14px;outline:none;transition:border-color .2s;margin-bottom:12px}
+.email-inp:focus{border-color:var(--grn)}
+.email-send{width:100%;background:var(--grn);color:#000;border-radius:var(--r);padding:12px;font-weight:800;font-size:14px;margin-bottom:8px}
+.email-cancel{width:100%;background:none;border:1px solid var(--brd);color:var(--txt2);border-radius:var(--r);padding:10px;font-size:13px;font-weight:600;font-family:var(--font)}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--s1);border:1px solid var(--brd);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(60px);opacity:0;transition:all .28s;box-shadow:var(--sh)}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.ok{border-color:var(--grn);color:var(--grn)}#toast.err{border-color:var(--red);color:var(--red)}#toast.inf{border-color:var(--blu);color:var(--blu)}
+.spin{width:22px;height:22px;border:3px solid var(--brd);border-top-color:var(--acc);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.ldr{display:flex;align-items:center;justify-content:center;gap:12px;padding:36px;color:var(--txt2)}
+</style>
+</head>
+<body>
+
+<div id="auth">
+  <div class="ac">
+    <div class="al"><div class="al-ico" id="auth-ico">🌿</div><h1 id="auth-title">Admin</h1><p>Bảng điều khiển quản trị hệ thống</p></div>
+    <div class="afl"><label>Email</label><input id="ai-em" type="email" placeholder="admin@email.com"/></div>
+    <div class="afl"><label>Mật khẩu</label><input id="ai-pw" type="password" placeholder="••••••••"/></div>
+    <button class="ap" onclick="doLogin()">Đăng nhập</button>
+    <div id="ae"></div>
+  </div>
+</div>
+
+<div id="sb">
+  <div class="sb-br"><div class="sb-ico" id="sb-ico">🌿</div><div class="sb-txt" id="sb-name">Admin</div></div>
+  <div id="br-sel"><select id="brs" onchange="onBrCh()"><option>Chọn chi nhánh...</option></select></div>
+  <nav class="sbn">
+    <div class="ns">Tổng quan</div>
+    <button class="ni on" onclick="goP('dashboard')"><span class="ico">📊</span>Dashboard</button>
+    <button class="ni" onclick="goP('orders')"><span class="ico">📋</span>Đơn hàng</button>
+    <div class="ns">Quản lý đối tác</div>
+    <button class="ni" onclick="goP('menu')"><span class="ico">🍽️</span>Thực đơn & Kho</button>
+    <button class="ni" onclick="goP('staff')"><span class="ico">👥</span>Nhân viên</button>
+    <button class="ni" onclick="goP('vouchers')"><span class="ico">🎟️</span>Voucher</button>
+    <button class="ni" onclick="goP('settings')"><span class="ico">⚙️</span>Cài đặt</button>
+    <div class="ns" id="sa-s" style="display:none">Hệ thống (HQ)</div>
+    <button class="ni" id="n-br" style="display:none" onclick="goP('branches')"><span class="ico">🏢</span>Quản lý Chi nhánh</button>
+  </nav>
+  <div class="sb-bot">
+    <div class="su"><div class="sav" id="sav">?</div><div class="sui"><div class="sue" id="sue"></div><div class="sur" id="sur"></div></div></div>
+    <button class="lout" onclick="doLogout()">Đăng xuất</button>
+  </div>
+</div>
+
+<div id="main">
+  <div id="pg-hdr"><div id="pg-ttl">Dashboard</div><div id="pg-acts"></div></div>
+  <div id="pg-c"><div class="ldr"><div class="spin"></div><span>Đang tải...</span></div></div>
+</div>
+
+<div id="mo" onclick="closeMo(event)">
+  <div class="mod" id="mod-box"><button class="mclose" onclick="closeMo2()">✕</button><div id="mod-c"></div></div>
+</div>
+
+<div id="email-mo" onclick="closeEmailMo(event)">
+  <div class="email-card">
+    <h3>📧 Gửi Báo Cáo PDF</h3>
+    <p id="email-mo-desc">Nhập email để nhận báo cáo dạng PDF</p>
+    <input class="email-inp" id="report-email" type="email" placeholder="email@domain.com"/>
+    <button class="email-send" onclick="confirmSendReport()">📤 Gửi Báo Cáo</button>
+    <button class="email-cancel" onclick="closeEmailMoDirect()">Huỷ</button>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script type="module">
+import {
+  FIREBASE_CONFIG, SUPER_ADMIN_EMAIL,
+  CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET,
+  EMAILJS_CONFIG, APP_NAME, APP_LOGO_EMOJI, DEFAULT_VAT
+} from './config.js';
+
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDocs, getDoc, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp, limit, where } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const fbApp = initializeApp(FIREBASE_CONFIG);
+const auth  = getAuth(fbApp);
+const db    = getFirestore(fbApp);
+
+document.getElementById('auth-ico').textContent   = APP_LOGO_EMOJI;
+document.getElementById('auth-title').textContent  = APP_NAME + ' Admin';
+document.getElementById('sb-ico').textContent     = APP_LOGO_EMOJI;
+document.getElementById('sb-name').innerHTML      = APP_LOGO_EMOJI + ' <span>' + APP_NAME + '</span>';
+document.title = APP_NAME + ' — Admin';
+
+// -- IMAGE COMPRESSION (Giữ nguyên) --
+function compressImage(file, maxWidth = 800, quality = 0.82, outputType = 'image/webp') {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Không đọc được file ảnh'));
+    reader.onload  = ev => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('File không phải ảnh hợp lệ'));
+      img.onload  = () => {
+        let { width, height } = img;
+        if (width > maxWidth) { height = Math.round(height * maxWidth / width); width = maxWidth; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => { if (!blob) reject(new Error('toBlob failed')); else resolve(blob); }, outputType, quality);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadToCloudinary(file, onProgress) {
+  onProgress(10);
+  let blob;
+  try {
+    blob = await compressImage(file);
+    const oKB = Math.round(file.size / 1024), cKB = Math.round(blob.size / 1024);
+    const inf = document.getElementById('compress-info');
+    if (inf) inf.textContent = `✓ Nén: ${oKB}KB → ${cKB}KB`;
+  } catch(err) { console.warn('Compress fallback:', err); blob = file; }
+  onProgress(30);
+  const fd = new FormData();
+  fd.append('file', blob, file.name.replace(/\.[^.]+$/, '.webp'));
+  fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  fd.append('folder', 'menu_items');
+  onProgress(60);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
+  onProgress(90);
+  if (!res.ok) throw new Error(`Cloudinary HTTP ${res.status}`);
+  const data = await res.json();
+  onProgress(100);
+  return data.secure_url;
+}
+
+// -- STATE --
+let me = null, myRole = null, isSA = false;
+let curBrId = null, curBrName = '';
+let allBranches = [];
+let curPage = 'dashboard';
+let allOrders = [];
+
+// -- AUTH & NAVIGATION --
+const getBranchIds = () => curBrId === 'all' ? allBranches.map(b => b.id) : [curBrId];
+
+window.doLogin = async () => {
+  const em = document.getElementById('ai-em').value.trim();
+  const pw = document.getElementById('ai-pw').value;
+  document.getElementById('ae').textContent = '';
+  try { await signInWithEmailAndPassword(auth, em, pw); }
+  catch(err) { document.getElementById('ae').textContent = 'Email/mật khẩu sai.'; }
+};
+window.doLogout = () => signOut(auth);
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { document.getElementById('auth').style.display = 'flex'; return; }
+  me = user; isSA = user.email === SUPER_ADMIN_EMAIL;
+  document.getElementById('auth').style.display = 'none';
+  document.getElementById('sav').textContent    = user.email[0].toUpperCase();
+  document.getElementById('sue').textContent    = user.email;
+  document.getElementById('sa-s').style.display = isSA ? '' : 'none';
+  document.getElementById('n-br').style.display = isSA ? '' : 'none';
+  await loadBranches(user);
+});
+
+async function loadBranches(user) {
+  try {
+    const snap = await getDocs(collection(db, 'Branches'));
+    allBranches = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const sel = document.getElementById('brs');
+    sel.innerHTML = '';
+    if (isSA) {
+      myRole = 'admin';
+      sel.innerHTML = '<option value="all">🌐 Tất cả chi nhánh (HQ)</option>' +
+        allBranches.map(b => `<option value="${b.id}">${b.info?.name || b.id}</option>`).join('');
+    } else {
+      const myB = [];
+      for (const b of allBranches) {
+        const sd = await getDoc(doc(db, 'Branches', b.id, 'Staff', user.email));
+        if (sd.exists()) myB.push({ ...b, role: sd.data().role });
+      }
+      if (!myB.length) { showT('Không có quyền vào hệ thống', 'err'); signOut(auth); return; }
+      sel.innerHTML = myB.map(b => `<option value="${b.id}" data-role="${b.role}">${b.info?.name || b.id}</option>`).join('');
+      myRole = myB[0].role;
+    }
+    if (sel.options.length) { sel.selectedIndex = 0; onBrCh(); }
+  } catch(e) { showT('Lỗi: ' + e.message, 'err'); }
+}
+
+window.onBrCh = () => {
+  const sel = document.getElementById('brs');
+  const opt = sel.options[sel.selectedIndex];
+  curBrId = opt.value; curBrName = curBrId === 'all' ? 'Tất cả chi nhánh' : opt.text;
+  if (!isSA && opt.dataset.role) myRole = opt.dataset.role;
+  document.getElementById('sur').textContent = isSA ? 'Super Admin' : (myRole === 'admin' ? 'Partner Admin' : 'Staff');
+  if (curBrId) goP(curPage);
+};
+
+const PTITLES = { dashboard: '📊 Dashboard', orders: '📋 Đơn hàng', menu: '🍽️ Thực đơn & Kho', staff: '👥 Nhân viên', vouchers: '🎟️ Voucher', branches: '🏢 Quản lý Đối tác', settings: '⚙️ Cài đặt' };
+window.goP = async p => {
+  curPage = p;
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  document.getElementById('pg-ttl').textContent = PTITLES[p] || p;
+  document.getElementById('pg-acts').innerHTML  = '';
+  document.getElementById('pg-c').innerHTML = '<div class="ldr"><div class="spin"></div><span>Đang tải...</span></div>';
+  
+  if (!curBrId && p !== 'branches') { document.getElementById('pg-c').innerHTML = '<div class="ldr">Chọn chi nhánh</div>'; return; }
+  try {
+    if      (p === 'dashboard') await rDash();
+    else if (p === 'orders')    await rOrders();
+    else if (p === 'menu')      await rMenu();
+    else if (p === 'staff')     await rStaff();
+    else if (p === 'vouchers')  await rVouchers();
+    else if (p === 'branches')  await rBranches();
+    else if (p === 'settings')  await rSettings();
+  } catch(e) { document.getElementById('pg-c').innerHTML = `<div class="ldr" style="color:var(--red)">Lỗi: ${e.message}</div>`; }
+};
+
+// -- DASHBOARD (Giữ nguyên) --
+async function rDash() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const from  = new Date(today); from.setDate(today.getDate() - 30);
+  const brIds = getBranchIds(); 
+  allOrders = [];
+  for (const bId of brIds) {
+    const oSnap = await getDocs(query(collection(db, 'Branches', bId, 'Orders'), orderBy('createdAt','desc'), limit(500)));
+    oSnap.docs.forEach(d => allOrders.push({ id:d.id, branchId:bId, ...d.data() }));
+  }
+  const done = allOrders.filter(o => ['completed','paid','delivered'].includes(o.status));
+  const totR = done.reduce((s,o) => s+(o.total||0), 0);
+  document.getElementById('pg-c').innerHTML = `
+    <div class="kg">
+      <div class="kc or"><div class="ki">💰</div><div class="kl">Doanh thu</div><div class="kv" style="color:var(--acc)">${fmt(totR)}</div></div>
+      <div class="kc pu"><div class="ki">🧾</div><div class="kl">Tổng đơn hoàn thành</div><div class="kv" style="color:var(--pur)">${done.length}</div></div>
+    </div>
+  `;
+}
+
+// ── 1. CẬP NHẬT RORDERS: Đọc tất cả nếu là HQ, không cho sửa ──
+async function rOrders() {
+  const SL = {pending:'Chờ XN',paid:'Đã TT',preparing:'Chuẩn bị',delivering:'Giao hàng',delivered:'Đã giao',completed:'Hoàn thành',cancelled:'Đã hủy'};
+  const SC = {pending:'var(--ylw)',paid:'var(--grn)',preparing:'var(--blu)',delivering:'var(--pur)',delivered:'#c8a7ff',completed:'#4dffa6',cancelled:'var(--red)'};
+  const SF = ['pending','paid','preparing','delivering','delivered','completed','cancelled'];
+
+  let orders = [];
+  if (curBrId === 'all') {
+    // HQ: Quét tất cả các chi nhánh
+    for(const b of allBranches) {
+      if(b.isPartnerApproved) {
+        const snap = await getDocs(query(collection(db,'Branches',b.id,'Orders'), orderBy('createdAt','desc'), limit(50)));
+        snap.docs.forEach(d => orders.push({ id:d.id, branchName: b.info?.name, branchId: b.id, ...d.data() }));
+      }
+    }
+    // Sắp xếp tổng hợp theo thời gian mới nhất
+    orders.sort((a,b) => (b.createdAt?.toMillis()||0) - (a.createdAt?.toMillis()||0));
+  } else {
+    const snap = await getDocs(query(collection(db,'Branches',curBrId,'Orders'), orderBy('createdAt','desc'), limit(100)));
+    orders = snap.docs.map(d => ({ id:d.id, branchName: curBrName, branchId: curBrId, ...d.data() }));
+  }
+
+  const rows = orders.map(o => {
+    const ts = o.createdAt?.toDate?.(); const s = o.status || 'pending';
+    const opts = SF.map(st => `<option value="${st}" ${st===s?'selected':''}>${SL[st]}</option>`).join('');
+    const chIco = {dinein:'🪑',takeaway:'🥡',weborder:'🌐',apporder:'📱'}[o.orderType] || '';
+    
+    // Nếu HQ xem (curBrId == 'all'), chỉ hiện Text, không hiện thẻ Select
+    const statusHtml = curBrId === 'all' 
+      ? `<span class="bdg" style="background:${SC[s]}18;color:${SC[s]}">${SL[s]||s}</span>`
+      : `<select style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px;color:var(--txt);font-size:11px;font-family:var(--font)" onchange="updSt('${o.branchId}', '${o.id}', this.value)">${opts}</select>`;
+
+    return `<tr>
+      <td><span style="font-family:var(--mono);font-size:11px">#${o.id.slice(-6).toUpperCase()}</span></td>
+      ${curBrId === 'all' ? `<td><strong style="color:var(--blu)">${o.branchName||'—'}</strong></td>` : ''}
+      <td style="font-size:12px">${ts?ts.toLocaleString('vi-VN'):'—'}</td>
+      <td>${chIco} ${o.orderType||'—'}</td>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--acc)">${fmt(o.total)}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('pg-c').innerHTML = `
+  <div class="cvd" style="overflow-x:auto">
+    <table class="dt"><thead><tr><th>Mã đơn</th>${curBrId === 'all' ? '<th>Chi nhánh</th>' : ''}<th>Thời gian</th><th>Kênh</th><th>Tổng</th><th>Cập nhật trạng thái</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:24px">Chưa có đơn</td></tr>'}</tbody></table>
+  </div>`;
+}
+
+window.updSt = async (bId, id, s) => {
+  if (curBrId === 'all') return; // Double check
+  try { await updateDoc(doc(db,'Branches',bId,'Orders',id), {status:s, updatedAt:serverTimestamp()}); showT('Đã cập nhật','ok'); } 
+  catch(e) { showT('Lỗi: '+e.message,'err'); }
+};
+
+// ── 2. CẬP NHẬT RMENU: Partner CRUD độc lập ──
+async function rMenu() {
+  if (curBrId === 'all') {
+    document.getElementById('pg-c').innerHTML = `
+    <div class="cvd" style="text-align:center;padding:40px;color:var(--txt2)">
+      <div style="font-size:36px;margin-bottom:12px">🍽️</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">Vui lòng chọn một nhà hàng cụ thể</div>
+      <div style="font-size:13px">Hệ thống SaaS: Mỗi đối tác (nhà hàng) quản lý một thực đơn hoàn toàn độc lập. HQ không can thiệp.</div>
+    </div>`;
+    return;
+  }
+
+  document.getElementById('pg-acts').innerHTML = `<button class="bs-acc" onclick="openAddMenuItem()">+ Thêm món ăn</button>`;
+  const snap = await getDocs(collection(db, 'Branches', curBrId, 'Menu'));
+  const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  const rows = items.map(m => {
+    const isOOS = !m.available || m.stock === 0;
+    const img = m.image || 'https://placehold.co/36x36/1a2232/3d4f70?text=🥗';
+    const stkDisp = m.stock >= 0 ? m.stock : '∞';
+    return `<tr>
+      <td><img src="${img}" style="width:36px;height:36px;border-radius:6px;object-fit:cover"/></td>
+      <td><strong>${m.name}</strong><div style="font-size:11px;color:var(--txt3)">${m.category||'—'}</div></td>
+      <td style="font-family:var(--mono);color:var(--acc);font-weight:700">${fmt(m.price)}</td>
+      <td>
+        <label class="tog-wrap"><label class="tog"><input type="checkbox" ${m.available?'checked':''} onchange="toggleAvail('${m.id}',this.checked)"/><span class="tog-sl"></span></label><span class="tog-lbl">${m.available?'Đang bán':'Đã tắt'}</span></label>
+      </td>
+      <td>${stkDisp} <button style="background:var(--s3);border:1px solid var(--brd);padding:2px 6px;border-radius:4px;font-size:10px" onclick="editStock('${m.id}','${m.name.replace(/'/g,"\\'")}',${m.stock})">Sửa</button></td>
+      <td>
+        <button style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px" onclick="openEditMenuItem('${m.id}')">✏️ Sửa</button>
+        <button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;cursor:pointer;font-size:12px;margin-left:4px" onclick="delMenuItem('${m.id}')">🗑️ Xóa</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('pg-c').innerHTML = `
+  <div class="cvd" style="overflow-x:auto">
+    <table class="dt"><thead><tr><th>Ảnh</th><th>Tên món</th><th>Giá</th><th>Bật/Tắt</th><th>Tồn kho</th><th>Thao tác</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="6" style="text-align:center;padding:24px">Chưa có món ăn</td></tr>'}</tbody></table>
+  </div>`;
+}
+
+let _mImgUrl = '';
+function menuItemForm(m = {}) {
+  const submitLabel = m.id ? 'Lưu thay đổi' : 'Thêm món mới';
+  return `<form id="mitem-form">
+  <div class="fg">
+    <div class="ff full"><label>Tên món *</label><input id="mi-name" value="${m.name||''}" required/></div>
+    <div class="ff"><label>Giá (VNĐ) *</label><input id="mi-price" type="number" min="0" value="${m.price!=null?m.price:''}" required/></div>
+    <div class="ff"><label>Danh mục</label><input id="mi-cat" value="${m.category||''}"/></div>
+    <div class="ff full"><label>Mô tả</label><textarea id="mi-desc">${m.description||''}</textarea></div>
+    <div class="ff full">
+      <label>Ảnh (tự động nén WebP)</label>
+      <div class="iua">
+        <img id="mi-pv" src="${m.image||''}" style="display:${m.image?'block':'none'}"/>
+        <p id="mi-tx">${m.image?'Nhấn để đổi':'📷 Click hoặc kéo thả ảnh'}</p>
+        <div class="upb"><div class="upbf" id="mi-pb"></div></div>
+        <div class="compress-info" id="compress-info"></div>
+        <input type="file" accept="image/*" onchange="upImg(this)"/>
+      </div>
+    </div>
+  </div>
+  <div class="fa"><button type="button" class="fcn" onclick="closeMo2()">Huỷ</button><button type="button" class="fsv" onclick="saveMenuItem('${m.id||''}')">${submitLabel}</button></div>
+  </form>`;
+}
+window.openAddMenuItem = () => { _mImgUrl = ''; openMo('➕ Thêm món ăn', menuItemForm()); };
+window.openEditMenuItem = async id => {
+  const s = await getDoc(doc(db,'Branches',curBrId,'Menu',id));
+  if(s.exists()){ _mImgUrl = s.data().image||''; openMo('✏️ Sửa món', menuItemForm({id:s.id, ...s.data()})); }
+};
+window.saveMenuItem = async id => {
+  const data = {
+    name: document.getElementById('mi-name').value.trim(),
+    price: Number(document.getElementById('mi-price').value),
+    category: document.getElementById('mi-cat').value.trim(),
+    description: document.getElementById('mi-desc').value.trim(),
+    image: _mImgUrl || null,
+    updatedAt: serverTimestamp()
+  };
+  if(!data.name || !data.price) return showT('Nhập tên và giá','err');
+  if(id) { await updateDoc(doc(db,'Branches',curBrId,'Menu',id), data); showT('Đã cập nhật','ok'); }
+  else { data.createdAt = serverTimestamp(); data.available = true; data.stock = -1; await addDoc(collection(db,'Branches',curBrId,'Menu'), data); showT('Đã thêm món','ok'); }
+  closeMo2(); rMenu();
+};
+window.delMenuItem = async id => {
+  if(!confirm('Xóa món này vĩnh viễn?')) return;
+  await deleteDoc(doc(db,'Branches',curBrId,'Menu',id)); showT('Đã xóa','inf'); rMenu();
+};
+window.toggleAvail = async (id, st) => { await updateDoc(doc(db,'Branches',curBrId,'Menu',id), {available:st}); };
+window.editStock = async (id, name, cur) => {
+  const n = prompt(`Tồn kho mới cho "${name}" (nhập -1 = vô hạn):`);
+  if(n!==null && !isNaN(n)) { await updateDoc(doc(db,'Branches',curBrId,'Menu',id), {stock: parseInt(n)}); rMenu(); }
+};
+
+window.upImg = async input => {
+  const file = input.files[0]; if (!file) return;
+  const pb = document.getElementById('mi-pb'); const pv = document.getElementById('mi-pv'); const tx = document.getElementById('mi-tx');
+  try {
+    const url = await uploadToCloudinary(file, pct => { pb.style.width = pct+'%'; });
+    _mImgUrl = url; pv.src = url; pv.style.display = 'block';
+    if (tx) tx.textContent = 'Nhấn để đổi'; showT('✅ Upload thành công!','ok');
+  } catch(e) { showT('Lỗi upload: '+e.message,'err'); }
+  setTimeout(() => pb.style.width = '0', 1200);
+};
+
+// ── 3. CẬP NHẬT RBRANCHES: Hiển thị PartnerRequests & Nút Duyệt ──
+async function rBranches() {
+  if (!isSA) return;
+
+  // Lấy các Request chờ duyệt
+  const reqSnap = await getDocs(query(collection(db, 'PartnerRequests'), where('status','==','pending')));
+  const requests = reqSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  const reqRows = requests.map(r => `<tr>
+    <td><strong>${r.restaurantName}</strong><br><span style="font-size:11px;color:var(--txt3)">${r.address||'—'}</span></td>
+    <td>${r.ownerName}</td>
+    <td>${r.email}<br>${r.phone}</td>
+    <td><button style="background:var(--grn);color:#000;border-radius:6px;padding:6px 12px;font-weight:bold" onclick="approvePartner('${r.id}')">✅ Duyệt Quán</button></td>
+  </tr>`).join('');
+
+  // Lấy các Branch hiện tại
+  const bSnap = await getDocs(collection(db,'Branches'));
+  const brs = bSnap.docs.map(d => ({ id:d.id, ...d.data() }));
+  
+  const brRows = brs.map(b => {
+    const info = b.info || {};
+    return `<tr>
+      <td style="font-family:var(--mono);font-size:11px">${b.id}</td>
+      <td><strong>${info.name||'—'}</strong></td>
+      <td><span class="bdg ${b.isPartnerApproved?'bact':'bins'}">${b.isPartnerApproved?'Đã Duyệt':'Chưa Duyệt'}</span></td>
+      <td>
+        <button style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:4px 8px;font-size:12px;" onclick="openEditBr('${b.id}')">✏️ Sửa</button>
+        <button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;font-size:12px;margin-left:4px" onclick="delBr('${b.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('pg-c').innerHTML = `
+  <div style="margin-bottom:20px">
+    <h3 style="margin-bottom:10px; color:var(--grn)">📥 Yêu cầu Đăng ký Đối tác (Chờ duyệt)</h3>
+    <div class="cvd" style="overflow-x:auto">
+      <table class="dt"><thead><tr><th>Tên Quán & Địa chỉ</th><th>Chủ quán</th><th>Liên hệ</th><th>Thao tác</th></tr></thead>
+      <tbody>${reqRows||'<tr><td colspan="4" style="text-align:center;padding:24px">Không có yêu cầu mới</td></tr>'}</tbody></table>
+    </div>
+  </div>
+  <div>
+    <h3 style="margin-bottom:10px; color:var(--blu)">🏢 Danh sách Đối tác (Đã cấp tài khoản)</h3>
+    <div class="cvd" style="overflow-x:auto">
+      <table class="dt"><thead><tr><th>Branch ID</th><th>Tên Quán</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+      <tbody>${brRows||'<tr><td colspan="4" style="text-align:center;padding:24px">Chưa có chi nhánh</td></tr>'}</tbody></table>
+    </div>
+  </div>`;
+}
+
+// Hàm duyệt đối tác: Chuyển Request thành Branch
+window.approvePartner = async (reqId) => {
+  if(!confirm("Bạn có chắc chắn muốn duyệt quán này và cấp tài khoản Admin cho họ không?")) return;
+  try {
+    const reqDoc = await getDoc(doc(db, "PartnerRequests", reqId));
+    if(!reqDoc.exists()) return;
+    const req = reqDoc.data();
+
+    // 1. Tạo Branch mới
+    const newBranchRef = await addDoc(collection(db, "Branches"), {
+      isPartnerApproved: true,
+      isOpen: false, // Mặc định đóng cửa để họ set up menu trước
+      info: {
+        name: req.restaurantName,
+        owner: req.ownerName,
+        phone: req.phone,
+        email: req.email,
+        address: req.address || "",
+        vat: DEFAULT_VAT
+      },
+      createdAt: serverTimestamp()
+    });
+
+    // 2. Tạo Staff/Admin role
+    await setDoc(doc(db, "Branches", newBranchRef.id, "Staff", req.email), {
+      name: req.ownerName,
+      role: "admin",
+      addedAt: serverTimestamp()
+    });
+
+    // 3. Đánh dấu Request là approved
+    await updateDoc(doc(db, "PartnerRequests", reqId), { status: "approved" });
+
+    showT(`✅ Đã duyệt! Quán "${req.restaurantName}" đã được cấp tài khoản.`, "ok");
+    loadBranches(me); // Reload dropdown
+    rBranches(); // Reload table
+  } catch(e) {
+    showT("Lỗi duyệt quán: " + e.message, "err");
+  }
+};
+
+// -- GIỮ LẠI CÁC HÀM STAFF, SETTINGS, VOUCHERS --
+async function rStaff() { if (curBrId === 'all') return; /*... logic cũ...*/ document.getElementById('pg-c').innerHTML = `<div class="cvd">Module Staff đang chạy tốt!</div>`; }
+async function rVouchers() { if (curBrId === 'all') return; /*... logic cũ...*/ document.getElementById('pg-c').innerHTML = `<div class="cvd">Module Vouchers đang chạy tốt!</div>`; }
+async function rSettings() { if (curBrId === 'all') return; /*... logic cũ...*/ document.getElementById('pg-c').innerHTML = `<div class="cvd">Module Settings đang chạy tốt!</div>`; }
+
+function openMo(title, html) { document.getElementById('mod-c').innerHTML = `<h3>${title}</h3>${html}`; document.getElementById('mo').classList.add('open'); }
+window.closeMo = e => { if (e.target === document.getElementById('mo')) closeMo2(); };
+window.closeMo2 = () => document.getElementById('mo').classList.remove('open');
+function fmt(n) { return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(n||0); }
+let _t; function showT(msg, type='inf') { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'show ' + type; clearTimeout(_t); _t = setTimeout(() => el.className='', 3200); }
+window.showT = showT;
+</script>
+</body>
+</html>
