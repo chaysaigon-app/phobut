@@ -586,38 +586,63 @@ window.delStaff = async email => {
 //  VOUCHERS
 // ════════════════════════════════════════════════════════
 async function rVouchers() {
-  if (curBrId === 'all') return;
-  document.getElementById('pg-acts').innerHTML = `<button class="bs-acc" onclick="openAddVoucher()">+ Thêm voucher</button>`;
+  if (curBrId === 'all') {
+    document.getElementById('pg-c').innerHTML = `<div class="cvd" style="text-align:center;padding:40px;color:var(--txt2)"><div style="font-size:32px;margin-bottom:12px">🎟️</div><div style="font-size:15px;font-weight:700">Chọn một nhà hàng cụ thể để quản lý voucher</div></div>`;
+    return;
+  }
+  document.getElementById('pg-acts').innerHTML = `<button class="bs-acc" onclick="openAddVoucher()">+ Tạo Voucher</button>`;
   const snap = await getDocs(collection(db,'Branches',curBrId,'Vouchers'));
   const rows = snap.docs.map(d => {
     const v = d.data();
+    const isActive = v.active !== false;
+    const used = v.usedCount || 0;
+    const maxUse = v.maxUse || '∞';
     return `<tr>
-      <td style="font-family:var(--mono);font-weight:700;color:var(--ylw)">${d.id}</td>
-      <td>${v.percent}% giảm</td>
-      <td><label class="tog-wrap"><label class="tog"><input type="checkbox" ${v.active!==false?'checked':''} onchange="toggleVoucher('${d.id}',this.checked)"><span class="tog-sl"></span></label></label></td>
-      <td><button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 8px;font-size:12px" onclick="delVoucher('${d.id}')">🗑️</button></td>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--ylw);font-size:15px">${d.id}</td>
+      <td style="font-weight:700;color:var(--acc)">${v.percent}%</td>
+      <td style="font-size:12px;color:var(--txt2)">${used} / ${maxUse}</td>
+      <td>
+        <label class="tog-wrap">
+          <label class="tog"><input type="checkbox" ${isActive?'checked':''} onchange="toggleVoucher('${d.id}',this.checked)"><span class="tog-sl"></span></label>
+          <span class="tog-lbl">${isActive?'Đang bật':'Đã tắt'}</span>
+        </label>
+      </td>
+      <td><button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 10px;font-size:12px" onclick="delVoucher('${d.id}')">🗑️ Xóa</button></td>
     </tr>`;
   }).join('');
   document.getElementById('pg-c').innerHTML = `
-  <div class="cvd" style="overflow-x:auto">
-    <table class="dt"><thead><tr><th>Mã</th><th>Giảm giá</th><th>Hoạt động</th><th>Xóa</th></tr></thead>
-    <tbody>${rows||'<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--txt3)">Chưa có voucher</td></tr>'}</tbody></table>
+  <div class="cvd">
+    <p style="font-size:12px;color:var(--txt2);margin-bottom:14px">Khách nhập mã khi đặt hàng online để được giảm giá. Mã phân biệt CHỮ HOA.</p>
+    <div style="overflow-x:auto">
+    <table class="dt"><thead><tr><th>Mã voucher</th><th>Giảm (%)</th><th>Đã dùng</th><th>Bật/Tắt</th><th>Xóa</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--txt3)">Chưa có voucher nào. Nhấn "+ Tạo Voucher" để bắt đầu.</td></tr>'}</tbody></table>
+    </div>
   </div>`;
 }
-window.openAddVoucher = () => openMo('🎟️ Tạo Voucher', `
+window.openAddVoucher = () => openMo('🎟️ Tạo Voucher mới', `
   <div class="fg">
-    <div class="ff full"><label>Mã voucher (viết hoa, không dấu) *</label><input id="vc-code" placeholder="GIAM20" style="text-transform:uppercase"></div>
-    <div class="ff full"><label>Phần trăm giảm (%) *</label><input id="vc-pct" type="number" min="1" max="100" placeholder="20"></div>
+    <div class="ff full"><label>Mã voucher * (viết hoa, không dấu, không khoảng trắng)</label><input id="vc-code" placeholder="GIAM20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"></div>
+    <div class="ff"><label>Giảm giá (%) *</label><input id="vc-pct" type="number" min="1" max="100" placeholder="20"></div>
+    <div class="ff"><label>Số lần dùng tối đa</label><input id="vc-max" type="number" min="0" placeholder="Để trống = không giới hạn"></div>
   </div>
-  <div class="fa"><button class="fcn" onclick="closeMo2()">Huỷ</button><button class="fsv" onclick="saveVoucher()">💾 Tạo</button></div>`);
+  <p style="font-size:11px;color:var(--txt3);margin-top:4px">VD: mã CHAY50 giảm 50% · dùng tối đa 100 lần</p>
+  <div class="fa"><button class="fcn" onclick="closeMo2()">Huỷ</button><button class="fsv" onclick="saveVoucher()">💾 Tạo Voucher</button></div>`);
 window.saveVoucher = async () => {
-  const code = document.getElementById('vc-code').value.trim().toUpperCase();
-  const pct  = Number(document.getElementById('vc-pct').value);
-  if (!code || !pct) return showT('Nhập đủ thông tin','err');
-  await setDoc(doc(db,'Branches',curBrId,'Vouchers',code), {percent:pct, active:true, createdAt:serverTimestamp()});
-  showT('Đã tạo voucher','ok'); closeMo2(); rVouchers();
+  const code   = document.getElementById('vc-code').value.trim().toUpperCase();
+  const pct    = Number(document.getElementById('vc-pct').value);
+  const maxRaw = document.getElementById('vc-max').value.trim();
+  const maxUse = maxRaw ? Number(maxRaw) : null;
+  if (!code || !pct) return showT('Nhập đủ mã và % giảm giá','err');
+  if (code.length < 3) return showT('Mã phải có ít nhất 3 ký tự','err');
+  const existing = await getDoc(doc(db,'Branches',curBrId,'Vouchers',code));
+  if (existing.exists()) return showT('Mã này đã tồn tại!','err');
+  await setDoc(doc(db,'Branches',curBrId,'Vouchers',code), {
+    percent:pct, active:true, usedCount:0,
+    maxUse: maxUse, createdAt:serverTimestamp()
+  });
+  showT('✅ Đã tạo voucher '+code,'ok'); closeMo2(); rVouchers();
 };
-window.toggleVoucher = async (id, st) => { await updateDoc(doc(db,'Branches',curBrId,'Vouchers',id), {active:st}); };
+window.toggleVoucher = async (id, st) => { await updateDoc(doc(db,'Branches',curBrId,'Vouchers',id), {active:st}); showT(st?'Đã bật voucher':'Đã tắt voucher','ok'); };
 window.delVoucher    = async id => {
   if (!confirm('Xóa voucher?')) return;
   await deleteDoc(doc(db,'Branches',curBrId,'Vouchers',id)); showT('Đã xóa','inf'); rVouchers();

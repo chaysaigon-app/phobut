@@ -565,11 +565,7 @@ window.handleSearch = (val) => {
     searchQuery = val.trim();
     renderListings();
     if (!searchQuery) renderFeed();
-    else {
-      const q = searchQuery.toLowerCase();
-      const filteredItems = [];
-      allBranches.filter(b => b.isPartnerApproved && !b.hidden && getIsOpen(b)).forEach(b => {});
-    }
+    // Feed không filter theo search (chỉ filter listing), giữ nguyên feed món
   }, 300);
 };
 
@@ -597,6 +593,7 @@ window.clearCartAndSwitch = () => {
 
 async function loadBranchMenu(bId) {
   showScreen("menu");
+  updateCartUI();
   currentBranch = null; currentMenuItems = []; activeMenuCat = "all";
   document.getElementById("menu-grid").innerHTML = `<div class="loader" style="grid-column:1/-1"><div class="spinner"></div></div>`;
   document.getElementById("menu-cat-bar").innerHTML = "";
@@ -615,6 +612,7 @@ async function loadBranchMenu(bId) {
     document.getElementById("br-address").textContent = info.address || "";
     const logoEl = document.getElementById("br-logo");
     logoEl.src = info.logo || svgPlaceholder();
+    logoEl.onerror = () => { logoEl.src = svgPlaceholder(); };
 
     let statusText = "", statusColor = "";
     if (!approved) {
@@ -785,8 +783,8 @@ window.confirmOrder = async () => {
   const errEl   = document.getElementById("co-err");
   errEl.style.display = "none";
 
-  if (!name || !phone || !address) {
-    errEl.textContent = "Vui lòng điền đầy đủ tên, SĐT và địa chỉ.";
+  if (!phone || !address) {
+    errEl.textContent = "Vui lòng điền SĐT và địa chỉ giao hàng.";
     errEl.style.display = "block"; return;
   }
 

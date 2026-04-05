@@ -392,6 +392,7 @@ let editingOrderId = null;
 
 // Multi-session: sessions = { "Bàn 1": [...cart], "Bàn 2": [...cart] }
 let sessions     = {};
+let sessionNotes = {};
 let activeSession = "Bàn 1";
 
 function getCart() { return sessions[activeSession] || []; }
@@ -435,7 +436,7 @@ function bootApp() {
   document.getElementById("vat-pct").textContent      = branchVAT;
   document.getElementById("tb-session-label").textContent = activeSession;
   sessions[activeSession] = sessions[activeSession] || [];
-  loadMenu(); subscribeOrders(); loadActivity("today"); updateBill(); renderCart();
+  loadMenu(); subscribeOrders(); loadActivity("today"); renderCart();
 }
 
 // ── TABLE SESSIONS ──
@@ -462,7 +463,8 @@ window.switchSession = (name) => {
   sessions[name] = sessions[name] || [];
   document.getElementById("tb-session-label").textContent = name;
   document.getElementById("bill-table").value = name;
-  closeTableModal(); updateBill(); renderCart(); updateBadge();
+  document.getElementById("bill-note").value = sessionNotes[name] || "";
+  closeTableModal(); renderCart(); updateBadge();
 };
 window.selectCustomTable = () => {
   const val = document.getElementById("custom-table-input").value.trim();
@@ -622,6 +624,7 @@ async function processOrder(targetStatus) {
   if (!cart.length) { toast("Chưa có món", "err"); return; }
   const tableNo = document.getElementById("bill-table").value.trim() || activeSession;
   const note    = document.getElementById("bill-note").value.trim();
+  sessionNotes[activeSession] = note;
 
   const orderData = {
     items:         cart,
