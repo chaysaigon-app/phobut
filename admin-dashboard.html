@@ -176,6 +176,7 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
     <div class="ns" id="sa-section" style="display:none">Hệ thống HQ</div>
     <button class="ni" id="n-branches" style="display:none" onclick="goP('branches')"><span class="ico">🏢</span>Quản lý Đối tác</button>
     <button class="ni" id="n-requests" style="display:none" onclick="goP('requests')"><span class="ico">📥</span>Yêu cầu đăng ký</button>
+    <button class="ni" id="n-import" style="display:none" onclick="goP('import')"><span class="ico">📦</span>Batch Import</button>
   </nav>
   <div class="sb-bot">
     <div class="su"><div class="sav" id="sav">?</div><div class="sui"><div class="sue" id="sue"></div><div class="sur" id="sur"></div></div></div>
@@ -282,6 +283,7 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('sa-section').style.display  = isSA ? '' : 'none';
   document.getElementById('n-branches').style.display  = isSA ? '' : 'none';
   document.getElementById('n-requests').style.display  = isSA ? '' : 'none';
+  document.getElementById('n-import').style.display   = isSA ? '' : 'none';
   await loadBranches(user);
 });
 
@@ -322,7 +324,7 @@ const PTITLES = {
   dashboard:'📊 Dashboard', orders:'📋 Đơn hàng',
   menu:'🍽️ Thực đơn & Kho', staff:'👥 Nhân viên',
   vouchers:'🎟️ Voucher', settings:'⚙️ Cài đặt Quán',
-  branches:'🏢 Quản lý Đối tác', requests:'📥 Yêu cầu đăng ký'
+  branches:'🏢 Quản lý Đối tác', requests:'📥 Yêu cầu đăng ký', import:'📦 Batch Import — Nhập hàng loạt'
 };
 
 window.goP = async p => {
@@ -331,7 +333,7 @@ window.goP = async p => {
   document.getElementById('pg-ttl').textContent = PTITLES[p] || p;
   document.getElementById('pg-acts').innerHTML  = '';
   document.getElementById('pg-c').innerHTML = '<div class="ldr"><div class="spin"></div><span>Đang tải...</span></div>';
-  if (!curBrId && !['branches','requests'].includes(p)) {
+  if (!curBrId && !['branches','requests','import'].includes(p)) {
     document.getElementById('pg-c').innerHTML = '<div class="ldr">Chọn chi nhánh</div>'; return;
   }
   try {
@@ -343,6 +345,7 @@ window.goP = async p => {
     else if (p==='settings')  await rSettings();
     else if (p==='branches')  await rBranches();
     else if (p==='requests')  await rRequests();
+    else if (p==='import')    await rBatchImport();
   } catch(e) {
     document.getElementById('pg-c').innerHTML = `<div class="ldr" style="color:var(--red)">Lỗi: ${e.message}</div>`;
   }
@@ -942,6 +945,268 @@ function showT(msg, type='inf') {
   el.className = 'show ' + type; clearTimeout(_t); _t = setTimeout(() => el.className='', 3200);
 }
 window.showT = showT;
+
+// ════════════════════════════════════════════════════════
+//  BATCH IMPORT — Nhập hàng loạt quán + menu từ JSON
+// ════════════════════════════════════════════════════════
+async function rBatchImport() {
+  if (!isSA) return;
+  document.getElementById('pg-c').innerHTML = `
+  <div class="cvd" style="max-width:760px">
+    <h3 style="font-size:16px;font-weight:900;margin-bottom:6px">📦 Batch Import — Nhập hàng loạt</h3>
+    <p style="font-size:13px;color:var(--txt2);margin-bottom:18px;line-height:1.7">
+      Dán JSON từ <strong>AI Data Extractor</strong> vào đây để tạo nhiều quán + menu cùng lúc.<br>
+      Schema: <code style="background:var(--s3);padding:2px 6px;border-radius:4px;font-size:11px">[{"name":"...","phone":"...","menuItems":[{"name":"...","price":12000}]}]</code>
+    </p>
+
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">Dán JSON vào đây</div>
+      <textarea id="batch-json-inp"
+        style="width:100%;min-height:220px;background:var(--s3);border:1.5px solid var(--brd);border-radius:var(--r);padding:14px;font-size:12px;font-family:var(--mono);color:var(--txt);outline:none;line-height:1.6;resize:vertical;transition:border-color .2s"
+        placeholder='[&#10;  {&#10;    "name": "Quán Chay Hương Sen",&#10;    "phone": "0901234567",&#10;    "address": "12 Lê Lợi, Hải Châu 1, Đà Nẵng",&#10;    "street": "Lê Lợi",&#10;    "ward": "Hải Châu 1",&#10;    "openTime": "07:00",&#10;    "closeTime": "21:00",&#10;    "description": "Quán chay thuần Đà Nẵng",&#10;    "menuItems": [&#10;      {"name": "Cơm chay", "price": 25000, "category": "Cơm"},&#10;      {"name": "Bún bò chay", "price": 30000, "category": "Bún"}&#10;    ]&#10;  }&#10;]'
+        onfocus="this.style.borderColor='var(--acc)'" onblur="this.style.borderColor='var(--brd)'"></textarea>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <button class="bs-acc" onclick="parseBatchJSON()">🔍 Phân tích JSON</button>
+      <button class="hdr-btn" onclick="document.getElementById('batch-json-inp').value=''">🗑️ Xóa</button>
+      <span id="batch-parse-info" style="font-size:12px;color:var(--txt2)"></span>
+    </div>
+
+    <div id="batch-preview" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Preview trước khi import</div>
+      <div id="batch-preview-cards" style="display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto;margin-bottom:14px"></div>
+
+      <div style="background:var(--ylw-d);border:1px solid var(--ylw);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--ylw);margin-bottom:14px">
+        ⚠️ Các quán sẽ được tạo với <code>isPartnerApproved=false</code>. Bạn cần vào <strong>Yêu cầu đăng ký</strong> hoặc <strong>Quản lý Đối tác</strong> để duyệt từng quán sau.
+      </div>
+
+      <div id="batch-import-progress" style="display:none;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--txt2);margin-bottom:6px" id="batch-prog-text">Đang xử lý...</div>
+        <div style="height:6px;background:var(--s3);border-radius:3px;overflow:hidden">
+          <div id="batch-prog-bar" style="height:100%;background:var(--grn);width:0;transition:width .3s"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button class="bs-acc" id="btn-do-import" onclick="doBatchImport()" style="background:var(--grn);border-color:var(--grn)">✅ Xác nhận Import tất cả</button>
+        <button class="hdr-btn" onclick="document.getElementById('batch-preview').style.display='none'">Hủy</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+let _batchData = [];
+
+window.parseBatchJSON = () => {
+  const raw   = document.getElementById('batch-json-inp').value.trim();
+  const info  = document.getElementById('batch-parse-info');
+  const prev  = document.getElementById('batch-preview');
+
+  try {
+    const clean = raw.replace(/```json?|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    _batchData = Array.isArray(parsed) ? parsed : [parsed];
+    if (!_batchData.length) throw new Error('Mảng rỗng');
+
+    info.style.color = 'var(--grn)';
+    info.textContent = `✅ Hợp lệ: ${_batchData.length} quán, ${_batchData.reduce((s,r)=>(r.menuItems?.length||0)+s,0)} món`;
+
+    // Build preview cards
+    document.getElementById('batch-preview-cards').innerHTML = _batchData.map((b, i) => {
+      const menuCount = b.menuItems?.length || 0;
+      const issues = [];
+      if (!b.name) issues.push('thiếu tên');
+      if (!b.phone && !b.email) issues.push('thiếu SĐT/email');
+      return `<div style="background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:12px 14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:22px">${b.logo ? `<img src="${b.logo}" style="width:32px;height:32px;border-radius:6px;object-fit:cover">` : '🏪'}</span>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:14px">${b.name || '<em style="color:var(--red)">Chưa có tên</em>'}</div>
+            <div style="font-size:11px;color:var(--txt2)">${b.address || b.ward || '—'} · ${b.phone || '—'}</div>
+          </div>
+          <span style="font-size:11px;background:var(--grn-d);color:var(--grn);padding:2px 8px;border-radius:4px;font-weight:700">${menuCount} món</span>
+          ${issues.length ? `<span style="font-size:10px;background:var(--red-d);color:var(--red);padding:2px 6px;border-radius:4px">⚠️ ${issues.join(', ')}</span>` : ''}
+        </div>
+        ${menuCount > 0 ? `<div style="font-size:11px;color:var(--txt3);line-height:1.7">${b.menuItems.slice(0,5).map(m=>`${m.name} — ${fmt(m.price)}`).join(' · ')}${menuCount>5?` · +${menuCount-5} món khác`:''}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    prev.style.display = '';
+  } catch(e) {
+    info.style.color = 'var(--red)';
+    info.textContent = '❌ JSON không hợp lệ: ' + e.message;
+    prev.style.display = 'none';
+  }
+};
+
+window.doBatchImport = async () => {
+  if (!_batchData.length) return;
+  const btn       = document.getElementById('btn-do-import');
+  const progWrap  = document.getElementById('batch-import-progress');
+  const progText  = document.getElementById('batch-prog-text');
+  const progBar   = document.getElementById('batch-prog-bar');
+  btn.disabled    = true;
+  progWrap.style.display = '';
+
+  let done = 0;
+  const results = { success: [], failed: [] };
+
+  for (const b of _batchData) {
+    progText.textContent = `Đang tạo: "${b.name || '(chưa tên)'}"... (${done+1}/${_batchData.length})`;
+    try {
+      const branchRef = await addDoc(collection(db, 'Branches'), {
+        isPartnerApproved: false,
+        hidden: false, isOpen: false, featured: false, displayOrder: 999,
+        info: {
+          name:        b.name || '',
+          owner:       b.owner || '',
+          email:       b.email || '',
+          phone:       b.phone || '',
+          address:     b.address || '',
+          street:      b.street || '',
+          ward:        b.ward || '',
+          zalo:        b.zalo || '',
+          whatsapp:    b.whatsapp || '',
+          facebook:    b.facebook || '',
+          tiktok:      b.tiktok || '',
+          youtube:     b.youtube || '',
+          googleMap:   b.googleMap || '',
+          openTime:    b.openTime || '07:00',
+          closeTime:   b.closeTime || '21:00',
+          description: b.description || '',
+          logo:        b.logo || '',
+          vat:         DEFAULT_VAT
+        },
+        importedAt: serverTimestamp(),
+        createdAt:  serverTimestamp()
+      });
+
+      const menuItems = b.menuItems || [];
+      for (const item of menuItems) {
+        await addDoc(collection(db, 'Branches', branchRef.id, 'Menu'), {
+          name:        item.name || '',
+          price:       Number(item.price) || 0,
+          category:    item.category || 'Món chính',
+          description: item.description || '',
+          image:       item.image || null,
+          available:   true,
+          stock:       -1,
+          createdAt:   serverTimestamp(),
+          updatedAt:   serverTimestamp()
+        });
+      }
+
+      // Create staff if email provided
+      if (b.email) {
+        await setDoc(doc(db, 'Branches', branchRef.id, 'Staff', b.email), {
+          name: b.owner || '', role: 'admin', addedAt: serverTimestamp()
+        });
+      }
+
+      results.success.push(b.name || branchRef.id);
+    } catch(e) {
+      results.failed.push(`${b.name || '?'}: ${e.message}`);
+    }
+    done++;
+    progBar.style.width = (done / _batchData.length * 100) + '%';
+  }
+
+  progText.textContent = `Hoàn thành!`;
+  await loadBranches(me);
+
+  showT(`✅ Import xong: ${results.success.length} thành công${results.failed.length ? `, ${results.failed.length} lỗi` : ''}`, results.failed.length ? 'inf' : 'ok');
+
+  // Show result summary
+  document.getElementById('batch-preview-cards').innerHTML += `
+    <div style="background:var(--grn-d);border:1px solid var(--grn);border-radius:8px;padding:14px;margin-top:8px">
+      <div style="font-weight:800;color:var(--grn);margin-bottom:8px">✅ Import hoàn tất</div>
+      <div style="font-size:12px;color:var(--grn)">Đã tạo ${results.success.length} quán thành công.<br>
+      Vào <strong>Quản lý Đối tác</strong> để duyệt và phân quyền.</div>
+      ${results.failed.length ? `<div style="margin-top:8px;font-size:11px;color:var(--red)">Lỗi:<br>${results.failed.join('<br>')}</div>` : ''}
+    </div>`;
+  btn.disabled = false;
+};
+
+// ════════════════════════════════════════════════════════
+//  IMPROVED IMAGE COMPRESSION (used by all upload flows)
+//  Unsharp mask + progressive quality targeting
+// ════════════════════════════════════════════════════════
+// Override the existing compressImage with enhanced version
+async function compressImage(file, maxWidth=800, quality=0.82, outputType='image/webp') {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Không đọc được file ảnh'));
+    reader.onload  = ev => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('File không phải ảnh hợp lệ'));
+      img.onload  = () => {
+        let { width, height } = img;
+        if (width > maxWidth) { height = Math.round(height * maxWidth / width); width = maxWidth; }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // White background
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, width, height);
+
+        // Render with slight smoothing
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Apply mild sharpening (unsharp mask)
+        try {
+          const id = ctx.getImageData(0, 0, width, height);
+          const sharpened = applyUnsharpMask(id, 0.6);
+          ctx.putImageData(sharpened, 0, 0);
+        } catch(e) { /* Skip if cross-origin */ }
+
+        canvas.toBlob(blob => {
+          if (!blob) reject(new Error('toBlob failed'));
+          else resolve(blob);
+        }, outputType, quality);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function applyUnsharpMask(imageData, amount=0.6) {
+  const { data, width, height } = imageData;
+  const blurred = fastBoxBlur(data, width, height);
+  const output  = new Uint8ClampedArray(data);
+  for (let i = 0; i < data.length; i += 4) {
+    for (let c = 0; c < 3; c++) {
+      output[i+c] = Math.min(255, Math.max(0, data[i+c] + amount * (data[i+c] - blurred[i+c])));
+    }
+    output[i+3] = data[i+3];
+  }
+  return new ImageData(output, width, height);
+}
+
+function fastBoxBlur(data, w, h) {
+  const out   = new Uint8ClampedArray(data.length);
+  const k     = [1,2,1, 2,4,2, 1,2,1];
+  const ksum  = 16;
+  for (let y=0; y<h; y++) {
+    for (let x=0; x<w; x++) {
+      let r=0, g=0, b=0, ki=0;
+      for (let dy=-1; dy<=1; dy++) for (let dx=-1; dx<=1; dx++) {
+        const nx = Math.min(w-1, Math.max(0, x+dx));
+        const ny = Math.min(h-1, Math.max(0, y+dy));
+        const idx = (ny*w+nx)*4;
+        r += data[idx]*k[ki]; g += data[idx+1]*k[ki]; b += data[idx+2]*k[ki]; ki++;
+      }
+      const oi = (y*w+x)*4;
+      out[oi]=r/ksum; out[oi+1]=g/ksum; out[oi+2]=b/ksum; out[oi+3]=data[oi+3];
+    }
+  }
+  return out;
+}
+
 </script>
 </body>
 </html>

@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🔍 Vegans DN — AI Data Extractor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0a0a0f; --paper:#f5f4ef; --paper2:#ede9e0; --paper3:#e4dfd3;
+  --grn:#1a5c2a; --grn2:#2e8b47; --grn3:#4db870; --grn-pale:#e8f5ec;
+  --acc:#c84b1f; --acc2:#e8622a;
+  --ylw:#d4a017; --blu:#1a4a7a;
+  --brd:#c8c0b0; --brd2:#ddd8cc;
+  --txt:#1a1a22; --txt2:#5a5650; --txt3:#8a8478;
+  --shadow: 0 2px 0 #c8c0b0, 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 4px 0 #b8b0a0, 0 8px 32px rgba(0,0,0,.14);
+  --font:'Space Grotesk',sans-serif; --mono:'Space Mono',monospace;
+  --r:6px; --r2:12px;
+}
+* { margin:0; padding:0; box-sizing:border-box }
+body { font-family:var(--font); background:var(--paper); color:var(--txt); min-height:100vh; }
+
+/* ── GRAIN TEXTURE ── */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  background-size:128px;
+}
+
+/* ── HEADER ── */
+header {
+  background:var(--grn); color:#fff; padding:20px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  border-bottom:3px solid var(--ink); position:relative; z-index:2;
+}
+.logo { font-size:20px; font-weight:700; letter-spacing:-0.5px; display:flex; align-items:center; gap:10px }
+.logo-badge { background:var(--grn3); color:var(--ink); font-size:10px; font-weight:700; padding:2px 8px; border-radius:3px; text-transform:uppercase; letter-spacing:1px }
+.hdr-sub { font-size:12px; opacity:.75; margin-top:2px }
+
+/* ── LAYOUT ── */
+.layout { display:grid; grid-template-columns:1fr 1fr; gap:0; max-width:1400px; margin:0 auto; min-height:calc(100vh - 64px); position:relative; z-index:1 }
+@media(max-width:900px){ .layout { grid-template-columns:1fr } }
+
+/* ── PANELS ── */
+.panel { padding:28px 24px; border-right:2px solid var(--brd2) }
+.panel:last-child { border-right:none }
+.panel-title {
+  font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;
+  color:var(--txt3); margin-bottom:20px; display:flex; align-items:center; gap:8px;
+  padding-bottom:10px; border-bottom:1px solid var(--brd2)
+}
+.panel-title .dot { width:8px; height:8px; border-radius:50%; background:var(--grn3); }
+
+/* ── INPUT SECTION ── */
+.input-block { margin-bottom:22px }
+.input-block label { display:block; font-size:12px; font-weight:600; color:var(--txt2); margin-bottom:7px; text-transform:uppercase; letter-spacing:.8px }
+.url-row { display:flex; gap:8px; margin-bottom:8px }
+.url-inp {
+  flex:1; border:1.5px solid var(--brd); border-radius:var(--r);
+  padding:9px 12px; font-size:13px; font-family:var(--font);
+  background:var(--paper); color:var(--txt); outline:none; transition:border-color .2s
+}
+.url-inp:focus { border-color:var(--grn2) }
+.btn-add-url {
+  background:var(--paper2); border:1.5px solid var(--brd); border-radius:var(--r);
+  padding:9px 14px; font-size:13px; font-weight:700; color:var(--txt2);
+  cursor:pointer; transition:all .15s; white-space:nowrap
+}
+.btn-add-url:hover { border-color:var(--grn2); color:var(--grn) }
+#url-list { display:flex; flex-direction:column; gap:6px }
+.url-chip {
+  display:flex; align-items:center; gap:8px; background:var(--grn-pale);
+  border:1px solid var(--grn3); border-radius:var(--r); padding:7px 12px;
+  font-size:12px; font-family:var(--mono);
+}
+.url-chip span { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--grn) }
+.url-chip button { background:none; border:none; cursor:pointer; color:var(--txt3); font-size:14px; padding:0 2px; flex-shrink:0 }
+
+/* DROP ZONE */
+.dropzone {
+  border:2px dashed var(--brd); border-radius:var(--r2);
+  padding:28px 20px; text-align:center; cursor:pointer;
+  transition:all .2s; background:var(--paper2); position:relative; overflow:hidden
+}
+.dropzone:hover, .dropzone.dragover { border-color:var(--grn2); background:var(--grn-pale) }
+.dropzone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100% }
+.dz-icon { font-size:36px; margin-bottom:8px; display:block }
+.dz-text { font-size:13px; font-weight:600; color:var(--txt2); margin-bottom:4px }
+.dz-sub { font-size:11px; color:var(--txt3) }
+#img-previews { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px }
+.img-thumb { position:relative; width:72px; height:72px }
+.img-thumb img { width:72px; height:72px; object-fit:cover; border-radius:var(--r); border:2px solid var(--brd) }
+.img-thumb button { position:absolute; top:-6px; right:-6px; width:20px; height:20px; border-radius:50%; background:var(--acc); color:#fff; border:2px solid #fff; font-size:10px; cursor:pointer; display:flex; align-items:center; justify-content:center }
+.img-size { position:absolute; bottom:2px; left:0; right:0; text-align:center; font-size:8px; color:#fff; background:rgba(0,0,0,.5); border-radius:0 0 4px 4px; padding:1px 0 }
+
+/* PROMPT SECTION */
+.prompt-box {
+  border:1.5px solid var(--brd); border-radius:var(--r); padding:10px 12px;
+  font-size:12px; font-family:var(--mono); color:var(--txt2); background:var(--paper2);
+  min-height:60px; line-height:1.6
+}
+.prompt-hint { font-size:11px; color:var(--txt3); margin-top:5px; line-height:1.5 }
+
+/* EXTRACT BUTTON */
+.btn-extract {
+  width:100%; background:var(--grn); color:#fff; border:none;
+  border-radius:var(--r); padding:14px; font-size:15px; font-weight:700;
+  cursor:pointer; transition:all .2s; display:flex; align-items:center; justify-content:center;
+  gap:10px; box-shadow:var(--shadow); letter-spacing:-.3px; margin-top:6px;
+  font-family:var(--font)
+}
+.btn-extract:hover { background:var(--grn2); transform:translateY(-1px); box-shadow:var(--shadow-lg) }
+.btn-extract:active { transform:translateY(1px); box-shadow:var(--shadow) }
+.btn-extract:disabled { background:var(--brd); cursor:not-allowed; transform:none }
+.spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; flex-shrink:0 }
+@keyframes spin { to { transform:rotate(360deg) } }
+
+/* PROGRESS LOG */
+#progress-log {
+  background:var(--ink); color:#7fff7f; border-radius:var(--r);
+  padding:14px; font-size:11px; font-family:var(--mono); line-height:1.8;
+  max-height:160px; overflow-y:auto; display:none; margin-top:12px
+}
+#progress-log.visible { display:block }
+#progress-log .log-line { display:block }
+#progress-log .log-line.err { color:#ff7f7f }
+#progress-log .log-line.inf { color:#7fd4ff }
+#progress-log .log-line.ok  { color:#7fffaa }
+
+/* ── OUTPUT PANEL ── */
+.output-toolbar {
+  display:flex; gap:8px; margin-bottom:14px; align-items:center; flex-wrap:wrap
+}
+.btn-out {
+  background:var(--paper2); border:1.5px solid var(--brd); border-radius:var(--r);
+  padding:7px 14px; font-size:12px; font-weight:700; cursor:pointer; color:var(--txt2);
+  transition:all .15s; font-family:var(--font)
+}
+.btn-out:hover { border-color:var(--grn2); color:var(--grn) }
+.btn-out.primary { background:var(--grn); border-color:var(--grn); color:#fff }
+.btn-out.primary:hover { background:var(--grn2) }
+.btn-out.danger  { border-color:var(--acc); color:var(--acc) }
+.badge-count { background:var(--grn-pale); border:1px solid var(--grn3); color:var(--grn); font-size:11px; font-weight:700; padding:2px 8px; border-radius:3px; margin-left:auto }
+
+#json-output {
+  background:var(--ink); color:#d4e8ff; border-radius:var(--r2);
+  padding:18px; font-size:11.5px; font-family:var(--mono); line-height:1.7;
+  min-height:300px; max-height:calc(100vh - 300px); overflow-y:auto;
+  white-space:pre-wrap; word-break:break-all; outline:none;
+  border:2px solid transparent; transition:border-color .2s
+}
+#json-output:focus { border-color:var(--grn3) }
+.json-key   { color:#ffcb6b }
+.json-str   { color:#c3e88d }
+.json-num   { color:#f78c6c }
+.json-bool  { color:#89ddff }
+.json-null  { color:#ff5572; opacity:.7 }
+
+/* VALIDATION */
+.validation-bar {
+  margin-top:10px; padding:10px 14px; border-radius:var(--r);
+  font-size:12px; display:none
+}
+.validation-bar.ok  { background:var(--grn-pale); border:1px solid var(--grn3); color:var(--grn) }
+.validation-bar.err { background:#fdf0ed; border:1px solid var(--acc2); color:var(--acc) }
+.validation-bar.visible { display:block }
+
+/* FIELD MAP */
+.field-map-wrap { margin-bottom:20px }
+.field-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px }
+.field-chip {
+  display:flex; align-items:center; gap:6px; padding:6px 10px;
+  background:var(--paper2); border:1px solid var(--brd); border-radius:var(--r);
+  font-size:11px;
+}
+.field-chip .fc-key { font-family:var(--mono); color:var(--grn); font-size:10px; font-weight:700; flex-shrink:0 }
+.field-chip .fc-desc { color:var(--txt2); font-size:10px }
+
+/* EMPTY STATE */
+.empty-state {
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:60px 20px; text-align:center; color:var(--txt3)
+}
+.empty-state .es-icon { font-size:56px; margin-bottom:14px; opacity:.5 }
+.empty-state .es-title { font-size:15px; font-weight:700; margin-bottom:6px; color:var(--txt2) }
+.empty-state .es-sub { font-size:12px; line-height:1.6 }
+
+/* TOAST */
+#toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:#fff; padding:10px 22px; border-radius:30px;
+  font-size:13px; font-weight:600; z-index:999; opacity:0; transition:.25s;
+  pointer-events:none; white-space:nowrap; font-family:var(--font)
+}
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0) }
+
+/* TABS */
+.tabs { display:flex; gap:0; margin-bottom:20px; border:1.5px solid var(--brd); border-radius:var(--r); overflow:hidden }
+.tab { flex:1; padding:8px 12px; font-size:12px; font-weight:700; text-align:center; cursor:pointer; background:var(--paper2); color:var(--txt2); border:none; transition:all .15s; font-family:var(--font) }
+.tab.on { background:var(--grn); color:#fff }
+.tab-content { display:none }
+.tab-content.on { display:block }
+
+/* IMAGE COMPRESSION TOOL */
+.compress-section { padding:20px; background:var(--paper2); border:1.5px solid var(--brd); border-radius:var(--r2); margin-bottom:16px }
+.compress-title { font-size:13px; font-weight:700; margin-bottom:14px; color:var(--txt); display:flex; align-items:center; gap:8px }
+.compress-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px }
+.compress-before, .compress-after { text-align:center }
+.compress-img-wrap { background:var(--paper); border:1.5px solid var(--brd); border-radius:var(--r); overflow:hidden; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; margin-bottom:6px }
+.compress-img-wrap img { max-width:100%; max-height:100%; object-fit:contain }
+.compress-meta { font-size:11px; color:var(--txt2); font-family:var(--mono) }
+.compress-meta .size-big { color:var(--acc); font-weight:700 }
+.compress-meta .size-ok  { color:var(--grn); font-weight:700 }
+.compress-controls { margin:14px 0 }
+.slider-row { display:flex; align-items:center; gap:10px; margin-bottom:8px }
+.slider-row label { font-size:11px; color:var(--txt2); width:100px; flex-shrink:0; font-weight:600 }
+.slider-row input[type=range] { flex:1; accent-color:var(--grn) }
+.slider-row .val { font-family:var(--mono); font-size:11px; color:var(--grn); width:40px; text-align:right; flex-shrink:0 }
+.btn-compress { width:100%; background:var(--grn); color:#fff; border:none; border-radius:var(--r); padding:11px; font-size:13px; font-weight:700; cursor:pointer; font-family:var(--font); margin-top:8px }
+.compress-result { background:var(--grn-pale); border:1px solid var(--grn3); border-radius:var(--r); padding:10px 14px; font-size:12px; color:var(--grn); font-weight:600; margin-top:10px; display:none }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">
+      🔍 AI Data Extractor
+      <span class="logo-badge">Vegans DN Tool</span>
+    </div>
+    <div class="hdr-sub">Trích xuất thông tin nhà hàng từ web / ảnh → JSON import</div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ════ LEFT: INPUT ════ -->
+  <div class="panel">
+    <div class="panel-title"><span class="dot"></span>Nguồn dữ liệu</div>
+
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('extract')">🤖 Trích xuất AI</button>
+      <button class="tab"    onclick="switchTab('compress')">🗜️ Nén ảnh</button>
+    </div>
+
+    <!-- TAB: EXTRACT -->
+    <div class="tab-content on" id="tab-extract">
+
+      <!-- URL INPUT -->
+      <div class="input-block">
+        <label>🌐 URL trang web cần quét</label>
+        <div class="url-row">
+          <input class="url-inp" id="url-inp" type="url" placeholder="https://quanchaythanhtuyen.com">
+          <button class="btn-add-url" onclick="addUrl()">+ Thêm</button>
+        </div>
+        <div id="url-list"></div>
+      </div>
+
+      <!-- IMAGE UPLOAD -->
+      <div class="input-block">
+        <label>🖼️ Upload ảnh (menu, profile, chụp màn hình...)</label>
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="img-files" accept="image/*" multiple onchange="handleImgFiles(this.files)">
+          <span class="dz-icon">📸</span>
+          <div class="dz-text">Kéo thả ảnh vào đây hoặc click để chọn</div>
+          <div class="dz-sub">JPG, PNG, WebP, HEIC · Tối đa 20 ảnh</div>
+        </div>
+        <div id="img-previews"></div>
+      </div>
+
+      <!-- EXTRACTION SCOPE -->
+      <div class="input-block">
+        <label>🎯 Loại thông tin cần trích xuất</label>
+        <div class="field-grid">
+          <label class="field-chip"><input type="checkbox" id="ex-basic" checked> <span class="fc-key">basic</span><span class="fc-desc">Tên, địa chỉ, SĐT</span></label>
+          <label class="field-chip"><input type="checkbox" id="ex-social" checked> <span class="fc-key">social</span><span class="fc-desc">Zalo, FB, TikTok...</span></label>
+          <label class="field-chip"><input type="checkbox" id="ex-hours" checked> <span class="fc-key">hours</span><span class="fc-desc">Giờ mở/đóng cửa</span></label>
+          <label class="field-chip"><input type="checkbox" id="ex-menu" checked>  <span class="fc-key">menu</span><span class="fc-desc">Tên món + giá</span></label>
+          <label class="field-chip"><input type="checkbox" id="ex-desc" checked>  <span class="fc-key">desc</span><span class="fc-desc">Mô tả, giới thiệu</span></label>
+          <label class="field-chip"><input type="checkbox" id="ex-location"> <span class="fc-key">geo</span><span class="fc-desc">Google Maps link</span></label>
+        </div>
+      </div>
+
+      <!-- EXTRA CONTEXT -->
+      <div class="input-block">
+        <label>📝 Ghi chú / context thêm (tuỳ chọn)</label>
+        <textarea class="url-inp prompt-box" id="extra-context" rows="2" placeholder="VD: Đây là quán chay thuần, tập trung lấy những món cơm và bún..."></textarea>
+        <div class="prompt-hint">AI sẽ dùng ghi chú này để lọc và ưu tiên thông tin phù hợp hơn.</div>
+      </div>
+
+      <!-- FIELDS REFERENCE -->
+      <div class="field-map-wrap">
+        <div class="panel-title" style="margin-bottom:10px"><span class="dot"></span>Schema output (Partner + Menu)</div>
+        <div class="field-grid">
+          <div class="field-chip"><span class="fc-key">name</span><span class="fc-desc">Tên nhà hàng</span></div>
+          <div class="field-chip"><span class="fc-key">owner</span><span class="fc-desc">Tên chủ/quản lý</span></div>
+          <div class="field-chip"><span class="fc-key">phone</span><span class="fc-desc">SĐT chính</span></div>
+          <div class="field-chip"><span class="fc-key">zalo</span><span class="fc-desc">SĐT Zalo</span></div>
+          <div class="field-chip"><span class="fc-key">whatsapp</span><span class="fc-desc">WhatsApp</span></div>
+          <div class="field-chip"><span class="fc-key">facebook</span><span class="fc-desc">Link page FB</span></div>
+          <div class="field-chip"><span class="fc-key">tiktok</span><span class="fc-desc">@tiktok</span></div>
+          <div class="field-chip"><span class="fc-key">youtube</span><span class="fc-desc">Link kênh YT</span></div>
+          <div class="field-chip"><span class="fc-key">address</span><span class="fc-desc">Địa chỉ đầy đủ</span></div>
+          <div class="field-chip"><span class="fc-key">street</span><span class="fc-desc">Tên đường</span></div>
+          <div class="field-chip"><span class="fc-key">ward</span><span class="fc-desc">Phường/Xã</span></div>
+          <div class="field-chip"><span class="fc-key">googleMap</span><span class="fc-desc">Maps URL</span></div>
+          <div class="field-chip"><span class="fc-key">openTime</span><span class="fc-desc">HH:MM mở cửa</span></div>
+          <div class="field-chip"><span class="fc-key">closeTime</span><span class="fc-desc">HH:MM đóng cửa</span></div>
+          <div class="field-chip"><span class="fc-key">description</span><span class="fc-desc">Mô tả quán</span></div>
+          <div class="field-chip"><span class="fc-key">menuItems[]</span><span class="fc-desc">Danh sách món ăn</span></div>
+        </div>
+      </div>
+
+      <button class="btn-extract" id="btn-extract" onclick="startExtract()">
+        <span id="extract-ico">🤖</span>
+        <span id="extract-label">Trích xuất thông tin bằng AI</span>
+      </button>
+
+      <div id="progress-log"></div>
+
+    </div><!-- /tab-extract -->
+
+    <!-- TAB: COMPRESS -->
+    <div class="tab-content" id="tab-compress">
+      <div class="compress-section">
+        <div class="compress-title">🗜️ Nén ảnh cho website</div>
+        <p style="font-size:12px;color:var(--txt2);margin-bottom:16px;line-height:1.6">Upload ảnh bất kỳ → hệ thống nén và chuyển sang WebP chất lượng cao. Tối ưu cho web: sắc nét nhưng dung lượng cực nhỏ.</p>
+
+        <div class="dropzone" style="margin-bottom:14px" id="compress-drop">
+          <input type="file" accept="image/*" multiple id="compress-files" onchange="handleCompressFiles(this.files)">
+          <span class="dz-icon">🗜️</span>
+          <div class="dz-text">Kéo thả hoặc click để chọn ảnh cần nén</div>
+          <div class="dz-sub">Hỗ trợ JPG, PNG, WebP, HEIC</div>
+        </div>
+
+        <div class="compress-controls">
+          <div class="slider-row">
+            <label>Chất lượng WebP</label>
+            <input type="range" id="s-quality" min="50" max="95" value="82" oninput="document.getElementById('v-quality').textContent=this.value+'%'">
+            <span class="val" id="v-quality">82%</span>
+          </div>
+          <div class="slider-row">
+            <label>Chiều rộng tối đa</label>
+            <input type="range" id="s-maxw" min="400" max="2000" step="100" value="1200" oninput="document.getElementById('v-maxw').textContent=this.value+'px'">
+            <span class="val" id="v-maxw">1200px</span>
+          </div>
+          <div class="slider-row">
+            <label>Sharpen mức độ</label>
+            <input type="range" id="s-sharp" min="0" max="3" step="0.5" value="1" oninput="document.getElementById('v-sharp').textContent=this.value">
+            <span class="val" id="v-sharp">1</span>
+          </div>
+        </div>
+        <button class="btn-compress" id="btn-compress" onclick="compressAll()" disabled>🗜️ Nén & tải xuống tất cả</button>
+        <div class="compress-result" id="compress-result"></div>
+      </div>
+
+      <div id="compress-previews"></div>
+    </div><!-- /tab-compress -->
+
+  </div><!-- /left panel -->
+
+  <!-- ════ RIGHT: OUTPUT ════ -->
+  <div class="panel">
+    <div class="panel-title"><span class="dot"></span>Kết quả JSON</div>
+
+    <div class="output-toolbar">
+      <button class="btn-out primary" onclick="copyJSON()">📋 Copy JSON</button>
+      <button class="btn-out" onclick="downloadJSON()">⬇️ Tải xuống .json</button>
+      <button class="btn-out" onclick="formatJSON()">✨ Format</button>
+      <button class="btn-out danger" onclick="clearOutput()">🗑️ Xóa</button>
+      <span class="badge-count" id="result-count" style="display:none">0 quán</span>
+    </div>
+
+    <div id="json-output" contenteditable="true" spellcheck="false">
+      <div class="empty-state">
+        <div class="es-icon">🤖</div>
+        <div class="es-title">Chưa có dữ liệu</div>
+        <div class="es-sub">Thêm URL hoặc upload ảnh bên trái<br>rồi nhấn "Trích xuất thông tin"</div>
+      </div>
+    </div>
+
+    <div class="validation-bar" id="validation-bar"></div>
+
+    <div style="margin-top:14px;padding:14px;background:var(--paper2);border:1.5px solid var(--brd);border-radius:var(--r);font-size:12px;color:var(--txt2);line-height:1.7">
+      <strong style="color:var(--txt)">💡 Sau khi có JSON:</strong><br>
+      Mở <code style="background:var(--paper3);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:11px">admin-dashboard.html</code> → chọn <strong>Batch Import</strong> → dán JSON vào → hệ thống tự tạo quán + menu
+    </div>
+  </div>
+
+</div><!-- /layout -->
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════════
+let urlList     = [];
+let imgFiles    = []; // { file, dataUrl, compressed }
+let compressFiles = [];
+
+// ════════════════════════════════════════════════════════
+//  TABS
+// ════════════════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('on', ['extract','compress'][i] === name));
+  document.querySelectorAll('.tab-content').forEach((t,i) => t.classList.toggle('on', ['tab-extract','tab-compress'][i] === 'tab-'+name));
+}
+
+// ════════════════════════════════════════════════════════
+//  URL MANAGEMENT
+// ════════════════════════════════════════════════════════
+function addUrl() {
+  const inp = document.getElementById('url-inp');
+  let url = inp.value.trim();
+  if (!url) return;
+  if (!url.startsWith('http')) url = 'https://' + url;
+  if (urlList.includes(url)) { toast('URL đã có trong danh sách'); return; }
+  urlList.push(url);
+  renderUrlList();
+  inp.value = '';
+}
+document.getElementById('url-inp').addEventListener('keydown', e => { if (e.key === 'Enter') addUrl(); });
+
+function removeUrl(i) { urlList.splice(i, 1); renderUrlList(); }
+function renderUrlList() {
+  document.getElementById('url-list').innerHTML = urlList.map((u, i) =>
+    `<div class="url-chip">
+      <span title="${u}">${u}</span>
+      <button onclick="removeUrl(${i})" title="Xóa">✕</button>
+    </div>`
+  ).join('');
+}
+
+// ════════════════════════════════════════════════════════
+//  IMAGE FILES
+// ════════════════════════════════════════════════════════
+async function handleImgFiles(files) {
+  const MAX = 20;
+  for (const file of Array.from(files)) {
+    if (imgFiles.length >= MAX) break;
+    const dataUrl = await readFileAsDataURL(file);
+    imgFiles.push({ file, dataUrl, sizeKB: Math.round(file.size/1024) });
+  }
+  renderImgPreviews();
+}
+
+function removeImg(i) { imgFiles.splice(i, 1); renderImgPreviews(); }
+function renderImgPreviews() {
+  document.getElementById('img-previews').innerHTML = imgFiles.map((img, i) =>
+    `<div class="img-thumb">
+      <img src="${img.dataUrl}" alt="">
+      <button onclick="removeImg(${i})" title="Xóa">✕</button>
+      <div class="img-size">${img.sizeKB}KB</div>
+    </div>`
+  ).join('');
+}
+
+const dropzone = document.getElementById('dropzone');
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('dragover');
+  handleImgFiles(e.dataTransfer.files);
+});
+
+// ════════════════════════════════════════════════════════
+//  AI EXTRACTION
+// ════════════════════════════════════════════════════════
+function log(msg, type = '') {
+  const el = document.getElementById('progress-log');
+  el.classList.add('visible');
+  el.innerHTML += `<span class="log-line ${type}">[${new Date().toLocaleTimeString('vi-VN')}] ${msg}</span>\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+async function startExtract() {
+  if (!urlList.length && !imgFiles.length) {
+    toast('Vui lòng thêm URL hoặc upload ảnh trước!'); return;
+  }
+
+  const btn = document.getElementById('btn-extract');
+  const lbl = document.getElementById('extract-label');
+  const ico = document.getElementById('extract-ico');
+  btn.disabled = true;
+  ico.outerHTML = '<div class="spinner" id="extract-ico"></div>';
+  lbl.textContent = 'Đang trích xuất...';
+
+  const logEl = document.getElementById('progress-log');
+  logEl.innerHTML = '';
+
+  const scope = {
+    basic:    document.getElementById('ex-basic').checked,
+    social:   document.getElementById('ex-social').checked,
+    hours:    document.getElementById('ex-hours').checked,
+    menu:     document.getElementById('ex-menu').checked,
+    desc:     document.getElementById('ex-desc').checked,
+    location: document.getElementById('ex-location').checked,
+  };
+  const extraCtx = document.getElementById('extra-context').value.trim();
+
+  try {
+    const results = [];
+
+    // Process URLs
+    for (const url of urlList) {
+      log(`🌐 Đang xử lý: ${url}`, 'inf');
+      const result = await extractFromURL(url, scope, extraCtx);
+      if (result) { results.push(result); log(`✅ Trích xuất xong: ${result.name || '(chưa có tên)'}`, 'ok'); }
+      else log(`⚠️ Không tìm thấy đủ thông tin từ ${url}`, 'err');
+    }
+
+    // Process images (group all together for one AI call)
+    if (imgFiles.length > 0) {
+      log(`📸 Phân tích ${imgFiles.length} ảnh...`, 'inf');
+      const imgResults = await extractFromImages(imgFiles, scope, extraCtx);
+      imgResults.forEach(r => { results.push(r); log(`✅ Trích xuất từ ảnh: ${r.name || '(chưa rõ tên)'}`, 'ok'); });
+    }
+
+    if (results.length === 0) {
+      log('❌ Không trích xuất được dữ liệu nào.', 'err');
+    } else {
+      log(`🎉 Hoàn thành! ${results.length} nhà hàng được trích xuất.`, 'ok');
+      renderOutput(results);
+    }
+
+  } catch (e) {
+    log(`❌ Lỗi: ${e.message}`, 'err');
+    toast('Lỗi kết nối AI: ' + e.message);
+  }
+
+  btn.disabled = false;
+  document.getElementById('extract-ico').outerHTML = '<span id="extract-ico">🤖</span>';
+  lbl.textContent = 'Trích xuất thông tin bằng AI';
+}
+
+async function extractFromURL(url, scope, extraCtx) {
+  // Fetch page content via CORS proxy
+  let pageText = '';
+  try {
+    log(`   └ Đang tải nội dung trang...`, 'inf');
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    const res  = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+    const html = await res.text();
+    // Strip HTML tags, keep text
+    const tmp  = document.createElement('div');
+    tmp.innerHTML = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '');
+    pageText = tmp.textContent.replace(/\s+/g, ' ').trim().slice(0, 8000);
+    log(`   └ Tải xong (${Math.round(pageText.length/1000)}K ký tự)`, 'ok');
+  } catch (e) {
+    log(`   └ Không tải được trang (${e.message}), thử trực tiếp qua AI...`, 'err');
+    pageText = `URL: ${url} — không thể tải nội dung trực tiếp, hãy suy luận từ URL.`;
+  }
+  return await callAI_extract({ type: 'url', url, content: pageText }, scope, extraCtx);
+}
+
+async function extractFromImages(images, scope, extraCtx) {
+  const contentParts = images.map(img => ({
+    type: 'image',
+    source: { type: 'base64', media_type: img.file.type || 'image/jpeg', data: img.dataUrl.split(',')[1] }
+  }));
+  contentParts.push({ type: 'text', text: buildPrompt({ type:'images', count: images.length }, scope, extraCtx) });
+
+  log(`   └ Gửi ${images.length} ảnh lên Claude...`);
+  const response = await callClaude(contentParts);
+  return parseAIResponse(response);
+}
+
+async function callAI_extract(source, scope, extraCtx) {
+  const prompt = buildPrompt(source, scope, extraCtx);
+  const response = await callClaude([{ type: 'text', text: prompt }]);
+  const results = parseAIResponse(response);
+  return results.length > 0 ? results[0] : null;
+}
+
+function buildPrompt(source, scope, extraCtx) {
+  const fields = [];
+  if (scope.basic)    fields.push('"name" (tên nhà hàng), "owner" (tên chủ quán/quản lý nếu có), "phone" (SĐT, chỉ số), "email" (email nếu có)');
+  if (scope.social)   fields.push('"zalo" (SĐT Zalo), "whatsapp" (SĐT WA), "facebook" (link hoặc tên page), "tiktok" (@handle), "youtube" (link channel)');
+  if (scope.hours)    fields.push('"openTime" (định dạng HH:MM, VD: "07:00"), "closeTime" (định dạng HH:MM, VD: "21:30")');
+  if (scope.location) fields.push('"address" (địa chỉ đầy đủ), "street" (tên đường), "ward" (phường/xã), "googleMap" (URL maps nếu có)');
+  if (scope.desc)     fields.push('"description" (mô tả ngắn về quán, 1-3 câu)');
+  if (scope.menu)     fields.push('"menuItems" (mảng tối đa 20 món, mỗi phần tử: {"name":"...", "price":12000, "category":"Cơm/Bún/Nước...", "description":"..."})');
+
+  const srcDesc = source.type === 'url'
+    ? `Nội dung trang web từ URL: ${source.url}\n\n---\n${source.content}`
+    : `Phân tích ${source.count} ảnh được gửi kèm.`;
+
+  return `Bạn là AI chuyên trích xuất thông tin nhà hàng chay Việt Nam.
+
+${srcDesc}
+
+${extraCtx ? `Context bổ sung từ người dùng: ${extraCtx}\n` : ''}
+
+Hãy trích xuất thông tin và trả về JSON array. Mỗi phần tử là 1 nhà hàng với các field sau:
+${fields.join('\n')}
+
+Yêu cầu:
+- Trả về CHỈ JSON array thuần túy, không có markdown, không có text giải thích.
+- Nếu không tìm thấy thông tin cho field nào, để null (không đặt chuỗi rỗng).
+- Giá món ăn phải là số nguyên (đơn vị VNĐ), không có ký tự đặc biệt.
+- Tên đường/phường phải tách riêng khỏi địa chỉ đầy đủ nếu có thể.
+- Phone/Zalo: chỉ giữ số, không có khoảng trắng hay dấu gạch.
+- Nếu không tìm thấy đủ thông tin để tạo ít nhất 1 nhà hàng, trả về [] (mảng rỗng).
+
+Trả về JSON array:`;
+}
+
+async function callClaude(contentParts) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: contentParts }]
+    })
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${response.status}`);
+  }
+  const data = await response.json();
+  return data.content?.map(c => c.text || '').join('') || '';
+}
+
+function parseAIResponse(text) {
+  try {
+    // Remove markdown code blocks if present
+    const clean = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    // Find the JSON array
+    const match = clean.match(/\[[\s\S]*\]/);
+    if (!match) return [];
+    const parsed = JSON.parse(match[0]);
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch (e) {
+    log(`   └ Lỗi parse JSON: ${e.message}`, 'err');
+    log(`   └ Raw: ${text.slice(0, 200)}`, 'err');
+    return [];
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  OUTPUT RENDERING
+// ════════════════════════════════════════════════════════
+function renderOutput(data) {
+  const jsonStr = JSON.stringify(data, null, 2);
+  const highlighted = syntaxHighlight(jsonStr);
+  document.getElementById('json-output').innerHTML = highlighted;
+  document.getElementById('json-output').dataset.raw = jsonStr;
+
+  const countEl = document.getElementById('result-count');
+  countEl.style.display = '';
+  countEl.textContent = `${data.length} quán · ${data.reduce((s,r)=>(r.menuItems?.length||0)+s,0)} món`;
+
+  validateOutput(data);
+}
+
+function syntaxHighlight(json) {
+  return json
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+      let cls = 'json-num';
+      if (/^"/.test(match)) { cls = /:$/.test(match) ? 'json-key' : 'json-str'; }
+      else if (/true|false/.test(match)) cls = 'json-bool';
+      else if (/null/.test(match)) cls = 'json-null';
+      return `<span class="${cls}">${match}</span>`;
+    });
+}
+
+function validateOutput(data) {
+  const bar = document.getElementById('validation-bar');
+  const issues = [];
+  data.forEach((r, i) => {
+    if (!r.name) issues.push(`Quán #${i+1}: thiếu tên`);
+    if (!r.phone && !r.email) issues.push(`Quán #${i+1} "${r.name||'?'}": thiếu SĐT và email`);
+    (r.menuItems||[]).forEach((m, j) => {
+      if (!m.name) issues.push(`Quán "${r.name||'?'}" món #${j+1}: thiếu tên`);
+      if (!m.price || m.price <= 0) issues.push(`Quán "${r.name||'?'}" món "${m.name||'?'}": giá không hợp lệ`);
+    });
+  });
+  if (issues.length === 0) {
+    bar.className = 'validation-bar ok visible';
+    bar.innerHTML = `✅ JSON hợp lệ — ${data.length} nhà hàng, ${data.reduce((s,r)=>(r.menuItems?.length||0)+s,0)} món ăn`;
+  } else {
+    bar.className = 'validation-bar err visible';
+    bar.innerHTML = `⚠️ ${issues.length} vấn đề cần kiểm tra:<br>• ${issues.slice(0,5).join('<br>• ')}${issues.length>5?`<br>... và ${issues.length-5} lỗi khác`:''}`;
+  }
+}
+
+function getRawJSON() {
+  const el = document.getElementById('json-output');
+  return el.dataset.raw || el.innerText;
+}
+
+function copyJSON() {
+  const raw = getRawJSON();
+  if (!raw.trim() || raw.includes('Chưa có dữ liệu')) { toast('Chưa có JSON để copy'); return; }
+  navigator.clipboard.writeText(raw).then(() => toast('✅ Đã copy JSON!'));
+}
+
+function downloadJSON() {
+  const raw = getRawJSON();
+  if (!raw.trim() || raw.includes('Chưa có')) { toast('Chưa có dữ liệu'); return; }
+  const blob = new Blob([raw], { type: 'application/json' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `vegans-dn-import-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function formatJSON() {
+  try {
+    const raw = getRawJSON();
+    const parsed = JSON.parse(raw.replace(/```json?|```/g,'').trim());
+    renderOutput(Array.isArray(parsed) ? parsed : [parsed]);
+    toast('✅ Đã format JSON');
+  } catch (e) { toast('JSON không hợp lệ: ' + e.message); }
+}
+
+function clearOutput() {
+  document.getElementById('json-output').innerHTML = `<div class="empty-state"><div class="es-icon">🤖</div><div class="es-title">Chưa có dữ liệu</div><div class="es-sub">Thêm URL hoặc upload ảnh bên trái<br>rồi nhấn "Trích xuất thông tin"</div></div>`;
+  delete document.getElementById('json-output').dataset.raw;
+  document.getElementById('result-count').style.display = 'none';
+  document.getElementById('validation-bar').className = 'validation-bar';
+}
+
+// ════════════════════════════════════════════════════════
+//  IMAGE COMPRESSION TOOL
+// ════════════════════════════════════════════════════════
+async function handleCompressFiles(files) {
+  compressFiles = [];
+  for (const f of Array.from(files)) {
+    const dataUrl = await readFileAsDataURL(f);
+    compressFiles.push({ file: f, dataUrl, sizeKB: Math.round(f.size/1024), result: null });
+  }
+  renderCompressPreviews();
+  document.getElementById('btn-compress').disabled = compressFiles.length === 0;
+}
+
+const compressDrop = document.getElementById('compress-drop');
+compressDrop.addEventListener('dragover', e => { e.preventDefault(); compressDrop.classList.add('dragover'); });
+compressDrop.addEventListener('dragleave', () => compressDrop.classList.remove('dragover'));
+compressDrop.addEventListener('drop', e => { e.preventDefault(); compressDrop.classList.remove('dragover'); handleCompressFiles(e.dataTransfer.files); });
+
+function renderCompressPreviews() {
+  const el = document.getElementById('compress-previews');
+  if (!compressFiles.length) { el.innerHTML = ''; return; }
+  el.innerHTML = compressFiles.map((cf, i) => `
+    <div class="compress-section" id="cf-${i}">
+      <div class="compress-title">📄 ${cf.file.name}</div>
+      <div class="compress-grid">
+        <div class="compress-before">
+          <div class="compress-img-wrap"><img src="${cf.dataUrl}"></div>
+          <div class="compress-meta">Gốc: <span class="size-big">${cf.sizeKB} KB</span><br>${cf.file.type}</div>
+        </div>
+        <div class="compress-after" id="ca-${i}">
+          <div class="compress-img-wrap" style="background:var(--paper3);align-items:center;justify-content:center;color:var(--txt3);font-size:13px">Chưa nén</div>
+          <div class="compress-meta" id="cm-${i}">—</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function compressAll() {
+  const quality = Number(document.getElementById('s-quality').value) / 100;
+  const maxW    = Number(document.getElementById('s-maxw').value);
+  const sharp   = Number(document.getElementById('s-sharp').value);
+  const btn     = document.getElementById('btn-compress');
+  btn.disabled  = true; btn.textContent = '⏳ Đang nén...';
+
+  let totalBefore = 0, totalAfter = 0;
+
+  for (let i = 0; i < compressFiles.length; i++) {
+    const cf = compressFiles[i];
+    totalBefore += cf.sizeKB;
+    try {
+      const blob = await compressImage(cf.file, maxW, quality, sharp);
+      const afterKB = Math.round(blob.size / 1024);
+      totalAfter += afterKB;
+      const resultUrl = URL.createObjectURL(blob);
+      compressFiles[i].result = { blob, url: resultUrl, sizeKB: afterKB };
+
+      // Update preview
+      const caEl = document.getElementById(`ca-${i}`);
+      if (caEl) caEl.innerHTML = `
+        <div class="compress-img-wrap"><img src="${resultUrl}"></div>
+        <div class="compress-meta" id="cm-${i}">WebP: <span class="size-ok">${afterKB} KB</span><br>
+          Giảm: <strong style="color:var(--grn)">${Math.round((1-afterKB/cf.sizeKB)*100)}%</strong>
+          <br><button onclick="downloadSingle(${i})" style="margin-top:4px;background:var(--grn);color:#fff;border:none;border-radius:4px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:var(--font)">⬇ Tải xuống</button>
+        </div>`;
+    } catch (e) {
+      document.getElementById(`cm-${i}`).textContent = 'Lỗi: ' + e.message;
+    }
+  }
+
+  const saved = Math.round((1 - totalAfter/totalBefore) * 100);
+  const resultEl = document.getElementById('compress-result');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `✅ Nén xong ${compressFiles.length} ảnh · Tiết kiệm <strong>${saved}%</strong> · ${totalBefore}KB → ${totalAfter}KB`;
+
+  btn.disabled = false; btn.textContent = '🗜️ Nén & tải xuống tất cả';
+
+  // Download all as zip (simulate by downloading one by one)
+  for (let i = 0; i < compressFiles.length; i++) {
+    if (compressFiles[i].result) {
+      await delay(300);
+      downloadSingle(i);
+    }
+  }
+}
+
+window.downloadSingle = (i) => {
+  const cf = compressFiles[i];
+  if (!cf.result) return;
+  const a   = document.createElement('a');
+  a.href    = cf.result.url;
+  a.download = cf.file.name.replace(/\.[^.]+$/, '') + '_compressed.webp';
+  a.click();
+};
+
+// ════════════════════════════════════════════════════════
+//  CORE IMAGE COMPRESSION ENGINE
+//  Dùng Canvas + sharpen kernel + WebP
+// ════════════════════════════════════════════════════════
+function compressImage(file, maxW = 1200, quality = 0.82, sharpness = 1) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Không đọc được file'));
+    reader.onload  = ev => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Không phải ảnh hợp lệ'));
+      img.onload  = () => {
+        let { width, height } = img;
+
+        // Scale down if needed
+        if (width > maxW) { height = Math.round(height * maxW / width); width = maxW; }
+
+        // Primary canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext('2d');
+
+        // White background (for PNG with transparency → WebP)
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Apply sharpening via unsharp mask if requested
+        if (sharpness > 0) {
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const sharpened = unsharpMask(imageData, sharpness);
+          ctx.putImageData(sharpened, 0, 0);
+        }
+
+        canvas.toBlob(blob => {
+          if (!blob) reject(new Error('toBlob failed'));
+          else resolve(blob);
+        }, 'image/webp', quality);
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Unsharp mask algorithm for sharpening
+function unsharpMask(imageData, amount) {
+  const { data, width, height } = imageData;
+  const output = new Uint8ClampedArray(data);
+  const radius = 1;
+
+  // Simple 3x3 Gaussian blur first
+  const blurred = gaussianBlur(data, width, height, radius);
+
+  // Unsharp = original + amount * (original - blurred)
+  for (let i = 0; i < data.length; i += 4) {
+    for (let c = 0; c < 3; c++) {
+      const diff   = data[i+c] - blurred[i+c];
+      output[i+c]  = Math.min(255, Math.max(0, data[i+c] + amount * diff));
+    }
+    output[i+3] = data[i+3]; // alpha
+  }
+
+  return new ImageData(output, width, height);
+}
+
+function gaussianBlur(data, w, h, r) {
+  const out = new Uint8ClampedArray(data.length);
+  // Simple box blur approximation (fast)
+  const kernel = [1,2,1, 2,4,2, 1,2,1]; const ksum = 16;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let r=0, g=0, b=0, ki=0;
+      for (let ky=-1; ky<=1; ky++) {
+        for (let kx=-1; kx<=1; kx++) {
+          const nx = Math.min(w-1, Math.max(0, x+kx));
+          const ny = Math.min(h-1, Math.max(0, y+ky));
+          const idx = (ny*w+nx)*4;
+          r += data[idx]   * kernel[ki];
+          g += data[idx+1] * kernel[ki];
+          b += data[idx+2] * kernel[ki];
+          ki++;
+        }
+      }
+      const oi = (y*w+x)*4;
+      out[oi]   = r/ksum; out[oi+1] = g/ksum; out[oi+2] = b/ksum; out[oi+3] = data[oi+3];
+    }
+  }
+  return out;
+}
+
+// ════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════
+function readFileAsDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = () => rej(new Error('Read failed'));
+    r.onload  = e => res(e.target.result);
+    r.readAsDataURL(file);
+  });
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
