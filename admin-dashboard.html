@@ -157,7 +157,7 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
     <div class="afl"><label>Email</label><input id="ai-em" type="email" placeholder="admin@email.com"/></div>
     <div class="afl"><label>Mật khẩu</label><input id="ai-pw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
     <button class="ap" onclick="doLogin()">Đăng nhập</button>
-    <div id="ae"></div>
+    <div id="ae" style="font-size:12px;min-height:16px;margin-top:8px;line-height:1.5"></div>
   </div>
 </div>
 
@@ -268,9 +268,30 @@ let _mImgUrl = '', _brImgUrl = '';
 
 // ── AUTH ──
 window.doLogin = async () => {
-  document.getElementById('ae').textContent = '';
-  try { await signInWithEmailAndPassword(auth, document.getElementById('ai-em').value.trim(), document.getElementById('ai-pw').value); }
-  catch { document.getElementById('ae').textContent = 'Email/mật khẩu sai.'; }
+  const errEl = document.getElementById('ae');
+  errEl.textContent = '';
+  const email = document.getElementById('ai-em').value.trim();
+  const pw    = document.getElementById('ai-pw').value;
+  if (!email || !pw) { errEl.textContent = 'Nhập email và mật khẩu.'; return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+  } catch(err) {
+    const code = err.code || '';
+    if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+      errEl.textContent = '❌ Sai email hoặc mật khẩu.';
+    } else if (code === 'auth/unauthorized-domain') {
+      errEl.innerHTML = '❌ Domain chưa được phép.<br><small>Vào Firebase Console → Authentication → Settings → Authorized domains → thêm domain này.</small>';
+    } else if (code === 'auth/network-request-failed') {
+      errEl.textContent = '❌ Lỗi mạng. Kiểm tra kết nối internet.';
+    } else if (code === 'auth/too-many-requests') {
+      errEl.textContent = '❌ Quá nhiều lần thử. Đợi vài phút rồi thử lại.';
+    } else if (code === 'auth/user-disabled') {
+      errEl.textContent = '❌ Tài khoản đã bị vô hiệu hóa.';
+    } else {
+      errEl.textContent = '❌ Lỗi: ' + (err.message || code);
+    }
+    console.error('Auth error:', err.code, err.message);
+  }
 };
 window.doLogout = () => signOut(auth);
 
@@ -303,7 +324,12 @@ async function loadBranches(user) {
       const sd = await getDoc(doc(db,'Branches',b.id,'Staff',user.email));
       if (sd.exists()) myBranches.push({...b, role: sd.data().role});
     }
-    if (!myBranches.length) { showT('Không có quyền truy cập','err'); signOut(auth); return; }
+    if (!myBranches.length) {
+      showT('Tài khoản này chưa được phân quyền vào quán nào. Liên hệ Super Admin.','err');
+      setTimeout(() => signOut(auth), 3000);
+      document.getElementById('pg-c').innerHTML = '<div class="ldr" style="color:var(--red)">Chưa có quyền truy cập.<br><small style="color:var(--txt2)">Tài khoản của bạn chưa được thêm vào Staff của quán nào.<br>Liên hệ Super Admin để được phân quyền.</small></div>';
+      return;
+    }
     sel.innerHTML = myBranches.map(b => `<option value="${b.id}" data-role="${b.role}">${b.info?.name||b.id}</option>`).join('');
     myRole = myBranches[0].role;
   }
@@ -312,7 +338,9 @@ async function loadBranches(user) {
 
 window.onBrCh = () => {
   const sel = document.getElementById('brs');
+  if (!sel.options.length) return;
   const opt = sel.options[sel.selectedIndex];
+  if (!opt) return;
   curBrId   = opt.value;
   curBrName = curBrId === 'all' ? 'Tất cả chi nhánh' : opt.text;
   if (!isSA && opt.dataset.role) myRole = opt.dataset.role;
