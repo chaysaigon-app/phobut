@@ -1,0 +1,242 @@
+// ═══════════════════════════════════════════════════════════════
+//  firestore.rules — Vegans Da Nang · Multi-tenant SaaS POS
+//  Kiến trúc: Platform B2B2C
+//
+//  Branches/{branchId}            → Thông tin quán (partner)
+//  Branches/{branchId}/Menu       → Menu độc lập của quán
+//  Branches/{branchId}/Orders     → Đơn hàng của quán
+//  Branches/{branchId}/Staff      → Phân quyền nhân viên
+//  Branches/{branchId}/Vouchers   → Mã giảm giá của quán
+//  Branches/{branchId}/Settings   → Cài đặt quán
+//  Branches/{branchId}/Invoices   → Lịch sử hoá đơn
+//  GlobalStats                    → Thống kê nền tảng (HQ only)
+//
+//  Roles:
+//  - Super Admin (HQ): chaysaigon@gmail.com — toàn quyền
+//  - Partner Admin:    role == "admin" trong Staff/{email}
+//  - Cashier:          role == "cashier" trong Staff/{email}
+//  - Guest (khách):    unauthenticated
+// ═══════════════════════════════════════════════════════════════
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ────────────────────────────────────────────────────────
+    //  HELPER FUNCTIONS
+    // ────────────────────────────────────────────────────────
+
+    function authed() {
+      return request.auth != null;
+    }
+
+    function isSuperAdmin() {
+      return authed()
+          && request.auth.token.email == "chaysaigon@gmail.com";
+    }
+
+    // Kiểm tra user có trong Staff của branch này không
+    function isMember(branchId) {
+      return authed()
+          && exists(/databases/$(database)/documents/Branches/$(branchId)/Staff/$(request.auth.token.email));
+    }
+
+    function getRole(branchId) {
+      return get(/databases/$(database)/documents/Branches/$(branchId)/Staff/$(request.auth.token.email)).data.role;
+    }
+
+    // Admin của branch (Super Admin luôn được coi là admin)
+    function isAdmin(branchId) {
+      return isSuperAdmin()
+          || (isMember(branchId) && getRole(branchId) == "admin");
+    }
+
+    function isCashier(branchId) {
+      return isMember(branchId) && getRole(branchId) == "cashier";
+    }
+
+    // Bất kỳ nhân viên nào thuộc branch (admin hoặc cashier)
+    function isStaff(branchId) {
+      return isSuperAdmin() || isMember(branchId);
+    }
+
+    // Cashier chỉ được update 2 trường: status + updatedAt
+    function validStatusOnly() {
+      return request.resource.data.diff(resource.data)
+          .affectedKeys().hasOnly(['status', 'updatedAt']);
+    }
+
+    function validStatus(s) {
+      return s in [
+        'pending', 'paid', 'preparing',
+        'delivering', 'delivered', 'completed', 'cancelled'
+      ];
+    }
+
+    // Validate đơn từ POS (cashier hoặc admin tạo tại quán)
+    function validPOSOrderCreate() {
+      let d = request.resource.data;
+      return d.keys().hasOnly([
+        'items', 'subtotal', 'vat', 'discount', 'total',
+        'paymentMethod', 'orderType', 'voucherCode',
+        'status', 'cashierEmail', 'createdAt', 'updatedAt'
+      ]) && validStatus(d.status);
+    }
+
+    // Validate đơn từ web/marketplace (khách vãng lai)
+    function validGuestOrderCreate() {
+      let d = request.resource.data;
+      return d.keys().hasOnly([
+        'items', 'subtotal', 'vat', 'discount', 'total',
+        'paymentMethod', 'orderType', 'deliveryType', 'voucherCode',
+        'customer', 'note', 'status', 'branchId',
+        'createdAt', 'updatedAt'
+      ])
+          && d.status == 'pending'
+          && d.orderType == 'weborder';
+    }
+
+    // Menu item chỉ cho phép ghi các trường hợp lệ
+    function validMenuItem() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['name', 'price'])
+          && d.price is number
+          && d.price >= 0;
+    }
+
+    // Branch info: chủ quán chỉ được update info, không được tự duyệt
+    function validBranchUpdate(branchId) {
+      // Partner Admin không được tự set isPartnerApproved = true
+      return isAdmin(branchId)
+          && (isSuperAdmin()
+              || !request.resource.data.diff(resource.data)
+                    .affectedKeys().hasAny(['isPartnerApproved']));
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  BRANCHES — Document chính của mỗi partner
+    // ────────────────────────────────────────────────────────
+    match /Branches/{branchId} {
+
+      // PUBLIC READ: Khách đọc để hiển thị trên Marketplace
+      allow read: if true;
+
+      // Super Admin tạo branch mới (khi duyệt hoặc batch import)
+      allow create: if isSuperAdmin();
+
+      // Update: Super Admin hoặc Partner Admin (nhưng không tự duyệt)
+      allow update: if isSuperAdmin()
+                 || validBranchUpdate(branchId);
+
+      allow delete: if isSuperAdmin();
+
+      // ── Menu — Thực đơn riêng của quán ──────────────────
+      match /Menu/{itemId} {
+        allow read:   if true;
+        allow create: if isAdmin(branchId) && validMenuItem();
+        allow update: if isAdmin(branchId);
+        allow delete: if isAdmin(branchId);
+      }
+
+      // ── Orders — Đơn hàng của quán ──────────────────────
+      match /Orders/{orderId} {
+        // Staff của quán đọc để xử lý đơn
+        // Super Admin đọc tất cả (read-only monitoring)
+        // Khách KHÔNG được đọc danh sách đơn (chỉ có thể tạo)
+        allow read: if isSuperAdmin() || isStaff(branchId);
+
+        // POS staff tạo đơn tại quán
+        // Khách vãng lai tạo weborder (không cần auth)
+        allow create: if (isStaff(branchId) && validPOSOrderCreate())
+                   || validGuestOrderCreate();
+
+        // UPDATE:
+        // - Super Admin: read-only theo SRS → KHÔNG cho update
+        // - Partner Admin: toàn quyền update trong branch của họ
+        // - Cashier: chỉ update status + updatedAt
+        allow update: if isAdmin(branchId)
+                   || (isCashier(branchId)
+                       && validStatusOnly()
+                       && validStatus(request.resource.data.status));
+
+        allow delete: if isAdmin(branchId);
+      }
+
+      // ── Staff — Phân quyền nhân viên ────────────────────
+      match /Staff/{staffEmail} {
+        // Admin xem tất cả staff; mỗi user xem hồ sơ của chính mình
+        allow read:   if isAdmin(branchId)
+                   || (authed() && request.auth.token.email == staffEmail);
+        allow create: if isAdmin(branchId);
+        allow update: if isAdmin(branchId);
+        allow delete: if isAdmin(branchId);
+      }
+
+      // ── Vouchers — Mã giảm giá ──────────────────────────
+      // Public read: khách cần đọc để validate khi đặt hàng
+      match /Vouchers/{voucherId} {
+        allow read:   if true;
+        allow create: if isAdmin(branchId);
+        allow update: if isAdmin(branchId);
+        allow delete: if isAdmin(branchId);
+      }
+
+      // ── Invoices — Lịch sử hoá đơn đã gửi ──────────────
+      match /Invoices/{invoiceId} {
+        allow read:   if isStaff(branchId);
+        allow create: if isStaff(branchId)
+                   && request.resource.data.sentBy == request.auth.token.email;
+        allow update: if isAdmin(branchId);
+        allow delete: if isAdmin(branchId);
+      }
+
+      // ── Settings — Cài đặt quán ─────────────────────────
+      match /Settings/{settingId} {
+        allow read:   if isStaff(branchId);
+        allow create: if isAdmin(branchId);
+        allow update: if isAdmin(branchId);
+        allow delete: if isAdmin(branchId);
+      }
+
+      // ── Chặn mọi sub-collection không được khai báo ──────
+      match /{unknown}/{docId} {
+        allow read, write: if false;
+      }
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  PARTNER REGISTRATION REQUESTS
+    //  Khách submit form đăng ký → ghi vào đây
+    //  Super Admin duyệt → tạo Branch thực sự
+    // ────────────────────────────────────────────────────────
+    match /PartnerRequests/{reqId} {
+      // Khách tạo request (unauthenticated hoặc authed đều được)
+      allow create: if request.resource.data.keys().hasAll([
+                        'restaurantName', 'ownerName',
+                        'email', 'phone', 'createdAt'
+                      ])
+                   && request.resource.data.status == 'pending';
+
+      // Chỉ Super Admin đọc và xử lý
+      allow read:   if isSuperAdmin();
+      allow update: if isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  GLOBAL STATS — Thống kê nền tảng (Super Admin only)
+    // ────────────────────────────────────────────────────────
+    match /GlobalStats/{docId} {
+      allow read:  if authed();
+      allow write: if isSuperAdmin();
+    }
+
+    // ────────────────────────────────────────────────────────
+    //  DEFAULT DENY — Chặn tất cả những gì không khớp
+    // ────────────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
