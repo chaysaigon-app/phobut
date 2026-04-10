@@ -199,14 +199,6 @@ service cloud.firestore {
         allow delete: if isAdmin(branchId);
       }
 
-      // ── Members — Thành viên Facebook Group ─────────────
-      match /Members/{memberId} {
-        allow read:   if isStaff(branchId);
-        allow create: if isAdmin(branchId);
-        allow update: if isAdmin(branchId);
-        allow delete: if isAdmin(branchId);
-      }
-
       // ── Chặn mọi sub-collection không được khai báo ──────
       match /{unknown}/{docId} {
         allow read, write: if false;
@@ -238,6 +230,13 @@ service cloud.firestore {
     match /GlobalStats/{docId} {
       allow read:  if authed();
       allow write: if isSuperAdmin();
+    }
+
+
+    // ── FBMembers — Thành viên Group Ăn Chay Đà Nẵng ──────────────
+    // Chỉ Super Admin quản lý, không thuộc chi nhánh nào
+    match /FBMembers/{memberId} {
+      allow read, write: if isSuperAdmin();
     }
 
     // ────────────────────────────────────────────────────────
