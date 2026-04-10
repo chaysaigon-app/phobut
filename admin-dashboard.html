@@ -172,6 +172,7 @@ input,select,textarea{font-family:var(--font);color:var(--txt);background:none}
     <button class="ni" onclick="goP('menu')"><span class="ico">🍽️</span>Thực đơn & Kho</button>
     <button class="ni" onclick="goP('staff')"><span class="ico">👥</span>Nhân viên</button>
     <button class="ni" onclick="goP('vouchers')"><span class="ico">🎟️</span>Voucher</button>
+    <button class="ni" onclick="goP('members')"><span class="ico">👤</span>Thành viên FB</button>
     <button class="ni" onclick="goP('settings')"><span class="ico">⚙️</span>Cài đặt Quán</button>
     <div class="ns" id="sa-section" style="display:none">Hệ thống HQ</div>
     <button class="ni" id="n-branches" style="display:none" onclick="goP('branches')"><span class="ico">🏢</span>Quản lý Đối tác</button>
@@ -353,7 +354,7 @@ window.onBrCh = () => {
 const PTITLES = {
   dashboard:'📊 Dashboard', orders:'📋 Đơn hàng',
   menu:'🍽️ Thực đơn & Kho', staff:'👥 Nhân viên',
-  vouchers:'🎟️ Voucher', settings:'⚙️ Cài đặt Quán',
+  vouchers:'🎟️ Voucher', members:'👤 Thành viên Facebook Group', settings:'⚙️ Cài đặt Quán',
   branches:'🏢 Quản lý Đối tác', requests:'📥 Yêu cầu đăng ký', import:'📦 Batch Import — Nhập hàng loạt'
 };
 
@@ -372,6 +373,7 @@ window.goP = async p => {
     else if (p==='menu')      await rMenu();
     else if (p==='staff')     await rStaff();
     else if (p==='vouchers')  await rVouchers();
+    else if (p==='members')   await rMembers();
     else if (p==='settings')  await rSettings();
     else if (p==='branches')  await rBranches();
     else if (p==='requests')  await rRequests();
@@ -1181,6 +1183,258 @@ window.doBatchImport = async () => {
       ${results.failed.length ? `<div style="margin-top:8px;font-size:11px;color:var(--red)">Lỗi:<br>${results.failed.join('<br>')}</div>` : ''}
     </div>`;
   btn.disabled = false;
+};
+
+// ════════════════════════════════════════════════════════
+//  MEMBERS — Quản lý thành viên Facebook Group
+// ════════════════════════════════════════════════════════
+function mDaysLeft(expire) {
+  if (!expire) return -999;
+  return Math.round((new Date(expire) - new Date(new Date().toISOString().slice(0,10))) / 86400000);
+}
+function mStatus(expire) {
+  const d = mDaysLeft(expire);
+  if (d < 0) return 'expired';
+  if (d <= 7) return 'warning';
+  return 'active';
+}
+function mFmtDate(s) {
+  if (!s) return '—';
+  const [y,m,d] = s.split('-'); return `${d}/${m}/${y}`;
+}
+function mAddMonths(dateStr, months) {
+  const d = new Date(dateStr);
+  d.setMonth(d.getMonth() + parseInt(months||1));
+  return d.toISOString().slice(0,10);
+}
+function mRole(expire) {
+  return mStatus(expire) === 'expired' ? 'Thành viên thường' : 'Người đóng góp';
+}
+
+async function rMembers() {
+  if (!curBrId || curBrId === 'all') {
+    document.getElementById('pg-c').innerHTML = `<div class="cvd" style="text-align:center;padding:40px;color:var(--txt2)">
+      <div style="font-size:32px;margin-bottom:12px">👤</div>
+      <div style="font-size:15px;font-weight:700">Chọn một chi nhánh để quản lý thành viên</div></div>`;
+    return;
+  }
+
+  document.getElementById('pg-acts').innerHTML = `
+    <button class="hdr-btn" onclick="mExportCSV()">⬇ Xuất CSV</button>
+    <button class="bs-acc" onclick="openAddMember()">＋ Thêm thành viên</button>`;
+
+  const snap = await getDocs(collection(db,'Branches',curBrId,'Members'));
+  const members = snap.docs.map(d => ({id:d.id,...d.data()}));
+  members.sort((a,b) => mDaysLeft(a.expire) - mDaysLeft(b.expire));
+
+  const total   = members.length;
+  const active  = members.filter(m => mStatus(m.expire)==='active').length;
+  const warning = members.filter(m => mStatus(m.expire)==='warning').length;
+  const expired = members.filter(m => mStatus(m.expire)==='expired').length;
+
+  const alertHtml = (expired > 0 || warning > 0) ? `
+    <div style="background:var(--red-d);border:1px solid var(--red);border-radius:var(--r);padding:11px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;animation:mPulse 2s ease-in-out infinite">
+      <span style="font-size:18px">🚨</span>
+      <div style="flex:1">
+        <div style="font-weight:700;color:var(--red);font-size:13px">${expired} người hết hạn, ${warning} người sắp hết hạn</div>
+        <div style="font-size:11px;color:var(--txt2);margin-top:2px">Cần hạ role xuống "Thành viên thường" trên Facebook Group</div>
+      </div>
+    </div>` : '';
+
+  const filterBtns = `
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+      <button class="df-btn mf-btn" style="font-size:11px" data-f="all" onclick="mSetFilter('all',this)">Tất cả (${total})</button>
+      <button style="background:var(--grn-d);border:1px solid var(--grn);color:var(--grn);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer" data-f="active" onclick="mSetFilter('active',this)">Còn hạn (${active})</button>
+      <button style="background:var(--ylw-d);border:1px solid var(--ylw);color:var(--ylw);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer" data-f="warning" onclick="mSetFilter('warning',this)">Sắp hết (${warning})</button>
+      <button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer" data-f="expired" onclick="mSetFilter('expired',this)">Hết hạn (${expired})</button>
+      <input id="m-search" placeholder="🔍 Tìm tên, FB..." style="margin-left:auto;background:var(--s3);border:1px solid var(--brd);border-radius:8px;padding:5px 10px;color:var(--txt);font-size:12px;outline:none;min-width:170px" oninput="mRenderTable()" />
+    </div>`;
+
+  window._mAll = members;
+  window._mFilter = 'all';
+
+  document.getElementById('pg-c').innerHTML = `
+  <style>@keyframes mPulse{0%,100%{border-color:rgba(255,71,102,.3)}50%{border-color:rgba(255,71,102,.8)}}</style>
+  <div class="kg" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kc or"><div class="ki">👥</div><div class="kl">Tổng</div><div class="kv">${total}</div><div class="ks">thành viên</div></div>
+    <div class="kc gr"><div class="ki">✅</div><div class="kl">Còn hạn</div><div class="kv" style="color:var(--grn)">${active}</div><div class="ks">Người đóng góp</div></div>
+    <div class="kc" style="border-top:3px solid var(--ylw)"><div class="ki">⏰</div><div class="kl">Sắp hết hạn</div><div class="kv" style="color:var(--ylw)">${warning}</div><div class="ks">≤ 7 ngày</div></div>
+    <div class="kc re"><div class="ki">🚫</div><div class="kl">Hết hạn</div><div class="kv" style="color:var(--red)">${expired}</div><div class="ks">Thành viên thường</div></div>
+  </div>
+  ${alertHtml}
+  <div class="cvd">
+    ${filterBtns}
+    <div style="overflow-x:auto"><table class="dt" id="m-table">
+      <thead><tr>
+        <th>Thành viên</th><th>Ngày TT</th><th>Hết hạn</th>
+        <th>Còn lại</th><th>Trạng thái</th><th>Vai trò FB</th><th>Giá</th><th>Hành động</th>
+      </tr></thead>
+      <tbody id="m-tbody"></tbody>
+    </table></div>
+  </div>`;
+
+  mRenderTable();
+}
+
+window.mSetFilter = (f, btn) => {
+  window._mFilter = f;
+  document.querySelectorAll('[data-f]').forEach(b => {
+    b.style.background = ''; b.style.opacity = '0.6';
+  });
+  if (btn) { btn.style.opacity = '1'; }
+  mRenderTable();
+};
+
+window.mRenderTable = () => {
+  const all = window._mAll || [];
+  const f   = window._mFilter || 'all';
+  const q   = (document.getElementById('m-search')?.value || '').toLowerCase();
+  let list  = all.filter(m => f === 'all' || mStatus(m.expire) === f);
+  if (q) list = list.filter(m => (m.name||'').toLowerCase().includes(q) || (m.fb||'').toLowerCase().includes(q));
+
+  const tbody = document.getElementById('m-tbody');
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--txt3)">Không có thành viên nào</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(m => {
+    const d  = mDaysLeft(m.expire);
+    const st = mStatus(m.expire);
+    const dColor = d < 0 ? 'var(--red)' : d <= 7 ? 'var(--ylw)' : 'var(--grn)';
+    const dLabel = d < 0 ? `${Math.abs(d)} ngày trước` : `+${d} ngày`;
+    const stBadge = st === 'expired'
+      ? `<span class="bdg bins">Hết hạn</span>`
+      : st === 'warning'
+      ? `<span class="bdg bpnd">Sắp hết</span>`
+      : `<span class="bdg bact">Còn hạn</span>`;
+    const roleBadge = st === 'expired'
+      ? `<span class="bdg bins" style="font-size:10px">Thành viên thường</span>`
+      : `<span class="bdg badm" style="font-size:10px">Người đóng góp</span>`;
+    const price = m.price ? m.price.toLocaleString('vi-VN') + 'đ' : '—';
+
+    return `<tr>
+      <td>
+        <div style="font-weight:600;color:var(--txt)">${m.name||'—'}</div>
+        <div style="font-size:11px;color:var(--blu);margin-top:2px">${m.fb ? `<a href="${m.fb.startsWith('http')?m.fb:'https://'+m.fb}" target="_blank" style="color:var(--blu);text-decoration:none">${m.fb}</a>` : '—'}</div>
+        ${m.note ? `<div style="font-size:10px;color:var(--txt3);margin-top:1px">${m.note}</div>` : ''}
+      </td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--txt2)">${mFmtDate(m.paid)}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--txt2)">${mFmtDate(m.expire)}</td>
+      <td style="font-family:var(--mono);font-size:12px;font-weight:700;color:${dColor}">${dLabel}</td>
+      <td>${stBadge}</td>
+      <td>${roleBadge}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--acc)">${price}</td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button style="background:var(--grn-d);border:1px solid var(--grn);color:var(--grn);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;cursor:pointer" onclick="mRenew('${m.id}')">↻ Gia hạn</button>
+          <button style="background:var(--s3);border:1px solid var(--brd);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="mEdit('${m.id}')">✏️</button>
+          <button style="background:var(--red-d);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="mDel('${m.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+};
+
+// ── Add Member Modal ──
+window.openAddMember = () => {
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('mod-c').innerHTML = `
+    <h3>➕ Thêm thành viên mới</h3>
+    <div class="fg">
+      <div class="ff"><label>Họ và tên *</label><input id="mf-name" class="ff" placeholder="Nguyễn Văn A" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none"></div>
+      <div class="ff"><label>Link Facebook</label><input id="mf-fb" placeholder="https://facebook.com/..." style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Ngày thanh toán *</label><input id="mf-paid" type="date" value="${today}" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Số tháng</label><input id="mf-months" type="number" min="1" max="24" value="1" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Giá (VNĐ)</label><input id="mf-price" type="number" placeholder="199000" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Ghi chú</label><input id="mf-note" placeholder="Tuỳ chọn" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+    </div>
+    <div class="fa">
+      <button class="fcn" onclick="closeMo2()">Huỷ</button>
+      <button class="fsv" onclick="mSave(null)">Lưu thành viên</button>
+    </div>`;
+  document.getElementById('mo').classList.add('open');
+};
+
+window.mEdit = async (id) => {
+  const snap = await getDoc(doc(db,'Branches',curBrId,'Members',id));
+  if (!snap.exists()) return;
+  const m = snap.data();
+  document.getElementById('mod-c').innerHTML = `
+    <h3>✏️ Chỉnh sửa thành viên</h3>
+    <div class="fg">
+      <div class="ff"><label>Họ và tên *</label><input id="mf-name" value="${m.name||''}" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Link Facebook</label><input id="mf-fb" value="${m.fb||''}" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Ngày thanh toán *</label><input id="mf-paid" type="date" value="${m.paid||''}" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Số tháng</label><input id="mf-months" type="number" min="1" max="24" value="${m.months||1}" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Giá (VNĐ)</label><input id="mf-price" type="number" value="${m.price||''}" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+      <div class="ff"><label>Ghi chú</label><input id="mf-note" value="${m.note||''}" style="background:var(--s3);border:1px solid var(--brd);border-radius:var(--r);padding:9px 12px;color:var(--txt);font-size:13px;outline:none;width:100%"></div>
+    </div>
+    <div class="fa">
+      <button class="fcn" onclick="closeMo2()">Huỷ</button>
+      <button class="fsv" onclick="mSave('${id}')">Lưu thay đổi</button>
+    </div>`;
+  document.getElementById('mo').classList.add('open');
+};
+
+window.mSave = async (id) => {
+  const name   = document.getElementById('mf-name')?.value?.trim();
+  const fb     = document.getElementById('mf-fb')?.value?.trim();
+  const paid   = document.getElementById('mf-paid')?.value;
+  const months = parseInt(document.getElementById('mf-months')?.value) || 1;
+  const price  = parseInt(document.getElementById('mf-price')?.value) || 0;
+  const note   = document.getElementById('mf-note')?.value?.trim();
+  if (!name || !paid) { showT('Nhập tên và ngày thanh toán','err'); return; }
+  const expire = mAddMonths(paid, months);
+  const data = { name, fb, paid, expire, months, price, note, updatedAt: serverTimestamp() };
+  try {
+    if (id) {
+      await updateDoc(doc(db,'Branches',curBrId,'Members',id), data);
+      showT('✅ Đã cập nhật thành viên','ok');
+    } else {
+      await addDoc(collection(db,'Branches',curBrId,'Members'), { ...data, createdAt: serverTimestamp() });
+      showT('✅ Đã thêm thành viên mới','ok');
+    }
+    closeMo2();
+    await rMembers();
+  } catch(e) { showT('Lỗi: ' + e.message,'err'); }
+};
+
+window.mRenew = async (id) => {
+  const snap = await getDoc(doc(db,'Branches',curBrId,'Members',id));
+  if (!snap.exists()) return;
+  const m = snap.data();
+  const today  = new Date().toISOString().slice(0,10);
+  const expire = mAddMonths(today, m.months || 1);
+  await updateDoc(doc(db,'Branches',curBrId,'Members',id), { paid: today, expire, updatedAt: serverTimestamp() });
+  showT(`✅ Đã gia hạn ${m.name} đến ${mFmtDate(expire)}`,'ok');
+  await rMembers();
+};
+
+window.mDel = async (id) => {
+  if (!confirm('Xoá thành viên này?')) return;
+  await deleteDoc(doc(db,'Branches',curBrId,'Members',id));
+  showT('🗑 Đã xoá','ok');
+  await rMembers();
+};
+
+window.mExportCSV = () => {
+  const all = window._mAll || [];
+  const header = ['Tên','Facebook','Ngày TT','Ngày HH','Còn lại','Trạng thái','Vai trò FB','Giá','Ghi chú'];
+  const rows = all.map(m => {
+    const d  = mDaysLeft(m.expire);
+    const st = mStatus(m.expire);
+    const stL = st==='expired'?'Hết hạn':st==='warning'?'Sắp hết':'Còn hạn';
+    return [m.name,m.fb||'',mFmtDate(m.paid),mFmtDate(m.expire),d,stL,mRole(m.expire),m.price||'',m.note||''];
+  });
+  const csv = [header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `thanh-vien-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showT('⬇️ Đã xuất CSV','ok');
 };
 
 // ════════════════════════════════════════════════════════

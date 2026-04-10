@@ -199,6 +199,14 @@ service cloud.firestore {
         allow delete: if isAdmin(branchId);
       }
 
+      // ── Members — Thành viên Facebook Group ─────────────
+      match /Members/{memberId} {
+        allow read:   if isStaff(branchId);
+        allow create: if isAdmin(branchId);
+        allow update: if isAdmin(branchId);
+        allow delete: if isAdmin(branchId);
+      }
+
       // ── Chặn mọi sub-collection không được khai báo ──────
       match /{unknown}/{docId} {
         allow read, write: if false;
